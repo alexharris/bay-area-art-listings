@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Art Listings",
-  description: "A list of art",
+  description: "A list of art shows",
 };
 
 export default function RootLayout({ children }) {

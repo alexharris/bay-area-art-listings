@@ -1,5 +1,6 @@
 
 import DisplayListings from "./components/displayListings";
+import GetDataFromSheet from "./components/getDataFromSheet";
 
 export default function Home() {
   return (

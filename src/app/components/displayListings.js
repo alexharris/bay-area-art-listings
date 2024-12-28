@@ -41,7 +41,7 @@ export default function displayListings() {
             sortedListings = listings.sort((a, b) => a.Artist.localeCompare(b.Artist));
 
         } else if (sortType === 'date') {
-            sortedListings = listings.sort((a, b) => new Date(a.Start + ', 2003') - new Date(b.Start + ', 2003'))
+            sortedListings = listings.sort((a, b) => new Date(a.Start.replace(/,/g, '\\,')) - new Date(b.Start.replace(/,/g, '\\,')))
         }
     }    
 
