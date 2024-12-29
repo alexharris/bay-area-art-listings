@@ -47,9 +47,10 @@ export default function displayListings() {
 
     return (
         <>
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-row gap-4 ">
+            <button className={sortType === "date" ? 'underline' : ''} onClick={() => setSortType('date')}>Start Date</button>
                 <button className={sortType === "alphabetical" ? 'underline' : ''} onClick={() => setSortType('alphabetical')}>Alphabetical</button>
-                <button className={sortType === "date" ? 'underline' : ''} onClick={() => setSortType('date')}>Start Date</button>
+                
                 <label>
                     <input 
                         type="checkbox" 
@@ -59,11 +60,11 @@ export default function displayListings() {
                     Highlights Only
                 </label>
             </div>
-            <ul>
+            <ul className="w-full">
                 {sortedListings
                     .filter(item => highlightsOnly ? item.Highlight : true)
                     .map((item, index) => (
-                        <li className="border-b border-dashed border-black py-4" key={index}>
+                        <li className="border-b border-dashed border-black py-4 w-full" key={index}>
                             <h2 className="font-bold">{item.Artist} {item.Highlight && '★'}</h2>
                             <div>{item.Start} - {item.End}</div>
                             <div></div>
