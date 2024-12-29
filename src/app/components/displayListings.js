@@ -41,16 +41,15 @@ export default function displayListings() {
             sortedListings = listings.sort((a, b) => a.Artist.localeCompare(b.Artist));
 
         } else if (sortType === 'date') {
-            sortedListings = listings.sort((a, b) => new Date(a.Start.replace(/,/g, '\\,')) - new Date(b.Start.replace(/,/g, '\\,')))
+            sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start))
         }
     }    
 
     return (
         <>
             <div className="flex flex-row gap-4 ">
-            <button className={sortType === "date" ? 'underline' : ''} onClick={() => setSortType('date')}>Start Date</button>
+                <button className={sortType === "date" ? 'underline' : ''} onClick={() => setSortType('date')}>Start Date</button>
                 <button className={sortType === "alphabetical" ? 'underline' : ''} onClick={() => setSortType('alphabetical')}>Alphabetical</button>
-                
                 <label>
                     <input 
                         type="checkbox" 
@@ -65,7 +64,7 @@ export default function displayListings() {
                     .filter(item => highlightsOnly ? item.Highlight : true)
                     .map((item, index) => (
                         <li className="border-b border-dashed border-black py-4 w-full" key={index}>
-                            <h2 className="font-bold">{item.Artist} {item.Highlight && '★'}</h2>
+                            <h2 className="font-bold">{item.Highlight && '★'} {item.Artist} {item.Event} @ {item.Location}</h2>
                             <div>{item.Start} - {item.End}</div>
                             <div></div>
                         <button onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
