@@ -42,6 +42,15 @@ export default function displayListings() {
 
         } else if (sortType === 'date') {
             sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start))
+        } else if (sortType === 'thisweek') {
+            sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start))
+        const now = new Date();
+        const nextWeek = new Date();
+        nextWeek.setDate(now.getDate() + 7);
+        sortedListings = listings.filter(item => {
+            const startDate = new Date(item.Start);
+            return startDate >= now && startDate <= nextWeek;
+        });
         }
     }    
 
@@ -50,6 +59,7 @@ export default function displayListings() {
             <div className="flex flex-row gap-4 ">
                 <button className={sortType === "date" ? 'underline' : ''} onClick={() => setSortType('date')}>Start Date</button>
                 <button className={sortType === "alphabetical" ? 'underline' : ''} onClick={() => setSortType('alphabetical')}>Alphabetical</button>
+                <button className={sortType === "thisweek" ? 'underline' : ''} onClick={() => setSortType('thisweek')}>This week</button>
                 <label>
                     <input 
                         type="checkbox" 
