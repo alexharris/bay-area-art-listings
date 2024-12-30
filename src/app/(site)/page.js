@@ -1,5 +1,5 @@
 
-import DisplayListings from "./components/displayListings";
+import DisplayListings from "../components/displayListings";
 
 export default function Home() {
   return (
