@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import getListings from './getListings';
+import CalendarLink from './calendarLink';
 
 
 export default function displayListings() {
@@ -76,19 +77,21 @@ export default function displayListings() {
                         <li className="border-b border-dashed border-black py-4 w-full" key={index}>
                             <h2 className="font-bold">{item.Highlight && '★'} {item.Artist} {item.Event} @ {item.Location}</h2>
                             <div>{item.Start} - {item.End}</div>
-                            <div></div>
                         <button onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
                             {showDetails[index] ? 'Hide Details' : 'Show Details'}
                         </button>
                         {showDetails[index] && (
-                            <div className="border-t border-dashed border-gray-300 pt-2 mt-2">
-                                <div>End Date: {item.End}</div>
-                                <div>Event: {item.Event}</div>
-                                <div>Location: {item.Location}</div>
-                                <div>Address: {item.Address}</div>
-                                <div>URL: <a href={item.URL}>{item.URL}</a></div>
-                                <div>Highlight: {item.Highlight}</div>
-                                <div>Notes: {item.Notes}</div>
+                                <div className="border-t border-dashed border-gray-300 pt-2 mt-2">
+                                    <div className="prose">
+                                    <div>End Date: {item.End}</div>
+                                    <div>Event: {item.Event}</div>
+                                    <div>Location: {item.Location}</div>
+                                    <div>Address: {item.Address}</div>
+                                    <div>URL: <a href={item.URL}>{item.URL}</a></div>
+                                    <div>Highlight: {item.Highlight}</div>
+                                    <div>Notes: {item.Notes}</div>
+                                    <CalendarLink listing={item} />
+                                </div>
                             </div>
                         )}
                         </li>
