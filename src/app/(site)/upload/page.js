@@ -1,20 +1,16 @@
-'use client';
-
 import React from 'react';
 import GetDataFromSheet from '../../components/getDataFromSheet';
 import DeleteAllListings from '../../components/deleteAllListings';
-import { useSearchParams } from 'next/navigation'
 
-
-function UploadPage() {
-    
-    const searchParams = useSearchParams()
+export default async function Upload({ searchParams }) {
+    const enteredPassword = await searchParams;
 
     let isAuthorized = false;
-    if(searchParams.get('password') === 'takethewaters') {
+    let errorMessage = '';
+    if (enteredPassword.password === process.env.UPLOAD_PASSWORD) {
         isAuthorized = true;
-    } else {
-        isAuthorized = false;
+    } else if (enteredPassword.password) {
+        errorMessage = 'Incorrect password';
     }
 
     return (
@@ -31,6 +27,7 @@ function UploadPage() {
                         />
                         <button type="submit" className="p-2 bg-black text-white">Submit</button>
                     </form>
+                    {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
                 </div>
             ) : (
                 <>
@@ -41,5 +38,3 @@ function UploadPage() {
         </div>
     );
 };
-
-export default UploadPage;
