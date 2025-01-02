@@ -1,9 +1,21 @@
+'use client';
+
 import React from 'react';
 import GetDataFromSheet from '../../components/getDataFromSheet';
 import DeleteAllListings from '../../components/deleteAllListings';
+import { useSearchParams } from 'next/navigation'
 
-const UploadPage = ({ searchParams }) => {
-    const isAuthorized = searchParams?.password === 'takethewater';
+
+function UploadPage() {
+    
+    const searchParams = useSearchParams()
+
+    let isAuthorized = false;
+    if(searchParams.get('password') === 'takethewaters') {
+        isAuthorized = true;
+    } else {
+        isAuthorized = false;
+    }
 
     return (
         <div className="p-4">
