@@ -6,6 +6,10 @@ export const listingType = defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'Event',
+      type: 'string',
+    }),
+    defineField({
       name: 'Artist',
       type: 'string',
     }),
@@ -19,10 +23,6 @@ export const listingType = defineType({
     }),
     defineField({
       name: 'End',
-      type: 'string',
-    }),
-    defineField({
-      name: 'Event',
       type: 'string',
     }),
     defineField({
