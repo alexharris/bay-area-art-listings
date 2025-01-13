@@ -2,8 +2,16 @@ import React from 'react';
 import GetDataFromSheet from '../../components/getDataFromSheet';
 import DeleteAllListings from '../../components/deleteAllListings';
 
-const UploadPage = ({ searchParams }) => {
-    const isAuthorized = searchParams?.password === 'takethewater';
+export default async function Upload({ searchParams }) {
+    const enteredPassword = await searchParams;
+
+    let isAuthorized = false;
+    let errorMessage = '';
+    if (enteredPassword.password === process.env.UPLOAD_PASSWORD) {
+        isAuthorized = true;
+    } else if (enteredPassword.password) {
+        errorMessage = 'Incorrect password';
+    }
 
     return (
         <div className="p-4">
@@ -19,6 +27,7 @@ const UploadPage = ({ searchParams }) => {
                         />
                         <button type="submit" className="p-2 bg-black text-white">Submit</button>
                     </form>
+                    {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
                 </div>
             ) : (
                 <>
@@ -29,5 +38,3 @@ const UploadPage = ({ searchParams }) => {
         </div>
     );
 };
-
-export default UploadPage;
