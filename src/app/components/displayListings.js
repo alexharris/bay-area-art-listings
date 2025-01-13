@@ -59,8 +59,8 @@ export default function displayListings() {
         <>
             <div className="flex flex-col md:flex-row justify-start gap-4 items-start border border-black p-4">
                 <button className={sortType === "date" ? 'underline' : ''} onClick={() => setSortType('date')}>Start Date</button>
-                <button className={sortType === "alphabetical" ? 'underline' : ''} onClick={() => setSortType('alphabetical')}>Alphabetical</button>
-                <button className={sortType === "thisweek" ? 'underline' : ''} onClick={() => setSortType('thisweek')}>This week</button>
+                {/* <button className={sortType === "alphabetical" ? 'underline' : ''} onClick={() => setSortType('alphabetical')}>Alphabetical</button> */}
+                <button className={sortType === "thisweek" ? 'underline' : ''} onClick={() => setSortType('thisweek')}>Opening This Week</button>
                 <label>
                     <input 
                         type="checkbox" 

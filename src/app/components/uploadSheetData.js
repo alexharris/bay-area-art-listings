@@ -1,14 +1,22 @@
-import {createClient} from '@sanity/client'
+import { createClient } from '@sanity/client';
 
-const client = createClient({
-  projectId: 'ride9vgj',
-  dataset: 'production',
-  token: 'skNjKTdtZLHyHrjFnNjL76asMf1OcDYvDYcsvEdLNjErzxN4HTDhBvYJl1QMoUXYGqleUZPMbz0z0BuVJyWV6aZuGcnQIw949ecUS9LMptAX6nCQajtEFT7MnlvNfQJ3kj3amgc1aTW9dqYTqgZ9zE8GcdhvRB4GRYrX12ZeMFvjRtA3Tthd',
-  useCdn: false,
-  apiVersion: 'v2022-03-07'
-});
+async function createSanityClient() {
+  return createClient({
+    projectId: 'ride9vgj',
+    dataset: 'production',
+    token: process.env.SANITY_STUDIO_API_READ_TOKEN,
+    useCdn: false,
+    apiVersion: 'v2022-03-07'
+  });
+}
 
 export default async function uploadSheetData(data) {
+
+  const client = await createSanityClient()
+
+  console.log(client)
+  console.log(process.env.SANITY_STUDIO_API_READ_TOKEN)
+
   try {
     for (const item of data) {
       const response = await client.create({
@@ -20,4 +28,8 @@ export default async function uploadSheetData(data) {
   } catch (error) {
     console.error('Upload failed:', error);
   }
+
+  setTimeout(() => {
+    console.log(process.env.SANITY_STUDIO_API_READ_TOKEN);
+  }, 10000);
 }
