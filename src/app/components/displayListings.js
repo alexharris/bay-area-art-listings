@@ -75,7 +75,7 @@ export default function displayListings() {
                     .filter(item => highlightsOnly ? item.Highlight : true)
                     .map((item, index) => (
                         <li className="border-b border-dashed border-black py-4 w-full" key={index}>
-                            <h2 className="font-bold">{item.Highlight && '★'} {item.Artist} {item.Event} @ {item.Location}</h2>
+                            <h2 className="font-bold">{item.Highlight && '★'} {item.Event} @ {item.Location}</h2>
                             <div>{item.Start} - {item.End}</div>
                             <button onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
                                 {showDetails[index] ? 'Hide Details' : 'Show Details'}
