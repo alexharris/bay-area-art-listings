@@ -5,6 +5,7 @@ import getListings from './getListings';
 import CalendarLink from './calendarLink';
 
 
+
 export default function displayListings() {
   
     const [sortType, setSortType] = useState('date');
@@ -28,6 +29,8 @@ export default function displayListings() {
             }
         }
         fetchData();
+
+
     }, []);  
 
 
@@ -37,7 +40,6 @@ export default function displayListings() {
     }
 
     function sortListings() {
-        console.log('sort listings called')
         if (sortType === 'alphabetical') {
             sortedListings = listings.sort((a, b) => a.Artist.localeCompare(b.Artist));
 
@@ -54,6 +56,8 @@ export default function displayListings() {
         });
         }
     }    
+
+
 
     return (
         <>
@@ -75,7 +79,7 @@ export default function displayListings() {
                     .filter(item => highlightsOnly ? item.Highlight : true)
                     .map((item, index) => (
                         <li className="border-b border-dashed border-black py-4 w-full" key={index}>
-                            <h2 className="font-bold">{item.Highlight && '★'} {item.Event} @ {console.log(item.Location)}</h2>
+                            <h2 className="font-bold">{item.Highlight && '★'} {item.Event} @ {item.locationName}</h2>
                             <div>{item.Start} - {item.End}</div>
                             <button onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
                                 {showDetails[index] ? 'Hide Details' : 'Show Details'}
@@ -86,8 +90,8 @@ export default function displayListings() {
                                         <div>Start Date: {item.Start}</div>
                                         <div>End Date: {item.End}</div>
                                         <div>Event: {item.Event}</div>
-                                        <div>Location: {item.Location}</div>
-                                        <div>Address: {item.Address}</div>
+                                        <div>Location: {item.locationName}</div>
+                                        <div>Address: {item.locationAddress}</div>
                                         <div>URL: <a href={item.URL}>{item.URL}</a></div>
                                         <div>Highlight: {item.Highlight}</div>
                                         <div>Notes: {item.Notes}</div>

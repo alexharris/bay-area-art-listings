@@ -9,7 +9,22 @@ const client = createClient({
 
 export default async function getListings() {
   try {
+    // get the listing
     let data = await client.fetch('*[_type == "listing"]');
+
+    // get the locations reference by the listing
+    const locations = await Promise.all(data.map(async listing => {
+      const location = await client.fetch(`*[_type == "location" && _id == "${listing.Location._ref}"]`);
+      return location
+    }));
+
+    // combine them
+    data = data.map((listing, index) => ({
+      ...listing,
+      locationName: locations[index][0]?.Name || 'Unknown',
+      locationAddress: locations[index][0]?.Address || 'Unknown'
+    }));
+
     if(data.length > 0) {
         return data
     }
