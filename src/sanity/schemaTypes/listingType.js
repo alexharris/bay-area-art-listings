@@ -10,11 +10,11 @@ export const listingType = defineType({
       type: 'string',
     }),
     defineField({
-      name: 'Artist',
-      type: 'string',
-    }),
-    defineField({
       name: 'Start',
+      type: 'string',
+    }),    
+    defineField({
+      name: 'Artist',
       type: 'string',
     }),
     defineField({
@@ -31,7 +31,9 @@ export const listingType = defineType({
     }),
     defineField({
       name: 'Location',
-      type: 'string',
+      type: 'reference',
+      to: [{type: 'location'}],
+      weak: true,
     }),
     defineField({
       name: 'Notes',
