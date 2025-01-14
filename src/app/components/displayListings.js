@@ -87,13 +87,8 @@ export default function displayListings() {
                             {showDetails[index] && (
                                     <div className="border-t border-dashed border-gray-300 pt-2 mt-2">
                                         <div className="prose">
-                                        <div>Start Date: {item.Start}</div>
-                                        <div>End Date: {item.End}</div>
-                                        <div>Event: {item.Event}</div>
-                                        <div>Location: {item.locationName}</div>
-                                        <div>Address: {item.locationAddress}</div>
+                                        <div>{item.locationAddress}</div>
                                         <div>URL: <a href={item.URL}>{item.URL}</a></div>
-                                        <div>Highlight: {item.Highlight}</div>
                                         <div>Notes: {item.Notes}</div>
                                         <CalendarLink listing={item} />
                                     </div>

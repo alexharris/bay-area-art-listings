@@ -14,14 +14,6 @@ export const listingType = defineType({
       type: 'string',
     }),    
     defineField({
-      name: 'Artist',
-      type: 'string',
-    }),
-    defineField({
-      name: 'Address',
-      type: 'string',
-    }),
-    defineField({
       name: 'End',
       type: 'string',
     }),
