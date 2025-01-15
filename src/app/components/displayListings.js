@@ -12,6 +12,7 @@ export default function displayListings() {
     const [listings, setListings] = useState([]);
     const [highlightsOnly, setHighlightsOnly] = useState(false);
     const [showDetails, setShowDetails] = useState({});
+    const [searchTerm, setSearchTerm] = useState('');
 
     let sortedListings = [...listings];
 
@@ -47,36 +48,90 @@ export default function displayListings() {
             sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start))
         } else if (sortType === 'thisweek') {
             sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start))
-        const now = new Date();
-        const nextWeek = new Date();
-        nextWeek.setDate(now.getDate() + 7);
-        sortedListings = listings.filter(item => {
-            const startDate = new Date(item.Start);
-            return startDate >= now && startDate <= nextWeek;
-        });
+            const now = new Date();
+            const nextWeek = new Date();
+            nextWeek.setDate(now.getDate() + 7);
+            sortedListings = listings.filter(item => {
+                const startDate = new Date(item.Start);
+                return startDate >= now && startDate <= nextWeek;
+            });
+        } else if (sortType === 'thismonth') {
+            sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start))
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            sortedListings = listings.filter(item => {
+                const startDate = new Date(item.Start);
+                return startDate >= startOfMonth && startDate <= endOfMonth;
+            });
+        } else if (sortType === 'nextmonth') {
+            const now = new Date();
+            const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+            const endOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+            sortedListings = listings.filter(item => {
+                const startDate = new Date(item.Start);
+                return startDate >= startOfNextMonth && startDate <= endOfNextMonth;
+            });
+        } else if (sortType === 'closethisweek') {
+            const now = new Date();
+            const endOfWeek = new Date();
+            endOfWeek.setDate(now.getDate() + 7);
+            sortedListings = listings.filter(item => {
+                const endDate = new Date(item.End);
+                return endDate >= now && endDate <= endOfWeek;
+            });
+        } 
+        else if (sortType === 'closethismonth') {
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            sortedListings = listings.filter(item => {
+                const endDate = new Date(item.End);
+                return endDate >= startOfMonth && endDate <= endOfMonth;
+            });
         }
+        
     }    
-
-
 
     return (
         <>
-            <div className="flex flex-col md:flex-row justify-start gap-4 items-start border border-black p-4">
-                <button className={sortType === "date" ? 'underline' : ''} onClick={() => setSortType('date')}>Start Date</button>
-                {/* <button className={sortType === "alphabetical" ? 'underline' : ''} onClick={() => setSortType('alphabetical')}>Alphabetical</button> */}
-                <button className={sortType === "thisweek" ? 'underline' : ''} onClick={() => setSortType('thisweek')}>Opening This Week</button>
+            <div className="flex flex-col md:flex-row justify-start gap-4 items-start bg-gray-50 p-4 w-full">
+                <div className="flex flex-col">
+                    <label htmlFor="filterResults">Filter Results</label>
+                    <select id="filterResults" value={sortType} onChange={(e) => setSortType(e.target.value)} className="p-1 bg-white border">
+                        <option value="date" defaultValue>All</option>
+                        {/* <option value="alphabetical">Alphabetical</option> */}
+                        <option value="thisweek">Opening This Week</option>
+                        <option value="thismonth">Opening This Month</option>
+                        <option value="nextmonth">Opening Next Month</option>
+                        <option value="closethisweek">Closing This Week</option>
+                        <option value="closethismonth">Closing This Month</option>
+                    </select>
+                </div>
                 <label>
                     <input 
                         type="checkbox" 
+                        className="m-2"
                         checked={highlightsOnly} 
                         onChange={toggleHighlights} 
                     />
                     Highlights Only
                 </label>
+                <div className="flex flex-col">
+                    <label htmlFor="searchTerm">Search</label>
+                    <input 
+                        type="text" 
+                        id="searchTerm"
+                        className="p-1 border"
+                        value={searchTerm} 
+                        onChange={(e) => setSearchTerm(e.target.value)} 
+                    />
+                </div>
             </div>
             <ul className="w-full">
                 {sortedListings
                     .filter(item => highlightsOnly ? item.Highlight : true)
+                    .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
                     .map((item, index) => (
                         <li className="border-b border-dashed border-black py-4 w-full" key={index}>
                             <h2 className="font-bold">{item.Highlight && '★'} {item.Event} @ {item.locationName}</h2>
