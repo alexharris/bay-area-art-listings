@@ -13,6 +13,8 @@ export default function displayListings() {
     const [highlightsOnly, setHighlightsOnly] = useState(false);
     const [showDetails, setShowDetails] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [displayedResults, setDisplayedResults] = useState(0);
 
     let sortedListings = [...listings];
 
@@ -27,6 +29,8 @@ export default function displayListings() {
                 sortListings();
             } catch (error) {
                 console.error('Data retrieval failed:', error);
+            } finally {
+                setLoading(false);
             }
         }
         fetchData();
@@ -34,6 +38,12 @@ export default function displayListings() {
 
     }, []);  
 
+    useEffect(() => {
+        const filteredListings = sortedListings
+            .filter(item => highlightsOnly ? item.Highlight : true)
+            .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()));
+        setDisplayedResults(filteredListings.length);
+    }, [sortType, highlightsOnly, searchTerm, listings]);
 
     function toggleHighlights() {
         console.log('toggleHighlights called')
@@ -95,8 +105,8 @@ export default function displayListings() {
 
     return (
         <>
-            <div className="flex flex-col md:flex-row justify-start gap-4 items-start bg-gray-50 p-4 w-full">
-                <div className="flex flex-col">
+            <div className="flex flex-col items-start md:flex-row justify-start gap-4 items-start bg-gray-50 p-4 w-full">
+                <div className="flex flex-col p-2">
                     <label htmlFor="filterResults">Filter Results</label>
                     <select id="filterResults" value={sortType} onChange={(e) => setSortType(e.target.value)} className="p-1 bg-white border">
                         <option value="date" defaultValue>All</option>
@@ -108,16 +118,16 @@ export default function displayListings() {
                         <option value="closethismonth">Closing This Month</option>
                     </select>
                 </div>
-                <label>
+                <label className="p-2">
                     <input 
                         type="checkbox" 
-                        className="m-2"
+                        className="mr-2"
                         checked={highlightsOnly} 
                         onChange={toggleHighlights} 
                     />
                     Highlights Only
                 </label>
-                <div className="flex flex-col">
+                <div className="flex flex-col p-2">
                     <label htmlFor="searchTerm">Search</label>
                     <input 
                         type="text" 
@@ -127,32 +137,55 @@ export default function displayListings() {
                         onChange={(e) => setSearchTerm(e.target.value)} 
                     />
                 </div>
+                <button 
+                    onClick={() => {
+                        setSortType('date');
+                        setHighlightsOnly(false);
+                        setSearchTerm('');
+                    }} 
+                    className="p-2"
+                >
+                    Clear Filters
+                </button>
             </div>
-            <ul className="w-full">
-                {sortedListings
-                    .filter(item => highlightsOnly ? item.Highlight : true)
-                    .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
-                    .map((item, index) => (
-                        <li className="border-b border-dashed border-black py-4 w-full" key={index}>
-                            <h2 className="font-bold">{item.Highlight && '★'} {item.Event} @ {item.locationName}</h2>
-                            <div>{item.Start} - {item.End}</div>
-                            <button onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
-                                {showDetails[index] ? 'Hide Details' : 'Show Details'}
-                            </button>
-                            {showDetails[index] && (
-                                    <div className="border-t border-dashed border-gray-300 pt-2 mt-2">
-                                        <div className="prose">
-                                        <div>{item.locationAddress}</div>
-                                        <div>URL: <a href={item.URL}>{item.URL}</a></div>
-                                        <div>Notes: {item.Notes}</div>
-                                        <CalendarLink listing={item} />
-                                    </div>
-                                </div>
-                            )}
-                        </li>
-                    ))}                
 
-            </ul>
+            {loading ? (
+                <div className="spinner animate-spin text-3xl text-center w-full">
+                    🎨
+                </div>
+            ) : (
+                <>
+                    <div>
+                        <p>{displayedResults} results found</p>
+                    </div>                
+                    <ul className="w-full">
+                        {
+                            sortedListings
+                                .filter(item => highlightsOnly ? item.Highlight : true)
+                                .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
+                                .map((item, index) => (
+                                    <li className="border-b border-dashed border-black py-4 w-full" key={index}>
+                                        <h2 className="font-bold">{item.Highlight && '★'} {item.Event} @ {item.locationName}</h2>
+                                        <div>{item.Start} - {item.End}</div>
+                                        <button onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
+                                            {showDetails[index] ? 'Hide Details' : 'Show Details'}
+                                        </button>
+                                        {showDetails[index] && (
+                                            <div className="border-t border-dashed border-gray-300 pt-2 mt-2">
+                                                <div className="prose">
+                                                    <div>{item.locationAddress}</div>
+                                                    <div>URL: <a href={item.URL}>{item.URL}</a></div>
+                                                    <div>Notes: {item.Notes}</div>
+                                                    <CalendarLink listing={item} />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </li>
+                            ))
+                        }
+                    </ul>
+                </>
+            )}
         </>
     )
 }
