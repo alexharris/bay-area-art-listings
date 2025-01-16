@@ -1,21 +1,18 @@
-'use server';
+// 'use server';
 
 import {createClient} from '@sanity/client'
 
 const client = createClient({
   projectId: 'ride9vgj',
   dataset: 'production',
-  token: process.env.SANITY_API_WRITE_TOKEN,
+  token: process.env.NEXT_PUBLIC_SANITY_API_WRITE_TOKEN,
   useCdn: false,
   apiVersion: 'v2022-03-07'
 });
 
-
-
-export default async function uploadSheetData(data) {
-
-  let locationData = []
-  let newLocations = []
+export default async function uploadSheetData(data, updateProgress) {
+  let locationData = [];
+  let newLocations = [];
 
   // get all of the existing locations
   try {
@@ -23,18 +20,15 @@ export default async function uploadSheetData(data) {
   } catch (error) {
     console.error('Data retrieval failed:', error);
     throw error;
-  } 
+  }
 
   // go through the new items and get the locations
-
   for (const item of data) {
-    // check if the location in the item exists in the existing locations
-      newLocations.push(item['Location']);
+    newLocations.push(item['Location']);
   }
 
   newLocations = [...new Set(newLocations)];
-
-  console.log(newLocations)
+  console.log(newLocations);
 
   // add the new locations
   for (const location of newLocations) {
@@ -46,8 +40,8 @@ export default async function uploadSheetData(data) {
       const locationResponse = await client.create({
         _type: 'location',
         Name: location
-      })   
-      console.log('Data uploaded successfully:', locationResponse); 
+      });
+      console.log('Data uploaded successfully:', locationResponse);
     }
   }
 
@@ -61,10 +55,12 @@ export default async function uploadSheetData(data) {
   } catch (error) {
     console.error('Data retrieval failed:', error);
     throw error;
-  } 
-
+  }
 
   try {
+    let completed = 0;
+    const total = data.length;
+
     for (const item of data) {
       // check if the location in the item exists in the existing locations
 
@@ -72,22 +68,24 @@ export default async function uploadSheetData(data) {
     
       // remove the location because we are replacing it with a reference
       delete item['Location'];
-     
+
       const response = await client.create({
         _type: 'listing',
         Location: {
           _type: 'reference',
           _ref: locationId,
           _weak: true
-        },   
+        },
         ...item
       });
-      console.log('Data uploaded successfully:', response);
+      // console.log('Data uploaded successfully:', response);
+
+      completed++;
+      updateProgress(completed, total);
     }
   } catch (error) {
     console.error('Upload failed:', error);
   }
 
-  setTimeout(() => {
-  }, 10000);
+  setTimeout(() => {}, 10000);
 }
