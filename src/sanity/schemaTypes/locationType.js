@@ -14,8 +14,7 @@ export const locationType = defineType({
       type: 'string',
     }),
     defineField({
-      title: 'URL',
-      name: 'imageUrl',
+      name: 'Url',
       type: 'url'
     }),
     defineField({

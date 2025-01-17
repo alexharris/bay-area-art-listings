@@ -188,8 +188,9 @@ export default function displayListings() {
                                 .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
                                 .map((item, index) => (
                                     <li className="border-b border-dashed border-black py-4 w-full" key={index}>
-                                        <h2 className="font-bold">{item.Highlight && '★'} {item.Event} @ {item.locationName}</h2>
+                                        <h2 className="font-bold">{item.Highlight && '★'} {item.Event} @ <a href="">{item.locationName}</a></h2>
                                         <div>{item.Start} - {item.End}</div>
+                                        {item.locationUrl}
                                         <button onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
                                             {showDetails[index] ? 'Hide Details' : 'Show Details'}
                                         </button>
