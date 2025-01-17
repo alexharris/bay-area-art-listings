@@ -19,11 +19,12 @@ export default async function getListings() {
     }));
 
     // combine them
+    console.log(locations)
     data = data.map((listing, index) => ({
       ...listing,
       locationName: locations[index][0]?.Name || 'Unknown',
       locationAddress: locations[index][0]?.Address || 'Address Not Listed',
-      locationUrl: locations[index][0]?.URL || ''
+      locationUrl: locations[index][0]?.imageUrl || ''
     }));
 
     if(data.length > 0) {

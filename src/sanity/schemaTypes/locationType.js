@@ -14,9 +14,18 @@ export const locationType = defineType({
       type: 'string',
     }),
     defineField({
+      title: 'URL',
+      name: 'imageUrl',
+      type: 'url',
+      deprecated: {
+        reason: 'Use the "Website URL" field instead.'
+      },      
+    }),
+    defineField({
+      title: 'Website URL',
       name: 'Url',
       type: 'url'
-    }),
+    }),    
     defineField({
       name: 'Geolocation',
       type: 'geopoint',
