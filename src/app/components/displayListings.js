@@ -112,9 +112,21 @@ export default function displayListings() {
 
     return (
         <>
-            <div className="flex flex-col items-start md:flex-row justify-start gap-4 items-start bg-gray-50 p-4 w-full">
+        <div className="bg-gray-50 p-4 w-full flex flex-col">
+            <button 
+                onClick={() => {
+                    setSortType('date');
+                    setHighlightsOnly(false);
+                    setSearchTerm('');
+                    setSelectedLocation('');
+                }} 
+                className="place-self-end"
+            >
+                Clear All Filters
+            </button>
+            <div className="flex flex-col items-start md:flex-row flex-wrap justify-start gap-4">
                 <div className="flex flex-col p-2">
-                    <label htmlFor="filterResults">Filter Results</label>
+                    <label htmlFor="filterResults">Time</label>
                     <select id="filterResults" value={sortType} onChange={(e) => setSortType(e.target.value)} className="p-1 bg-white border">
                         <option value="date" defaultValue>All</option>
                         {/* <option value="alphabetical">Alphabetical</option> */}
@@ -125,27 +137,8 @@ export default function displayListings() {
                         <option value="closethismonth">Closing This Month</option>
                     </select>
                 </div>
-                <label className="p-2">
-                    <input 
-                        type="checkbox" 
-                        className="mr-2"
-                        checked={highlightsOnly} 
-                        onChange={toggleHighlights} 
-                    />
-                    Highlights Only
-                </label>
-                <div className="flex flex-col p-2">
-                    <label htmlFor="searchTerm">Search</label>
-                    <input 
-                        type="text" 
-                        id="searchTerm"
-                        className="p-1 border"
-                        value={searchTerm} 
-                        onChange={(e) => setSearchTerm(e.target.value)} 
-                    />
-                </div>
-                <div className="flex flex-col p-2">
-                    <label htmlFor="locationFilter">Filter by Location</label>
+                <div className="flex flex-col p-2 w-48">
+                    <label htmlFor="locationFilter">Venue</label>
                     <select 
                         id="locationFilter" 
                         onChange={(e) => setSelectedLocation(e.target.value)} 
@@ -156,21 +149,28 @@ export default function displayListings() {
                             <option key={index} value={location.Name}>{location.Name}</option>
                         ))}
                     </select>
-                </div>                
-                <button 
-                    onClick={() => {
-                        setSortType('date');
-                        setHighlightsOnly(false);
-                        setSearchTerm('');
-                        setSelectedLocation('');
-                    }} 
-                    className="p-2"
-                >
-                    Clear Filters
-                </button>
-
+                </div>                 
+                <label className="p-2">
+                    <input 
+                        type="checkbox" 
+                        className="mr-2"
+                        checked={highlightsOnly} 
+                        onChange={toggleHighlights} 
+                    />
+                    Highlights Only
+                </label>
+                <div className="flex flex-col p-2 grow">
+                    <label htmlFor="searchTerm">Search</label>
+                    <input 
+                        type="text" 
+                        id="searchTerm"
+                        className="p-1 border"
+                        value={searchTerm} 
+                        onChange={(e) => setSearchTerm(e.target.value)} 
+                    />
+                </div>
             </div>
-
+        </div>
             {loading ? (
                 <div className="spinner animate-spin text-3xl text-center w-full">
                     🎨
