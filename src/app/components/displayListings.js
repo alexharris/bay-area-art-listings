@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import getListings from './getListings';
+import getLocations from './getLocations';
 import CalendarLink from './calendarLink';
 
 
@@ -15,10 +16,13 @@ export default function displayListings() {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [displayedResults, setDisplayedResults] = useState(0);
+    const [locations, setLocations] = useState([]);
+    const [selectedLocation, setSelectedLocation] = useState('')
 
     let sortedListings = [...listings];
 
     sortListings();
+
 
     useEffect(() => {
         async function fetchData() {
@@ -27,6 +31,9 @@ export default function displayListings() {
                 setListings(data);
                 setSortType('date');
                 sortListings();
+                const locationData = await getLocations();
+                setLocations(locationData); 
+                
             } catch (error) {
                 console.error('Data retrieval failed:', error);
             } finally {
@@ -35,25 +42,25 @@ export default function displayListings() {
         }
         fetchData();
 
-
     }, []);  
 
     useEffect(() => {
         const filteredListings = sortedListings
             .filter(item => highlightsOnly ? item.Highlight : true)
+            .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
             .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()));
         setDisplayedResults(filteredListings.length);
-    }, [sortType, highlightsOnly, searchTerm, listings]);
+    }, [sortType, highlightsOnly, searchTerm, listings, selectedLocation]);
 
     function toggleHighlights() {
         console.log('toggleHighlights called')
         setHighlightsOnly(!highlightsOnly);
     }
 
+
     function sortListings() {
         if (sortType === 'alphabetical') {
             sortedListings = listings.sort((a, b) => a.Artist.localeCompare(b.Artist));
-
         } else if (sortType === 'date') {
             sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start))
         } else if (sortType === 'thisweek') {
@@ -137,16 +144,31 @@ export default function displayListings() {
                         onChange={(e) => setSearchTerm(e.target.value)} 
                     />
                 </div>
+                <div className="flex flex-col p-2">
+                    <label htmlFor="locationFilter">Filter by Location</label>
+                    <select 
+                        id="locationFilter" 
+                        onChange={(e) => setSelectedLocation(e.target.value)} 
+                        className="p-1 bg-white border"
+                    >
+                        <option value="">All Locations</option>
+                        {locations.map((location, index) => (
+                            <option key={index} value={location.Name}>{location.Name}</option>
+                        ))}
+                    </select>
+                </div>                
                 <button 
                     onClick={() => {
                         setSortType('date');
                         setHighlightsOnly(false);
                         setSearchTerm('');
+                        setSelectedLocation('');
                     }} 
                     className="p-2"
                 >
                     Clear Filters
                 </button>
+
             </div>
 
             {loading ? (
@@ -162,6 +184,7 @@ export default function displayListings() {
                         {
                             sortedListings
                                 .filter(item => highlightsOnly ? item.Highlight : true)
+                                .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
                                 .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
                                 .map((item, index) => (
                                     <li className="border-b border-dashed border-black py-4 w-full" key={index}>
