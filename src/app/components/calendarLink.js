@@ -1,6 +1,5 @@
 export default function calendarLink(data) {
     const listing = data.listing
-    console.log(listing.Event)
     return (
         <div>
             <a

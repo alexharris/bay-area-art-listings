@@ -64,10 +64,11 @@ export default function displayListings() {
         } else if (sortType === 'date') {
             sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start))
         } else if (sortType === 'thisweek') {
-            sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start))
+            sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start));
             const now = new Date();
             const nextWeek = new Date();
             nextWeek.setDate(now.getDate() + 7);
+            now.setDate(now.getDate() - 1);
             sortedListings = listings.filter(item => {
                 const startDate = new Date(item.Start);
                 return startDate >= now && startDate <= nextWeek;
@@ -77,6 +78,7 @@ export default function displayListings() {
             const now = new Date();
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
             const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            now.setDate(now.getDate() - 1);
             sortedListings = listings.filter(item => {
                 const startDate = new Date(item.Start);
                 return startDate >= startOfMonth && startDate <= endOfMonth;
@@ -85,6 +87,7 @@ export default function displayListings() {
             const now = new Date();
             const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
             const endOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+            now.setDate(now.getDate() - 1);
             sortedListings = listings.filter(item => {
                 const startDate = new Date(item.Start);
                 return startDate >= startOfNextMonth && startDate <= endOfNextMonth;
@@ -93,6 +96,7 @@ export default function displayListings() {
             const now = new Date();
             const endOfWeek = new Date();
             endOfWeek.setDate(now.getDate() + 7);
+            now.setDate(now.getDate() - 1);
             sortedListings = listings.filter(item => {
                 const endDate = new Date(item.End);
                 return endDate >= now && endDate <= endOfWeek;
@@ -102,9 +106,21 @@ export default function displayListings() {
             const now = new Date();
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
             const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            now.setDate(now.getDate() - 1);
             sortedListings = listings.filter(item => {
                 const endDate = new Date(item.End);
                 return endDate >= startOfMonth && endDate <= endOfMonth;
+            });
+        }
+        else if (sortType === 'tonight') {
+            sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start));
+            const now = new Date();
+            const tomorrow = new Date();
+            tomorrow.setDate(now.getDate());
+            now.setDate(now.getDate() - 1);
+            sortedListings = listings.filter(item => {
+                const startDate = new Date(item.Start);
+                return startDate >= now && startDate <= tomorrow;
             });
         }
         
@@ -130,6 +146,7 @@ export default function displayListings() {
                     <select id="filterResults" value={sortType} onChange={(e) => setSortType(e.target.value)} className="p-1 bg-white border">
                         <option value="date" defaultValue>All</option>
                         {/* <option value="alphabetical">Alphabetical</option> */}
+                        <option value="tonight">Tonight</option>
                         <option value="thisweek">Opening This Week</option>
                         <option value="thismonth">Opening This Month</option>
                         <option value="nextmonth">Opening Next Month</option>

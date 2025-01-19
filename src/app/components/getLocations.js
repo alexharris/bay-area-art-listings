@@ -15,16 +15,12 @@ export default async function getListings() {
   
 
     let sortedData = data.sort((a, b) => {
-      console.log(a.Name)
-      console.log(b.Name)
       // Custom sort function
       const nameA = a.Name || '';
       const nameB = b.Name || '';
 
       return nameA.localeCompare(nameB);
     });
-
-    console.log(sortedData)
 
     if(data.length > 0) {
         return sortedData
