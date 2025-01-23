@@ -1,6 +1,7 @@
 import React from 'react';
 import GetDataFromSheet from '../../components/getDataFromSheet';
 import DeleteAllListings from '../../components/deleteAllListings';
+import GeocodeLocations from '../../components/geocodeLocations';
 
 export default async function Upload({ searchParams }) {
     const enteredPassword = await searchParams;
@@ -32,6 +33,7 @@ export default async function Upload({ searchParams }) {
             ) : (
                 <>
                     <GetDataFromSheet />
+                    <GeocodeLocations />
                     <DeleteAllListings />
                 </>
             )}

@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import getListings from './getListings';
 import getLocations from './getLocations';
 import CalendarLink from './calendarLink';
-
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 
 export default function displayListings() {
@@ -52,6 +53,27 @@ export default function displayListings() {
             .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()));
         setDisplayedResults(filteredListings.length);
     }, [sortType, highlightsOnly, searchTerm, listings, selectedLocation]);
+
+    useEffect(() => {
+        if (isMapView) {
+            const map = L.map('map').setView([37.7749, -122.4194], 13); // Centered on San Francisco
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // sortedListings.forEach(item => {
+            //     if (item.latitude && item.longitude) {
+            //         L.marker([item.latitude, item.longitude])
+            //             .addTo(map)
+            //             .bindPopup(`<b>${item.Event}</b><br>${item.locationName}`);
+            //     }
+            // });
+
+            return () => {
+                map.remove();
+            };
+        }
+    }, [isMapView, sortedListings]);
 
     function toggleHighlights() {
         console.log('toggleHighlights called')
@@ -221,10 +243,11 @@ export default function displayListings() {
                                     .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
                                     .map((item, index) => (
                                         <span key={index}>
-                                            {item.locationName}
+                                            {item.locationAddress}<br />
                                         </span>
                                 ))
                             }
+                             <div className="h-[50vh] border" id="map"></div>
                         </div>
                     ) : (
                         <ul id="list-view" className="w-full">
