@@ -33,6 +33,7 @@ export default async function Upload({ searchParams }) {
             ) : (
                 <>
                     <GetDataFromSheet />
+                    
                     <GeocodeLocations />
                     <DeleteAllListings />
                 </>

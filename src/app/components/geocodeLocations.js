@@ -1,6 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { createClient } from '@sanity/client';
+import Papa from 'papaparse';
 
 const client = createClient({
   projectId: 'ride9vgj',
@@ -21,15 +23,65 @@ async function getLocations() {
   }
 }
 
-async function geocodeLocations() {
-  let locations = await getLocations();
-  console.log(locations);
+async function geocodeLocations(file) {
+  const locations = await getLocations();
+  const csvData = [];
+
+  const fileContent = await file.text();
+  console.log(locations)
+  console.log(fileContent)
+  Papa.parse(fileContent, {
+    header: true,
+    complete: async (results) => {
+      csvData.push(...results.data);
+
+      for (const location of locations) {
+        const match = csvData.find((row) => row.address === location.Address);
+        if (match) {
+            match.Latitude = parseFloat(match.Latitude);
+            match.Longitude = parseFloat(match.Longitude);
+          try {
+            await client.patch(location._id)
+              .set({
+              'Geolocation.lat': match.Latitude,
+              'Geolocation.lng': match.Longitude
+              })
+              .commit();
+            console.log(`Updated location ${location._id} with latitude ${match.Latitude} and longitude ${match.Longitude}`);
+          } catch (error) {
+            console.error(`Error updating location ${location._id}:`, error);
+          }
+        } else {
+          console.log('not a match')
+        }
+      }
+    }
+  });
 }
 
-export default function geocoder() {
+export default function Geocoder() {
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleFileUpload = () => {
+    if (file) {
+      geocodeLocations(file);
+    }
+  };
+
   return (
     <div className='p-4 mt-48'>
-      <button onClick={geocodeLocations} className='border p-2'>Geocode everything</button>
+      Geocode
+      <input type="file" accept=".csv" onChange={handleFileChange} />
+      {file && (
+        <>
+          {file.name}
+          <button onClick={handleFileUpload} className='border p-2'>Geocode everything</button>
+        </>
+      )}
     </div>
   );
 }

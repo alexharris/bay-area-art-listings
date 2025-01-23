@@ -6,6 +6,8 @@ import getLocations from './getLocations';
 import CalendarLink from './calendarLink';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 
 export default function displayListings() {
@@ -61,13 +63,23 @@ export default function displayListings() {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            // sortedListings.forEach(item => {
-            //     if (item.latitude && item.longitude) {
-            //         L.marker([item.latitude, item.longitude])
-            //             .addTo(map)
-            //             .bindPopup(`<b>${item.Event}</b><br>${item.locationName}`);
-            //     }
-            // });
+            // Set default icon options
+            const DefaultIcon = L.icon({
+                iconUrl: markerIcon,
+                shadowUrl: markerShadow
+            });
+            L.Marker.prototype.options.icon = DefaultIcon;
+
+            sortedListings.forEach(item => {
+                
+                const location = locations.find(loc => loc.Name === item.locationName);
+                console.log(location)
+                if (location && location.Geolocation) {
+                    L.marker([location.Geolocation.lat, location.Geolocation.lng])
+                        .addTo(map)
+                        .bindPopup(`<b>${item.Event}</b><br>${item.locationName}<br>${item.locationAddress}`);
+                }
+            });
 
             return () => {
                 map.remove();
@@ -235,19 +247,8 @@ export default function displayListings() {
                         </span>
                     </div>
                     {isMapView ? (
-                        <div id="map-view">
-                            {
-                                sortedListings
-                                    .filter(item => highlightsOnly ? item.Highlight : true)
-                                    .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
-                                    .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
-                                    .map((item, index) => (
-                                        <span key={index}>
-                                            {item.locationAddress}<br />
-                                        </span>
-                                ))
-                            }
-                             <div className="h-[50vh] border" id="map"></div>
+                        <div id="map-view" className="w-full">
+                             <div className="h-[50vh] border w-full" id="map"></div>
                         </div>
                     ) : (
                         <ul id="list-view" className="w-full">
