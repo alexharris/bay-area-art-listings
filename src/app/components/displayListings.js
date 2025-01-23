@@ -18,6 +18,7 @@ export default function displayListings() {
     const [displayedResults, setDisplayedResults] = useState(0);
     const [locations, setLocations] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState('')
+    const [isMapView, setIsMapView] = useState(false);
 
     let sortedListings = [...listings];
 
@@ -196,37 +197,67 @@ export default function displayListings() {
                 <>
                     <div>
                         <p>{displayedResults} results found</p>
-                    </div>                
-                    <ul className="w-full">
-                        {
-                            sortedListings
-                                .filter(item => highlightsOnly ? item.Highlight : true)
-                                .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
-                                .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
-                                .map((item, index) => (
-                                    <li className="border-b border-dashed border-black py-4 w-full" key={index}>
-                                        <h2 className="font-bold">{item.Event} @ <a className="underline decoration-wavy" href={item.locationUrl}>{item.locationName}</a> {item.Highlight && '★'}</h2>
-                                        <div>{item.Start} - {item.End}</div>
-                                        {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
-                                        <CalendarLink listing={item} />
-                                        <button className="text-gray-500 mt-2" onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
-                                            {showDetails[index] ? 'Hide Details' : 'Show Details'}
-                                        </button>
-                                        {showDetails[index] && (
-                                            <div className="border-t border-dashed border-gray-300 pt-2 mt-2">
-                                                <div className="prose">
-                                                    {/* <div>URL: <a href={item.URL}>{item.URL}</a></div> */}
-                                                    <div>Venue: {item.locationName}</div>
-                                                    <div>Address: {item.locationAddress}</div>
-                                                    <div>Website: <a className="underline" href={item.locationUrl}>{item.locationUrl}</a></div>                                                    
-                                                    
+                    </div>     
+                    <div className="flex flex-row gap-4">
+                        <span 
+                            className={isMapView ? '' : 'font-bold'} 
+                            onClick={() => setIsMapView(false)}
+                        >
+                            List View
+                        </span>
+                        <span 
+                            className={isMapView ? 'font-bold' : ''} 
+                            onClick={() => setIsMapView(true)}
+                        >
+                            Map View
+                        </span>
+                    </div>
+                    {isMapView ? (
+                        <div id="map-view">
+                            {
+                                sortedListings
+                                    .filter(item => highlightsOnly ? item.Highlight : true)
+                                    .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
+                                    .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
+                                    .map((item, index) => (
+                                        <span key={index}>
+                                            {item.locationName}
+                                        </span>
+                                ))
+                            }
+                        </div>
+                    ) : (
+                        <ul id="list-view" className="w-full">
+                            {
+                                sortedListings
+                                    .filter(item => highlightsOnly ? item.Highlight : true)
+                                    .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
+                                    .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
+                                    .map((item, index) => (
+                                        <li className="border-b border-dashed border-black py-4 w-full" key={index}>
+                                            <h2 className="font-bold">{item.Event} @ <a className="underline decoration-wavy" href={item.locationUrl}>{item.locationName}</a> {item.Highlight && '★'}</h2>
+                                            <div>{item.Start} - {item.End}</div>
+                                            {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
+                                            <CalendarLink listing={item} />
+                                            <button className="text-gray-500 mt-2" onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
+                                                {showDetails[index] ? 'Hide Details' : 'Show Details'}
+                                            </button>
+                                            {showDetails[index] && (
+                                                <div className="border-t border-dashed border-gray-300 pt-2 mt-2">
+                                                    <div className="prose">
+                                                        {/* <div>URL: <a href={item.URL}>{item.URL}</a></div> */}
+                                                        <div>Venue: {item.locationName}</div>
+                                                        <div>Address: {item.locationAddress}</div>
+                                                        <div>Website: <a className="underline" href={item.locationUrl}>{item.locationUrl}</a></div>                                                    
+                                                        
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )}
-                                    </li>
-                            ))
-                        }
-                    </ul>
+                                            )}
+                                        </li>
+                                ))
+                            }
+                        </ul>
+                    )}
                 </>
             )}
         </>
