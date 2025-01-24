@@ -4,21 +4,16 @@ import { useState, useEffect, useRef } from 'react';
 import getListings from './getListings';
 import getLocations from './getLocations';
 import CalendarLink from './calendarLink';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
+import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Set default icon options
-const DefaultIcon = L.icon({
-    iconUrl: markerIcon,
-    shadowUrl: markerShadow
-});
-L.Marker.prototype.options.icon = DefaultIcon;
+// Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
+const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
+const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
+const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
 export default function displayListings() {
-  
     const [sortType, setSortType] = useState('date');
     const [listings, setListings] = useState([]);
     const [highlightsOnly, setHighlightsOnly] = useState(false);
@@ -27,13 +22,10 @@ export default function displayListings() {
     const [loading, setLoading] = useState(true);
     const [displayedResults, setDisplayedResults] = useState(0);
     const [locations, setLocations] = useState([]);
-    const [selectedLocation, setSelectedLocation] = useState('')
+    const [selectedLocation, setSelectedLocation] = useState('');
     const [isMapView, setIsMapView] = useState(false);
     const [sortedListings, setSortedListings] = useState([]);
-    const mapRef = useRef(null);
-    const markersRef = useRef([]);
 
-    //
     useEffect(() => {
         async function fetchData() {
             try {
@@ -43,7 +35,6 @@ export default function displayListings() {
                 sortListings(data);
                 const locationData = await getLocations();
                 setLocations(locationData); 
-                
             } catch (error) {
                 console.error('Data retrieval failed:', error);
             } finally {
@@ -51,7 +42,6 @@ export default function displayListings() {
             }
         }
         fetchData();
-
     }, []);  
 
     useEffect(() => {
@@ -62,74 +52,34 @@ export default function displayListings() {
         setDisplayedResults(filteredListings.length);
     }, [sortType, highlightsOnly, searchTerm, listings, selectedLocation, sortedListings]);
 
-
-    useEffect(() => console.log('1'), [sortType]);
-    useEffect(() => console.log('2'), [highlightsOnly]);
-    useEffect(() => console.log('3'), [searchTerm]);
-    useEffect(() => console.log('4'), [listings]);
-    useEffect(() => console.log('5'), [selectedLocation]);
-    useEffect(() => console.log('6'), [sortedListings]);
-
-    // useEffect(() => {
-    //     if (isMapView) {
-    //         // Dynamically import Leaflet and related assets
-    //         // Because otherwise it gives "window not found" error
-    //         import('leaflet').then(L => {
-    //             import('leaflet/dist/leaflet.css');
-    //             import('leaflet/dist/images/marker-icon.png').then(markerIcon => {
-    //                 import('leaflet/dist/images/marker-shadow.png').then(markerShadow => {
-                      
-    //                         mapRef.current = L.map('map').setView([37.7749, -122.4194], 8); // Centered on San Francisco
-    //                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    //                             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    //                         }).addTo(mapRef.current);
-
-    //                         // Set default icon options
-    //                         const DefaultIcon = L.icon({
-    //                             iconUrl: markerIcon.default,
-    //                             shadowUrl: markerShadow.default
-    //                         });
-    //                         L.Marker.prototype.options.icon = DefaultIcon;
-                        
-
-    //                     // Clear existing markers
-    //                     markersRef.current.forEach(marker => marker.remove());
-    //                     markersRef.current = [];
-                        
-    //                     console.log('placing new markers')
-    //                     // Add new markers
-    //                     console.log('highlightsOnly:', highlightsOnly, 'searchTerm:', searchTerm, 'selectedLocation:', selectedLocation);
-    //                     sortedListings.filter(item => highlightsOnly ? item.Highlight : true)
-    //                     .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
-    //                     .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
-    //                     .forEach(item => {
-    //                         const location = locations.find(loc => loc.Name === item.locationName);
-    //                         if (location && location.Geolocation) {
-    //                             const marker = L.marker([location.Geolocation.lat, location.Geolocation.lng])
-    //                                 .addTo(mapRef.current)
-    //                                 .bindPopup(`<b>${item.Event}</b><br>${item.locationName}<br>${item.locationAddress}`);
-    //                             markersRef.current.push(marker);
-    //                         }
-    //                     });
-    //                 });
-    //             });
-    //         });
-    //     }
-    // }, [isMapView, sortedListings, highlightsOnly, searchTerm, listings, selectedLocation]);
-
+    useEffect(() => {
+        if (isMapView) {
+            // Dynamically import Leaflet and related assets
+            import('leaflet').then(L => {
+                import('leaflet/dist/images/marker-icon.png').then(markerIcon => {
+                    import('leaflet/dist/images/marker-shadow.png').then(markerShadow => {
+                        // Set default icon options
+                        const DefaultIcon = L.icon({
+                            iconUrl: markerIcon.default,
+                            shadowUrl: markerShadow.default
+                        });
+                        L.Marker.prototype.options.icon = DefaultIcon;
+                    });
+                });
+            });
+        }
+    }, [isMapView]);
 
     function toggleHighlights() {
-        console.log('toggleHighlights called')
         setHighlightsOnly(!highlightsOnly);
     }
-
 
     function sortListings(listingsToSort = listings) {
         let sorted = [...listingsToSort];
         if (sortType === 'alphabetical') {
             sorted = sorted.sort((a, b) => a.Artist.localeCompare(b.Artist));
         } else if (sortType === 'date') {
-            sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start))
+            sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start));
         } else if (sortType === 'thisweek') {
             sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start));
             const now = new Date();
@@ -141,7 +91,7 @@ export default function displayListings() {
                 return startDate >= now && startDate <= nextWeek;
             });
         } else if (sortType === 'thismonth') {
-            sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start))
+            sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start));
             const now = new Date();
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
             const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -168,8 +118,7 @@ export default function displayListings() {
                 const endDate = new Date(item.End);
                 return endDate >= now && endDate <= endOfWeek;
             });
-        } 
-        else if (sortType === 'closethismonth') {
+        } else if (sortType === 'closethismonth') {
             const now = new Date();
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
             const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -178,8 +127,7 @@ export default function displayListings() {
                 const endDate = new Date(item.End);
                 return endDate >= startOfMonth && endDate <= endOfMonth;
             });
-        }
-        else if (sortType === 'tonight') {
+        } else if (sortType === 'tonight') {
             sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start));
             const now = new Date();
             const tomorrow = new Date();
@@ -284,10 +232,8 @@ export default function displayListings() {
                     </div>
                     {isMapView ? (
                         <div id="map-view" className="w-full">
-                            {/* <div className="h-[50vh] border w-full" id="map"></div> */}
                             <div className="h-[50vh] border w-full">
                             <MapContainer center={[37.7749, -122.4194]} zoom={8} scrollWheelZoom={true} className="h-[50vh] border w-full">
-
                                 <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -308,8 +254,6 @@ export default function displayListings() {
                                         ) : null;
                                     })
                                 }
-                               
-                              
                             </MapContainer>
                             </div>
 
