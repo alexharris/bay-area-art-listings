@@ -1,14 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import getListings from './getListings';
 import getLocations from './getLocations';
 import CalendarLink from './calendarLink';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
+// Set default icon options
+const DefaultIcon = L.icon({
+    iconUrl: markerIcon,
+    shadowUrl: markerShadow
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function displayListings() {
   
@@ -22,19 +29,18 @@ export default function displayListings() {
     const [locations, setLocations] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState('')
     const [isMapView, setIsMapView] = useState(false);
+    const [sortedListings, setSortedListings] = useState([]);
+    const mapRef = useRef(null);
+    const markersRef = useRef([]);
 
-    let sortedListings = [...listings];
-
-    sortListings();
-
-
+    //
     useEffect(() => {
         async function fetchData() {
             try {
                 const data = await getListings();
                 setListings(data);
                 setSortType('date');
-                sortListings();
+                sortListings(data);
                 const locationData = await getLocations();
                 setLocations(locationData); 
                 
@@ -54,38 +60,63 @@ export default function displayListings() {
             .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
             .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()));
         setDisplayedResults(filteredListings.length);
-    }, [sortType, highlightsOnly, searchTerm, listings, selectedLocation]);
+    }, [sortType, highlightsOnly, searchTerm, listings, selectedLocation, sortedListings]);
 
-    useEffect(() => {
-        if (isMapView) {
-            const map = L.map('map').setView([37.7749, -122.4194], 13); // Centered on San Francisco
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
 
-            // Set default icon options
-            const DefaultIcon = L.icon({
-                iconUrl: markerIcon,
-                shadowUrl: markerShadow
-            });
-            L.Marker.prototype.options.icon = DefaultIcon;
+    useEffect(() => console.log('1'), [sortType]);
+    useEffect(() => console.log('2'), [highlightsOnly]);
+    useEffect(() => console.log('3'), [searchTerm]);
+    useEffect(() => console.log('4'), [listings]);
+    useEffect(() => console.log('5'), [selectedLocation]);
+    useEffect(() => console.log('6'), [sortedListings]);
 
-            sortedListings.forEach(item => {
-                
-                const location = locations.find(loc => loc.Name === item.locationName);
-                console.log(location)
-                if (location && location.Geolocation) {
-                    L.marker([location.Geolocation.lat, location.Geolocation.lng])
-                        .addTo(map)
-                        .bindPopup(`<b>${item.Event}</b><br>${item.locationName}<br>${item.locationAddress}`);
-                }
-            });
+    // useEffect(() => {
+    //     if (isMapView) {
+    //         // Dynamically import Leaflet and related assets
+    //         // Because otherwise it gives "window not found" error
+    //         import('leaflet').then(L => {
+    //             import('leaflet/dist/leaflet.css');
+    //             import('leaflet/dist/images/marker-icon.png').then(markerIcon => {
+    //                 import('leaflet/dist/images/marker-shadow.png').then(markerShadow => {
+                      
+    //                         mapRef.current = L.map('map').setView([37.7749, -122.4194], 8); // Centered on San Francisco
+    //                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    //                             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    //                         }).addTo(mapRef.current);
 
-            return () => {
-                map.remove();
-            };
-        }
-    }, [isMapView, sortedListings]);
+    //                         // Set default icon options
+    //                         const DefaultIcon = L.icon({
+    //                             iconUrl: markerIcon.default,
+    //                             shadowUrl: markerShadow.default
+    //                         });
+    //                         L.Marker.prototype.options.icon = DefaultIcon;
+                        
+
+    //                     // Clear existing markers
+    //                     markersRef.current.forEach(marker => marker.remove());
+    //                     markersRef.current = [];
+                        
+    //                     console.log('placing new markers')
+    //                     // Add new markers
+    //                     console.log('highlightsOnly:', highlightsOnly, 'searchTerm:', searchTerm, 'selectedLocation:', selectedLocation);
+    //                     sortedListings.filter(item => highlightsOnly ? item.Highlight : true)
+    //                     .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
+    //                     .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
+    //                     .forEach(item => {
+    //                         const location = locations.find(loc => loc.Name === item.locationName);
+    //                         if (location && location.Geolocation) {
+    //                             const marker = L.marker([location.Geolocation.lat, location.Geolocation.lng])
+    //                                 .addTo(mapRef.current)
+    //                                 .bindPopup(`<b>${item.Event}</b><br>${item.locationName}<br>${item.locationAddress}`);
+    //                             markersRef.current.push(marker);
+    //                         }
+    //                     });
+    //                 });
+    //             });
+    //         });
+    //     }
+    // }, [isMapView, sortedListings, highlightsOnly, searchTerm, listings, selectedLocation]);
+
 
     function toggleHighlights() {
         console.log('toggleHighlights called')
@@ -93,28 +124,29 @@ export default function displayListings() {
     }
 
 
-    function sortListings() {
+    function sortListings(listingsToSort = listings) {
+        let sorted = [...listingsToSort];
         if (sortType === 'alphabetical') {
-            sortedListings = listings.sort((a, b) => a.Artist.localeCompare(b.Artist));
+            sorted = sorted.sort((a, b) => a.Artist.localeCompare(b.Artist));
         } else if (sortType === 'date') {
-            sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start))
+            sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start))
         } else if (sortType === 'thisweek') {
-            sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start));
+            sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start));
             const now = new Date();
             const nextWeek = new Date();
             nextWeek.setDate(now.getDate() + 7);
             now.setDate(now.getDate() - 1);
-            sortedListings = listings.filter(item => {
+            sorted = sorted.filter(item => {
                 const startDate = new Date(item.Start);
                 return startDate >= now && startDate <= nextWeek;
             });
         } else if (sortType === 'thismonth') {
-            sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start))
+            sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start))
             const now = new Date();
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
             const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
             now.setDate(now.getDate() - 1);
-            sortedListings = listings.filter(item => {
+            sorted = sorted.filter(item => {
                 const startDate = new Date(item.Start);
                 return startDate >= startOfMonth && startDate <= endOfMonth;
             });
@@ -123,7 +155,7 @@ export default function displayListings() {
             const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
             const endOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
             now.setDate(now.getDate() - 1);
-            sortedListings = listings.filter(item => {
+            sorted = sorted.filter(item => {
                 const startDate = new Date(item.Start);
                 return startDate >= startOfNextMonth && startDate <= endOfNextMonth;
             });
@@ -132,7 +164,7 @@ export default function displayListings() {
             const endOfWeek = new Date();
             endOfWeek.setDate(now.getDate() + 7);
             now.setDate(now.getDate() - 1);
-            sortedListings = listings.filter(item => {
+            sorted = sorted.filter(item => {
                 const endDate = new Date(item.End);
                 return endDate >= now && endDate <= endOfWeek;
             });
@@ -142,24 +174,28 @@ export default function displayListings() {
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
             const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
             now.setDate(now.getDate() - 1);
-            sortedListings = listings.filter(item => {
+            sorted = sorted.filter(item => {
                 const endDate = new Date(item.End);
                 return endDate >= startOfMonth && endDate <= endOfMonth;
             });
         }
         else if (sortType === 'tonight') {
-            sortedListings = listings.sort((a, b) => new Date(a.Start) - new Date(b.Start));
+            sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start));
             const now = new Date();
             const tomorrow = new Date();
             tomorrow.setDate(now.getDate());
             now.setDate(now.getDate() - 1);
-            sortedListings = listings.filter(item => {
+            sorted = sorted.filter(item => {
                 const startDate = new Date(item.Start);
                 return startDate >= now && startDate <= tomorrow;
             });
         }
-        
+        setSortedListings(sorted);
     }    
+
+    useEffect(() => {
+        sortListings();
+    }, [sortType, listings, highlightsOnly]);
 
     return (
         <>
@@ -248,7 +284,35 @@ export default function displayListings() {
                     </div>
                     {isMapView ? (
                         <div id="map-view" className="w-full">
-                             <div className="h-[50vh] border w-full" id="map"></div>
+                            {/* <div className="h-[50vh] border w-full" id="map"></div> */}
+                            <div className="h-[50vh] border w-full">
+                            <MapContainer center={[37.7749, -122.4194]} zoom={8} scrollWheelZoom={true} className="h-[50vh] border w-full">
+
+                                <TileLayer
+                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                />
+                                { 
+                                sortedListings
+                                    .filter(item => highlightsOnly ? item.Highlight : true)
+                                    .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
+                                    .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
+                                    .map((item, index) => {
+                                        const location = locations.find(loc => loc.Name === item.locationName);
+                                        return location && location.Geolocation ? (
+                                            <Marker key={index} position={[location.Geolocation.lat, location.Geolocation.lng]}>
+                                                <Popup>
+                                                    <b>{item.Event}</b><br />{item.locationName}<br />{item.locationAddress}
+                                                </Popup>
+                                            </Marker>
+                                        ) : null;
+                                    })
+                                }
+                               
+                              
+                            </MapContainer>
+                            </div>
+
                         </div>
                     ) : (
                         <ul id="list-view" className="w-full">
