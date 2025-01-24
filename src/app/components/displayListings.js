@@ -6,12 +6,17 @@ import getLocations from './getLocations';
 import CalendarLink from './calendarLink';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
+import L from 'leaflet'
+import { MapContainer } from 'react-leaflet/MapContainer'
+import { TileLayer } from 'react-leaflet/TileLayer'
+import { Marker } from 'react-leaflet/Marker'
+import { Popup } from 'react-leaflet/Popup'
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
-const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
-const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
-const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
-const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
+// const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
+// const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
+// const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
+// const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
 export default function displayListings() {
     const [sortType, setSortType] = useState('date');
@@ -52,23 +57,7 @@ export default function displayListings() {
         setDisplayedResults(filteredListings.length);
     }, [sortType, highlightsOnly, searchTerm, listings, selectedLocation, sortedListings]);
 
-    useEffect(() => {
-        if (isMapView) {
-            // Dynamically import Leaflet and related assets
-            import('leaflet').then(L => {
-                import('leaflet/dist/images/marker-icon.png').then(markerIcon => {
-                    import('leaflet/dist/images/marker-shadow.png').then(markerShadow => {
-                        // Set default icon options
-                        const DefaultIcon = L.icon({
-                            iconUrl: markerIcon.default,
-                            shadowUrl: markerShadow.default
-                        });
-                        L.Marker.prototype.options.icon = DefaultIcon;
-                    });
-                });
-            });
-        }
-    }, [isMapView]);
+
 
     function toggleHighlights() {
         setHighlightsOnly(!highlightsOnly);
@@ -236,7 +225,7 @@ export default function displayListings() {
                             <MapContainer center={[37.7749, -122.4194]} zoom={8} scrollWheelZoom={true} className="h-[50vh] border w-full">
                                 <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
                                 { 
                                 sortedListings
@@ -246,7 +235,15 @@ export default function displayListings() {
                                     .map((item, index) => {
                                         const location = locations.find(loc => loc.Name === item.locationName);
                                         return location && location.Geolocation ? (
-                                            <Marker key={index} position={[location.Geolocation.lat, location.Geolocation.lng]}>
+                                            <Marker 
+                                                key={index} 
+                                                position={[location.Geolocation.lat, location.Geolocation.lng]} 
+                                                icon={L.icon({
+                                                    iconUrl: item.Highlight 
+                                                        ? "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23FFD700' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A"
+                                                        : "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A",
+                                                })}
+                                            >
                                                 <Popup>
                                                     <b>{item.Event}</b><br />{item.locationName}<br />{item.locationAddress}
                                                 </Popup>

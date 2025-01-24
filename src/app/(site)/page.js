@@ -1,3 +1,4 @@
+'use client'
 
 import DisplayListings from "../components/displayListings";
 
