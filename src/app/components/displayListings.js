@@ -6,17 +6,12 @@ import getLocations from './getLocations';
 import CalendarLink from './calendarLink';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet'
-import { MapContainer } from 'react-leaflet/MapContainer'
-import { TileLayer } from 'react-leaflet/TileLayer'
-import { Marker } from 'react-leaflet/Marker'
-import { Popup } from 'react-leaflet/Popup'
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
-// const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
-// const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
-// const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
-// const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
+const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
+const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
+const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
 export default function displayListings() {
     const [sortType, setSortType] = useState('date');
@@ -30,6 +25,7 @@ export default function displayListings() {
     const [selectedLocation, setSelectedLocation] = useState('');
     const [isMapView, setIsMapView] = useState(false);
     const [sortedListings, setSortedListings] = useState([]);
+    const [L, setL] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -57,7 +53,14 @@ export default function displayListings() {
         setDisplayedResults(filteredListings.length);
     }, [sortType, highlightsOnly, searchTerm, listings, selectedLocation, sortedListings]);
 
-
+    useEffect(() => {
+        if (isMapView) {
+            // Dynamically import Leaflet and related assets
+            import('leaflet').then(L => {
+                setL(L);
+            });
+        }
+    }, [isMapView]);
 
     function toggleHighlights() {
         setHighlightsOnly(!highlightsOnly);
@@ -219,7 +222,7 @@ export default function displayListings() {
                             Map View
                         </span>
                     </div>
-                    {isMapView ? (
+                    {isMapView && L ? (
                         <div id="map-view" className="w-full">
                             <div className="h-[50vh] border w-full">
                             <MapContainer center={[37.7749, -122.4194]} zoom={8} scrollWheelZoom={true} className="h-[50vh] border w-full">
@@ -234,6 +237,7 @@ export default function displayListings() {
                                     .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
                                     .map((item, index) => {
                                         const location = locations.find(loc => loc.Name === item.locationName);
+                                        
                                         return location && location.Geolocation ? (
                                             <Marker 
                                                 key={index} 
