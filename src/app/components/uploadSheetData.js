@@ -1,16 +1,16 @@
-// 'use server';
+'use server';
 
 import {createClient} from '@sanity/client'
 
 const client = createClient({
   projectId: 'ride9vgj',
   dataset: 'production',
-  token: process.env.NEXT_PUBLIC_SANITY_API_WRITE_TOKEN,
+  token: process.env.SANITY_API_WRITE_TOKEN,
   useCdn: false,
   apiVersion: 'v2022-03-07'
 });
 
-export default async function uploadSheetData(data, updateProgress) {
+export default async function uploadSheetData(data) {
   let locationData = [];
   let newLocations = [];
 
@@ -58,8 +58,6 @@ export default async function uploadSheetData(data, updateProgress) {
   }
 
   try {
-    let completed = 0;
-    const total = data.length;
 
     for (const item of data) {
       // check if the location in the item exists in the existing locations
@@ -78,10 +76,7 @@ export default async function uploadSheetData(data, updateProgress) {
         },
         ...item
       });
-      // console.log('Data uploaded successfully:', response);
-
-      completed++;
-      updateProgress(completed, total);
+      console.log('Data uploaded successfully:', response);
     }
   } catch (error) {
     console.error('Upload failed:', error);
