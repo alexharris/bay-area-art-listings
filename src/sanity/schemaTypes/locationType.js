@@ -13,14 +13,7 @@ export const locationType = defineType({
       name: 'Address',
       type: 'string',
     }),
-    defineField({
-      title: 'URL',
-      name: 'imageUrl',
-      type: 'url',
-      deprecated: {
-        reason: 'Use the "Website URL" field instead.'
-      },      
-    }),
+
     defineField({
       title: 'Website URL',
       name: 'Url',
