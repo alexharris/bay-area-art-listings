@@ -18,6 +18,20 @@ export const listingType = defineType({
       type: 'string',
     }),
     defineField({
+      name: 'StartDate',
+      type: 'date',
+      options: {
+        dateFormat: 'MMMM D, YYYY'
+      }      
+    }),    
+    defineField({
+      name: 'EndDate',
+      type: 'date',
+      options: {
+        dateFormat: 'MMMM D, YYYY'
+      }
+    }),    
+    defineField({
       name: 'Highlight',
       type: 'string',
     }),

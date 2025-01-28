@@ -71,25 +71,25 @@ export default function displayListings() {
         if (sortType === 'alphabetical') {
             sorted = sorted.sort((a, b) => a.Artist.localeCompare(b.Artist));
         } else if (sortType === 'date') {
-            sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start));
+            sorted = sorted.sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate));
         } else if (sortType === 'thisweek') {
-            sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start));
+            sorted = sorted.sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate));
             const now = new Date();
             const nextWeek = new Date();
             nextWeek.setDate(now.getDate() + 7);
             now.setDate(now.getDate() - 1);
             sorted = sorted.filter(item => {
-                const startDate = new Date(item.Start);
+                const startDate = new Date(item.StartDate);
                 return startDate >= now && startDate <= nextWeek;
             });
         } else if (sortType === 'thismonth') {
-            sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start));
+            sorted = sorted.sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate));
             const now = new Date();
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
             const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
             now.setDate(now.getDate() - 1);
             sorted = sorted.filter(item => {
-                const startDate = new Date(item.Start);
+                const startDate = new Date(item.StartDate);
                 return startDate >= startOfMonth && startDate <= endOfMonth;
             });
         } else if (sortType === 'nextmonth') {
@@ -98,7 +98,7 @@ export default function displayListings() {
             const endOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
             now.setDate(now.getDate() - 1);
             sorted = sorted.filter(item => {
-                const startDate = new Date(item.Start);
+                const startDate = new Date(item.StartDate);
                 return startDate >= startOfNextMonth && startDate <= endOfNextMonth;
             });
         } else if (sortType === 'closethisweek') {
@@ -107,7 +107,7 @@ export default function displayListings() {
             endOfWeek.setDate(now.getDate() + 7);
             now.setDate(now.getDate() - 1);
             sorted = sorted.filter(item => {
-                const endDate = new Date(item.End);
+                const endDate = new Date(item.EndDate);
                 return endDate >= now && endDate <= endOfWeek;
             });
         } else if (sortType === 'closethismonth') {
@@ -116,17 +116,17 @@ export default function displayListings() {
             const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
             now.setDate(now.getDate() - 1);
             sorted = sorted.filter(item => {
-                const endDate = new Date(item.End);
+                const endDate = new Date(item.EndDate);
                 return endDate >= startOfMonth && endDate <= endOfMonth;
             });
         } else if (sortType === 'tonight') {
-            sorted = sorted.sort((a, b) => new Date(a.Start) - new Date(b.Start));
+            sorted = sorted.sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate));
             const now = new Date();
             const tomorrow = new Date();
             tomorrow.setDate(now.getDate());
             now.setDate(now.getDate() - 1);
             sorted = sorted.filter(item => {
-                const startDate = new Date(item.Start);
+                const startDate = new Date(item.StartDate);
                 return startDate >= now && startDate <= tomorrow;
             });
         }
@@ -269,7 +269,7 @@ export default function displayListings() {
                                     .map((item, index) => (
                                         <li className="border-b border-dashed border-black py-4 w-full" key={index}>
                                             <h2 className="font-bold">{item.Event} @ <a className="underline decoration-wavy" href={item.locationUrl}>{item.locationName}</a> {item.Highlight && '★'}</h2>
-                                            <div>{item.Start} - {item.End}</div>
+                                            <div>{item.StartDate} - {item.EndDate}</div>
                                             {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
                                             <CalendarLink listing={item} />
                                             <button className="text-gray-500 mt-2" onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
