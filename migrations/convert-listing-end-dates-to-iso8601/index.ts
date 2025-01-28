@@ -12,13 +12,11 @@ export default defineMigration({
       console.log(doc._id)
       if (!doc[toEnd]) {
         console.log(doc._id + ' no end date');
-        return [];
+        return;
       }
       var date = new Date((doc[toEnd] as Date)).toISOString().substring(0, 10);
-      return [
-        console.log(doc._id + ' has end date'),
-        at(toEnd, set(date)),     
-      ]
+      console.log(doc._id + ' has end date');
+      return at(toEnd, set(date));
     },
   },
 })
