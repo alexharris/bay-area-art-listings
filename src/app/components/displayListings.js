@@ -155,7 +155,7 @@ export default function displayListings() {
                 <div className="flex flex-col p-2">
                     <label htmlFor="filterResults">Time</label>
                     <select id="filterResults" value={sortType} onChange={(e) => setSortType(e.target.value)} className="p-1 bg-white border">
-                        <option value="date" defaultValue>All</option>
+                        <option value="date" defaultValue>Current</option>
                         {/* <option value="alphabetical">Alphabetical</option> */}
                         <option value="tonight">Tonight</option>
                         <option value="thisweek">Opening This Week</option>
