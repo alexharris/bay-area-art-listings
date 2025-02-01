@@ -19,7 +19,6 @@ export default async function getListings() {
     }));
 
     // combine them
-    console.log(locations)
     data = data.map((listing, index) => ({
       ...listing,
       locationName: locations[index][0]?.Name || 'Unknown',

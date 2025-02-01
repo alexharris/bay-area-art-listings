@@ -249,7 +249,7 @@ export default function displayListings() {
                                                 })}
                                             >
                                                 <Popup>
-                                                    <b>{item.Event}</b><br />{item.locationName}<br />{item.locationAddress}
+                                                    <div><b>{item.Event}</b><br /><a href={'/location/' + item.Location._ref}>{item.locationName}</a><br />{item.locationAddress}</div>
                                                 </Popup>
                                             </Marker>
                                         ) : null;
@@ -268,7 +268,7 @@ export default function displayListings() {
                                     .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
                                     .map((item, index) => (
                                         <li className="border-b border-dashed border-black py-4 w-full" key={index}>
-                                            <h2 className="font-bold">{item.Event} @ <a className="underline decoration-wavy" href={item.locationUrl}>{item.locationName}</a> {item.Highlight && '★'}</h2>
+                                            <h2 className="font-bold">{item.Event} @ <a className="underline decoration-wavy" href={'/location/' + item.Location._ref}>{item.locationName}</a> {item.Highlight && '★'}</h2>
                                             <div>{item.StartDate} - {item.EndDate}</div>
                                             {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
                                             <CalendarLink listing={item} />
