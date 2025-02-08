@@ -25,7 +25,8 @@
     "react-dom": "^19.0.0",
     "react-leaflet": "^5.0.0-rc.2",
     "sanity": "^3.68.3",
-    "styled-components": "^6.1.13"
+    "styled-components": "^6.1.13",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",

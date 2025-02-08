@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 
 export default function Process() {
@@ -15,7 +16,7 @@ export default function Process() {
   function processEntry(entry) {
     // current row:
     // Id	Highlight	Event	Location	StartDate	EndDate	Notes
-    const csvRow = `${''}\t${entry.highlight === 'yes' ? '★' : ''}\t${''}\t${entry.title || ''}\t${entry.location || ''}\t${entry.startDate || ''}\t${entry.endDate || ''}\t${entry.notes || ''}\n`;
+    const csvRow = `${uuidv4()}\t${entry.highlight === 'yes' ? '★' : ''}\t${entry.title || ''}\t${entry.location || ''}\t${entry.startDate || ''}\t${entry.endDate || ''}\t${entry.notes || ''}\n`;
     setCsvData(prevCsvData => prevCsvData + csvRow);
   }
 
@@ -27,11 +28,19 @@ export default function Process() {
   
     const rows = text.split('\n');
 
-    rows.forEach(row => {
+    // Add header row
+    const headerRow = 'Id\tHighlight\tEvent\tLocation\tStartDate\tEndDate\tNotes\n';
+    setCsvData(headerRow);
+    
 
+    
+    rows.forEach(row => {
+      console.log(row)
       if(row.trim() === '') {
+        // this means we have reached the end of a chunk, so we are ready to process the row
         processEntry(entry)
         entry = {};
+
         
       } else {
         const datePattern = /\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b/;
@@ -47,7 +56,6 @@ export default function Process() {
             const dateParts = row.split('–');
             const startDatePattern = /\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b \d{1,2}/;
             entry['startDate'] = startDatePattern.test(dateParts[0].trim()) ? dateParts[0].trim().match(startDatePattern)[0] : '';
-            console.log(entry['startDate']);
             const endDate = dateParts[1] ? dateParts[1].trim() : '';
             const endDatePattern = /\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b \d{1,2}/;
             entry['endDate'] = endDatePattern.test(endDate) ? endDate : '';
@@ -57,7 +65,7 @@ export default function Process() {
       }        
 
     })
-
+    
   };
 
   const downloadCSV = () => {
@@ -94,6 +102,12 @@ export default function Process() {
               onClick={downloadCSV}
             >
               Download CSV
+            </button>
+            <button
+              className="mt-4 p-2 bg-yellow-500 text-white"
+              onClick={() => navigator.clipboard.writeText(csvData)}
+            >
+              Copy to Clipboard
             </button>
           </div>
         )}

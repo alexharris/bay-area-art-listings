@@ -12,6 +12,7 @@ export async function GET(req, res) {
   const apiKey = process.env.GOOGLE_API;
   const placesClient = new PlacesClient({apiKey});
 
+
   // Get Sheet Data
   const sheetData = await sheets.spreadsheets.values.get({
     key: apiKey,
