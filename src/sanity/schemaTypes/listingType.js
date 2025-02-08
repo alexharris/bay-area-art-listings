@@ -10,14 +10,6 @@ export const listingType = defineType({
       type: 'string',
     }),
     defineField({
-      name: 'Start',
-      type: 'string',
-    }),    
-    defineField({
-      name: 'End',
-      type: 'string',
-    }),
-    defineField({
       name: 'StartDate',
       type: 'date',
       options: {
@@ -33,7 +25,7 @@ export const listingType = defineType({
     }),    
     defineField({
       name: 'Highlight',
-      type: 'string',
+      type: 'boolean',
     }),
     defineField({
       name: 'Location',
@@ -44,10 +36,6 @@ export const listingType = defineType({
     defineField({
       name: 'Notes',
       type: 'text',
-    }),
-    defineField({
-      name: 'URL',
-      type: 'url',
     }),
   ],
 })

@@ -6,7 +6,7 @@ import Papa from 'papaparse';
 
 const client = createClient({
   projectId: 'ride9vgj',
-  dataset: 'production',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
   token: 'skNjKTdtZLHyHrjFnNjL76asMf1OcDYvDYcsvEdLNjErzxN4HTDhBvYJl1QMoUXYGqleUZPMbz0z0BuVJyWV6aZuGcnQIw949ecUS9LMptAX6nCQajtEFT7MnlvNfQJ3kj3amgc1aTW9dqYTqgZ9zE8GcdhvRB4GRYrX12ZeMFvjRtA3Tthd',
   useCdn: false,
   apiVersion: 'v2022-03-07'

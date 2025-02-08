@@ -13,7 +13,9 @@ export default function Process() {
   // - date: last line, dates
   // - notes: anything else
   function processEntry(entry) {
-    const csvRow = `"${entry.highlight === 'yes' ? '★' : ''}", "${''}","${entry.title || ''}","${entry.location || ''}","${entry.startDate || ''}","${entry.endDate || ''}", "${''}", "${''}","${entry.notes || ''}"\n`;
+    // current row:
+    // Id	Highlight	Event	Location	StartDate	EndDate	Notes
+    const csvRow = `${''}\t${entry.highlight === 'yes' ? '★' : ''}\t${''}\t${entry.title || ''}\t${entry.location || ''}\t${entry.startDate || ''}\t${entry.endDate || ''}\t${entry.notes || ''}\n`;
     setCsvData(prevCsvData => prevCsvData + csvRow);
   }
 
@@ -56,7 +58,6 @@ export default function Process() {
 
     })
 
-    console.log(csvData)
   };
 
   const downloadCSV = () => {

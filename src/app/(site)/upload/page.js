@@ -2,6 +2,7 @@ import React from 'react';
 import GetDataFromSheet from '../../components/getDataFromSheet';
 import DeleteAllListings from '../../components/deleteAllListings';
 import GeocodeLocations from '../../components/geocodeLocations';
+import CallHelloApiButton from '../../components/CallHelloApiButton';
 
 export default async function Upload({ searchParams }) {
     const enteredPassword = await searchParams;
@@ -32,10 +33,10 @@ export default async function Upload({ searchParams }) {
                 </div>
             ) : (
                 <>
-                    <GetDataFromSheet />
-                    
-                    <GeocodeLocations />
+                    {/* <GetDataFromSheet /> */}
+                    {/* <GeocodeLocations /> */}
                     <DeleteAllListings />
+                    <CallHelloApiButton />
                 </>
             )}
         </div>

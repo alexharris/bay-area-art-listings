@@ -14,7 +14,7 @@ export default async function Location({ params }) {
   const locationData = await client.fetch(`*[_type == "location" && _id == $id][0]`, { id });
   const today = new Date().toISOString().split('T')[0];
   const listings = await client.fetch(`*[_type == "listing" && references($id) && StartDate <= $today && EndDate >= $today]`, { id, today });
-
+  console.log(locationData)
   return (
     <div className="p-4 prose">
       <h1>{locationData.Name}</h1>

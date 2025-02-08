@@ -13,7 +13,14 @@ export const locationType = defineType({
       name: 'Address',
       type: 'string',
     }),
-
+    defineField({
+      name: 'GoogleID',
+      type: 'string',
+    }),    
+    defineField({
+      name: 'OriginalName',
+      type: 'string',
+    }),      
     defineField({
       title: 'Website URL',
       name: 'Url',
