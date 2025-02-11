@@ -1,5 +1,3 @@
-export const dyanmic = 'force-dynamic';
-
 import { google } from 'googleapis';
 import {createClient} from '@sanity/client'
 const { PlacesClient } = require('@googlemaps/places').v1;
