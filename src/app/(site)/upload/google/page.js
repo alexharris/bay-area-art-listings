@@ -28,12 +28,12 @@ export default function GoogleSheetPage() {
       }
     };
     // Call the API
-    const response = await fetch('/api/googlesheet', {
-      method: 'GET',
-      headers: {
-          'Content-Type': 'application/json',
-      },
-    });    
+    // const response = await fetch('/api/googlesheet', {
+    //   method: 'GET',
+    //   headers: {
+    //       'Content-Type': 'application/json',
+    //   },
+    // });    
   };
  
 
