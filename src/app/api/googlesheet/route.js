@@ -57,7 +57,6 @@ async function getExistingLocationsFromSanity(sanityClient) {
     console.error('Data retrieval failed:', error);
     throw error;
   }  
-  console.log(existingLocations)
   return existingLocations
 }
 
@@ -80,6 +79,34 @@ async function addGooglePlaceToSanity(googlePlace, newLocation, sanityClient, co
   return
 }
 
+function cleanUpListingDates(startDate = 'January 1, 1970', endDate = 'January 1, 1970') {
+  console.log('clean up dates');
+  if (startDate) {
+    if (startDate.split(',').length === 1) {
+      startDate = startDate + ', ' + new Date().getFullYear();
+    }
+    startDate = new Date(startDate).toISOString().split('T')[0];
+  }
+
+  if (endDate) {
+    
+    if (endDate.split(',').length === 1) {
+      endDate = endDate + ', ' + new Date().getFullYear();
+      
+    }
+    console.log('start: ' + endDate)
+    console.log(new Date(endDate))
+    try {
+      endDate = new Date(endDate).toISOString().split('T')[0];
+    } catch (error) {
+      endDate = '';
+    }
+    console.log('end: ' + endDate)
+  }
+
+  return { startDate, endDate };
+}
+
 async function addListingsToSanity(sheetRows, sanityClient, controller) {
   for (let i = 1; i < sheetRows.length; i++) {
 
@@ -91,20 +118,10 @@ async function addListingsToSanity(sheetRows, sanityClient, controller) {
     let startDate = row[4];
     let endDate = row[5];
 
-    // Format dates
-    // if the date has a year, leave it alone, otherwise add the current year
-    console.log(startDate, endDate)
-    // Dates have format MMMM DD, YYYY
-    if(startDate.split(',').length === 1) {
-      startDate = startDate + ', ' + new Date().getFullYear();
-    }
-    if(endDate.split(',').length === 1) {
-      endDate = endDate + ', ' + new Date().getFullYear();
-    }
-    // now convert start and end date to to YYYY-MM-DD
-    startDate = new Date(startDate).toISOString().split('T')[0];
-    endDate = new Date(endDate).toISOString().split('T')[0];
-
+    // Clean up the start and end dates
+    const cleanedDates = cleanUpListingDates(startDate, endDate);
+    startDate = cleanedDates.startDate;
+    endDate = cleanedDates.endDate;
 
     // Use the spreadsheet location name to find the corresponding location in Sanity
     let updatedExistingLocations = await sanityClient.fetch('*[_type == "location"]');
@@ -123,10 +140,10 @@ async function addListingsToSanity(sheetRows, sanityClient, controller) {
       StartDate: startDate,
       EndDate: endDate,
     }).then((listingResponse) => {
-      // writeMessageToClient(`Added listing: ${listingTitle}`, controller);
+      writeMessageToClient(`Added listing: ${listingTitle}`, controller);
     }).catch((error) => {
-      // console.error('Error adding listing:', error);
-      // writeMessageToClient(`Unable to add listing: ${listingTitle}. Reason ${error}`, controller);
+      console.error('Error adding listing:', error);
+      writeMessageToClient(`Unable to add listing: ${listingTitle}. Reason ${error}`, controller);
     });
   }
 }
@@ -174,16 +191,17 @@ export async function GET(req, res) {
             writeMessageToClient(`Found info about ${newLocation}. Adding to Sanity`, controller);
             await addGooglePlaceToSanity(googlePlace, newLocation, sanityClient, controller);
           } else {
-            writeMessageToClient(`Couldn't find info about ${newLocation}. Manually Review.`, controller);
+            writeMessageToClient(`🖐 Couldn't find info about ${newLocation}. Manually Review.`, controller);
           }
 
         } else {
           writeMessageToClient(`Location exists: ${newLocation}`, controller);
         }
+        writeMessageToClient('--------------------', controller);
       }
 
       // With locations done, now we put up the listings
-      writeMessageToClient('--------------------', controller);
+     
       await addListingsToSanity(sheetRows, sanityClient, controller);
 
       writeMessageToClient('Upload finished', controller);
