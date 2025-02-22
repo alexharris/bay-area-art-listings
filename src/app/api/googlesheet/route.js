@@ -1,4 +1,3 @@
-export const maxDuration = 60; // This function can run for a maximum of 20 seconds
 import { google } from 'googleapis';
 import {createClient} from '@sanity/client'
 const { PlacesClient } = require('@googlemaps/places').v1;
@@ -48,20 +47,29 @@ async function getPlaceDetailsFromGoogle(newLocation) {
 }
 
 // This function gets the existing locations from Sanity
-async function getExistingLocationsFromSanity(sanityClient) {
+async function getExistingLocationsFromSanity() {
   let existingLocations = [];
-
+  // Create Sanity Client
+  const client = createClient({
+    projectId: 'ride9vgj',
+    dataset: 'development',
+    token: process.env.SANITY_API_WRITE_TOKEN,
+    useCdn: false,
+    apiVersion: 'v2022-03-07'
+  });
   // Get all of the locations that already exist
   try {
-    existingLocations = await sanityClient.fetch('*[_type == "location"]');
+    existingLocations = await client.fetch('*[_type == "location"]');
   } catch (error) {
     console.error('Data retrieval failed:', error);
     throw error;
   }  
+  console.log(existingLocations)
   return existingLocations
 }
 
 async function addGooglePlaceToSanity(googlePlace, newLocation, sanityClient, controller) {
+  
   await sanityClient.create({
     _type: 'location',
     Name: googlePlace.displayName.text,
@@ -80,34 +88,6 @@ async function addGooglePlaceToSanity(googlePlace, newLocation, sanityClient, co
   return
 }
 
-function cleanUpListingDates(startDate = 'January 1, 1970', endDate = 'January 1, 1970') {
-  console.log('clean up dates');
-  if (startDate) {
-    if (startDate.split(',').length === 1) {
-      startDate = startDate + ', ' + new Date().getFullYear();
-    }
-    startDate = new Date(startDate).toISOString().split('T')[0];
-  }
-
-  if (endDate) {
-    
-    if (endDate.split(',').length === 1) {
-      endDate = endDate + ', ' + new Date().getFullYear();
-      
-    }
-    console.log('start: ' + endDate)
-    console.log(new Date(endDate))
-    try {
-      endDate = new Date(endDate).toISOString().split('T')[0];
-    } catch (error) {
-      endDate = '';
-    }
-    console.log('end: ' + endDate)
-  }
-
-  return { startDate, endDate };
-}
-
 async function addListingsToSanity(sheetRows, sanityClient, controller) {
   for (let i = 1; i < sheetRows.length; i++) {
 
@@ -116,13 +96,8 @@ async function addListingsToSanity(sheetRows, sanityClient, controller) {
     const highlight = row[1] 
     const isHighlight = highlight ? true : false;
     const listingTitle = row[2];
-    let startDate = row[4];
-    let endDate = row[5];
-
-    // Clean up the start and end dates
-    const cleanedDates = cleanUpListingDates(startDate, endDate);
-    startDate = cleanedDates.startDate;
-    endDate = cleanedDates.endDate;
+    const startDate = row[4];
+    const endDate = row[5];
 
     // Use the spreadsheet location name to find the corresponding location in Sanity
     let updatedExistingLocations = await sanityClient.fetch('*[_type == "location"]');
@@ -138,8 +113,8 @@ async function addListingsToSanity(sheetRows, sanityClient, controller) {
         _ref: locationId,
         _weak: true
       },
-      StartDate: startDate,
-      EndDate: endDate,
+      StartDate: startDate || '',
+      EndDate: endDate || '',
     }).then((listingResponse) => {
       writeMessageToClient(`Added listing: ${listingTitle}`, controller);
     }).catch((error) => {
@@ -160,7 +135,7 @@ export async function GET(req, res) {
   // Create Sanity Client
   const sanityClient = createClient({
     projectId: 'ride9vgj',
-    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
+    dataset: 'development',
     token: process.env.SANITY_API_WRITE_TOKEN,
     useCdn: false,
     apiVersion: 'v2022-03-07'
@@ -171,7 +146,7 @@ export async function GET(req, res) {
     async start(controller) {
       writeMessageToClient(`Beginning process.`, controller);
       // Get the existing locations from Sanity
-      let existingLocations = await getExistingLocationsFromSanity(sanityClient);
+      let existingLocations = await getExistingLocationsFromSanity();
       // Get the new locations from the Google Sheet
       let newLocations = [];
       let sheetRows = await getDataFromSheet(sheetName);
@@ -192,17 +167,16 @@ export async function GET(req, res) {
             writeMessageToClient(`Found info about ${newLocation}. Adding to Sanity`, controller);
             await addGooglePlaceToSanity(googlePlace, newLocation, sanityClient, controller);
           } else {
-            writeMessageToClient(`🖐 Couldn't find info about ${newLocation}. Manually Review.`, controller);
+            writeMessageToClient(`Couldn't find info about ${newLocation}. Manually Review.`, controller);
           }
 
         } else {
           writeMessageToClient(`Location exists: ${newLocation}`, controller);
         }
-        writeMessageToClient('--------------------', controller);
       }
 
       // With locations done, now we put up the listings
-     
+      writeMessageToClient('--------------------', controller);
       await addListingsToSanity(sheetRows, sanityClient, controller);
 
       writeMessageToClient('Upload finished', controller);
