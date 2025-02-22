@@ -118,6 +118,7 @@ async function addListingsToSanity(sheetRows, sanityClient, controller) {
       StartDate: startDate || '',
       EndDate: endDate || '',
     }).then((listingResponse) => {
+      console.error(listingResponse);
       writeMessageToClient(`Added listing: ${listingTitle}`, controller);
     }).catch((error) => {
       console.error('Error adding listing:', error);
