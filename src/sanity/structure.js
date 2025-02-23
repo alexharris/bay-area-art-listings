@@ -48,6 +48,6 @@ export const structure = (S) =>
                 .child(S.list().title('Months').items(createMonthListItems(S, '2025'))),
             ])
         ),
-      // ...S.documentTypeListItems()
-      ...S.documentTypeListItems().filter(item => item.getId() !== 'listing'),
+      ...S.documentTypeListItems()
+      // ...S.documentTypeListItems().filter(item => item.getId() !== 'listing'),
     ]);
