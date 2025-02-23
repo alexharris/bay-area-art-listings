@@ -66,12 +66,13 @@ async function getExistingLocationsFromSanity() {
     console.error('Data retrieval failed:', error);
     throw error;
   }  
-  console.log(existingLocations)
   return existingLocations
 }
 
 async function addGooglePlaceToSanity(googlePlace, newLocation, sanityClient, controller) {
   
+
+
   await sanityClient.create({
     _type: 'location',
     Name: googlePlace.displayName.text,
@@ -86,6 +87,49 @@ async function addGooglePlaceToSanity(googlePlace, newLocation, sanityClient, co
   });
   
   writeMessageToClient(`${googlePlace.displayName.text} added to Sanity.`, controller);
+
+  return
+}
+
+async function updateLocationInSanity(googlePlace, existingLocation, sanityClient, controller) {
+  
+
+  const patchData = {
+    Name: googlePlace.displayName.text,
+    Address: googlePlace.formattedAddress,
+    GoogleID: googlePlace.id,
+    Url: googlePlace.websiteUri,
+    Geolocation: {
+      lat: googlePlace.location.latitude,
+      lng: googlePlace.location.longitude
+    }
+  };
+
+  if (googlePlace.currentOpeningHours && googlePlace.currentOpeningHours.weekdayDescriptions) {
+    patchData.Hours = {
+      'Monday': googlePlace.currentOpeningHours.weekdayDescriptions[0],
+      'Tuesday': googlePlace.currentOpeningHours.weekdayDescriptions[1],
+      'Wednesday': googlePlace.currentOpeningHours.weekdayDescriptions[2],
+      'Thursday': googlePlace.currentOpeningHours.weekdayDescriptions[3],
+      'Friday': googlePlace.currentOpeningHours.weekdayDescriptions[4],
+      'Saturday': googlePlace.currentOpeningHours.weekdayDescriptions[5],
+      'Sunday': googlePlace.currentOpeningHours.weekdayDescriptions[6]
+    };
+  }
+
+  await sanityClient.patch(existingLocation._id)
+    .set(patchData)
+    .commit()
+    .then((updatedLocation) => {
+      console.log('Location updated:')
+      console.log(updatedLocation)
+      writeMessageToClient(`${googlePlace.displayName.text} updated in Sanity.`, controller);
+    })
+    .catch((err) => {
+      console.error('Oh no, the update failed: ', err.message)
+    });
+  
+  
 
   return
 }
@@ -118,7 +162,6 @@ async function addListingsToSanity(sheetRows, sanityClient, controller) {
       StartDate: startDate || '',
       EndDate: endDate || '',
     }).then((listingResponse) => {
-      console.log(listingResponse);
       writeMessageToClient(`Added listing: ${listingTitle}`, controller);
     }).catch((error) => {
       console.error('Error adding listing:', error);
@@ -175,6 +218,9 @@ export async function GET(req, res) {
 
         } else {
           writeMessageToClient(`Location exists: ${newLocation}`, controller);
+          let existingLocation = existingLocations.find(existingLocation => existingLocation.OriginalName === newLocation);          
+          let googlePlace = await getPlaceDetailsFromGoogle(newLocation);
+          await updateLocationInSanity(googlePlace, existingLocation, sanityClient, controller);
         }
       }
 

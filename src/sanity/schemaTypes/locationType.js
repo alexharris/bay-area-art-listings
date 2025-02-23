@@ -29,6 +29,40 @@ export const locationType = defineType({
     defineField({
       name: 'Geolocation',
       type: 'geopoint',
-    })
+    }),
+    defineField({
+      name: 'Hours',
+      type: 'object',
+      fields: [
+        {
+          name: 'Monday',
+          type: 'string',
+        },
+        {
+          name: 'Tuesday',
+          type: 'string',
+        },
+        {
+          name: 'Wednesday',
+          type: 'string',
+        },
+        {
+          name: 'Thursday',
+          type: 'string',
+        },
+        {
+          name: 'Friday',
+          type: 'string',
+        },
+        {
+          name: 'Saturday',
+          type: 'string',
+        },
+        {
+          name: 'Sunday',
+          type: 'string',
+        },
+      ]
+    })    
   ],
 })
