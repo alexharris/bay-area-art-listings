@@ -54,7 +54,7 @@ async function getExistingLocationsFromSanity() {
   // Create Sanity Client
   const client = createClient({
     projectId: 'ride9vgj',
-    dataset: 'development',
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
     token: process.env.SANITY_API_WRITE_TOKEN,
     useCdn: false,
     apiVersion: 'v2022-03-07'
@@ -138,7 +138,7 @@ export async function GET(req, res) {
   // Create Sanity Client
   const sanityClient = createClient({
     projectId: 'ride9vgj',
-    dataset: process.env.SANITY_DATASET,
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
     token: process.env.SANITY_API_WRITE_TOKEN,
     useCdn: false,
     apiVersion: 'v2022-03-07'
