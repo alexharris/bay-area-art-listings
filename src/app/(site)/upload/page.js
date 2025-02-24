@@ -1,7 +1,5 @@
 import React from 'react';
-import GetDataFromSheet from '../../components/getDataFromSheet';
 import DeleteAllListings from '../../components/deleteAllListings';
-import GeocodeLocations from '../../components/geocodeLocations';
 import CallHelloApiButton from '../../components/CallHelloApiButton';
 
 export default async function Upload({ searchParams }) {
@@ -33,8 +31,6 @@ export default async function Upload({ searchParams }) {
                 </div>
             ) : (
                 <>
-                    {/* <GetDataFromSheet /> */}
-                    {/* <GeocodeLocations /> */}
                     <DeleteAllListings />
                     <CallHelloApiButton />
                 </>

@@ -15,18 +15,39 @@ function writeMessageToClient(message, controller) {
 
 // This function gets the data from the Google Sheet
 // It returns an array of rows
-async function getDataFromSheet(sheetName) {
+async function getDataFromSheet(sheetName, controller) {
   const sheets = google.sheets('v4');
   const apiKey = process.env.GOOGLE_API;
+  console.log('about to get data');
+  
   // Get Sheet Data
-  const sheetData = await sheets.spreadsheets.values.get({
-    key: apiKey,
-    spreadsheetId: '1uQejuXXnuVwrU1vGDwcWoM4HlZh1XHwRCVqLJE4yqOg',
-    range: sheetName,
-  });  
-  // Get the rows from the sheet data
-  const sheetRows = sheetData.data.values;
-  return sheetRows;
+  let sheetData;
+  try {
+    sheetData = await sheets.spreadsheets.values.get({
+      key: apiKey,
+      spreadsheetId: '1uQejuXXnuVwrU1vGDwcWoM4HlZh1XHwRCVqLJE4yqOg',
+      range: sheetName,
+    });
+    if (sheetData.status === 200) {
+      if (sheetData.data.values) {
+
+        writeMessageToClient(`Getting data from rows.`, controller);
+        const sheetRows = sheetData.data.values;
+        return sheetRows;
+      } else {
+        writeMessageToClient(`no-rows`, controller);
+        return null;
+      }
+    } else {
+      writeMessageToClient(`Error retrieving sheet data: ${sheetData.statusText}`, controller);
+      return null;
+    }
+
+  } catch (e) {
+    console.error(e);
+    writeMessageToClient(`sheet-not-found`, controller);
+    return null;
+  }
 }
 
 async function getPlaceDetailsFromGoogle(newLocation) {
@@ -92,7 +113,6 @@ async function addGooglePlaceToSanity(googlePlace, newLocation, sanityClient, co
 }
 
 async function updateLocationInSanity(googlePlace, existingLocation, sanityClient, controller) {
-  
 
   const patchData = {
     Name: googlePlace.displayName.text,
@@ -122,7 +142,6 @@ async function updateLocationInSanity(googlePlace, existingLocation, sanityClien
     .commit()
     .then((updatedLocation) => {
       console.log('Location updated:')
-      console.log(updatedLocation)
       writeMessageToClient(`${googlePlace.displayName.text} updated in Sanity.`, controller);
     })
     .catch((err) => {
@@ -191,45 +210,51 @@ export async function GET(req, res) {
   const readableStream = new ReadableStream({
     async start(controller) {
       writeMessageToClient(`Beginning process.`, controller);
+      writeMessageToClient(`Checking sheet.`, controller);
       // Get the existing locations from Sanity
       let existingLocations = await getExistingLocationsFromSanity();
       // Get the new locations from the Google Sheet
       let newLocations = [];
-      let sheetRows = await getDataFromSheet(sheetName);
-      // Go through the new items and get the locations
-      for (let i = 1; i < sheetRows.length; i++) {
-        newLocations.push(sheetRows[i][3]);
-      }
-      // Reduce to a single set, no duplicates
-      newLocations = [...new Set(newLocations)];
-      // Go through the new locations and check if they exist
-      for (const newLocation of newLocations) {
-        writeMessageToClient(`Checking ${newLocation}`, controller);
-        const locationExistsAlready = existingLocations.some(existingLocation => existingLocation.OriginalName === newLocation);
-        if (!locationExistsAlready) {
-          writeMessageToClient(`Location does not exist: ${newLocation}. Googling it.`, controller);
-          let googlePlace = await getPlaceDetailsFromGoogle(newLocation);
-          if(googlePlace) {
-            writeMessageToClient(`Found info about ${newLocation}. Adding to Sanity`, controller);
-            await addGooglePlaceToSanity(googlePlace, newLocation, sanityClient, controller);
-          } else {
-            writeMessageToClient(`Couldn't find info about ${newLocation}. Manually Review.`, controller);
-          }
+      let sheetRows = await getDataFromSheet(sheetName, controller);
 
-        } else {
-          writeMessageToClient(`Location exists: ${newLocation}`, controller);
-          let existingLocation = existingLocations.find(existingLocation => existingLocation.OriginalName === newLocation);          
-          let googlePlace = await getPlaceDetailsFromGoogle(newLocation);
-          await updateLocationInSanity(googlePlace, existingLocation, sanityClient, controller);
+      if (sheetRows && sheetRows.length > 0) {
+        // Go through the new items and get the locations
+        for (let i = 1; i < sheetRows.length; i++) {
+          newLocations.push(sheetRows[i][3]);
         }
+        // Reduce to a single set, no duplicates
+        newLocations = [...new Set(newLocations)];
+        // Go through the new locations and check if they exist
+        for (const newLocation of newLocations) {
+          writeMessageToClient(`Checking ${newLocation}`, controller);
+          const locationExistsAlready = existingLocations.some(existingLocation => existingLocation.OriginalName === newLocation);
+          if (!locationExistsAlready) {
+            writeMessageToClient(`Location does not exist: ${newLocation}. Googling it.`, controller);
+            let googlePlace = await getPlaceDetailsFromGoogle(newLocation);
+            if(googlePlace) {
+              writeMessageToClient(`Found info about ${newLocation}. Adding to Sanity`, controller);
+              await addGooglePlaceToSanity(googlePlace, newLocation, sanityClient, controller);
+            } else {
+              writeMessageToClient(`Couldn't find info about ${newLocation}. Manually Review.`, controller);
+            }
+
+          } else {
+            writeMessageToClient(`Location exists: ${newLocation}`, controller);
+            let existingLocation = existingLocations.find(existingLocation => existingLocation.OriginalName === newLocation);          
+            let googlePlace = await getPlaceDetailsFromGoogle(newLocation);
+            await updateLocationInSanity(googlePlace, existingLocation, sanityClient, controller);
+          }
+        }
+
+        // With locations done, now we put up the listings
+        writeMessageToClient('--------------------', controller);
+        await addListingsToSanity(sheetRows, sanityClient, controller);
+
+        writeMessageToClient('Upload finished', controller);
+        controller.close();
+      } else {
+        controller.close();
       }
-
-      // With locations done, now we put up the listings
-      writeMessageToClient('--------------------', controller);
-      await addListingsToSanity(sheetRows, sanityClient, controller);
-
-      writeMessageToClient('Upload finished', controller);
-      controller.close();
     }
   });
 
