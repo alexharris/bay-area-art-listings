@@ -1,6 +1,6 @@
 import React from 'react';
 import DeleteAllListings from '../../components/deleteAllListings';
-import CallHelloApiButton from '../../components/CallHelloApiButton';
+// import CallHelloApiButton from '../../components/CallHelloApiButton';
 
 export default async function Upload({ searchParams }) {
     const enteredPassword = await searchParams;
@@ -31,8 +31,15 @@ export default async function Upload({ searchParams }) {
                 </div>
             ) : (
                 <>
+                <a 
+                    className="p-2 bg-blue-500 text-white mb-4"
+                    href="/upload/listings"
+                >
+                    Upload Listings
+                </a>
+                
                     <DeleteAllListings />
-                    <CallHelloApiButton />
+                    {/* <CallHelloApiButton /> */}
                 </>
             )}
         </div>

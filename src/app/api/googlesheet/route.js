@@ -141,7 +141,6 @@ async function updateLocationInSanity(googlePlace, existingLocation, sanityClien
     .set(patchData)
     .commit()
     .then((updatedLocation) => {
-      console.log('Location updated:')
       writeMessageToClient(`${googlePlace.displayName.text} updated in Sanity.`, controller);
     })
     .catch((err) => {
