@@ -6,12 +6,22 @@ import getLocations from './getLocations';
 import CalendarLink from './calendarLink';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
+import { format } from 'date-fns';
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const currentYear = new Date().getFullYear();
+    if (date.getFullYear() === currentYear) {
+        return format(date, 'MMMM d');
+    }
+    return format(date, 'MMMM d, yyyy');
+}
 
 export default function displayListings() {
     const [sortType, setSortType] = useState('date');
@@ -49,7 +59,7 @@ export default function displayListings() {
         const filteredListings = sortedListings
             .filter(item => highlightsOnly ? item.Highlight : true)
             .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
-            .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()));
+            .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()));
         setDisplayedResults(filteredListings.length);
     }, [sortType, highlightsOnly, searchTerm, listings, selectedLocation, sortedListings]);
 
@@ -155,9 +165,9 @@ export default function displayListings() {
                 <div className="flex flex-col p-2">
                     <label htmlFor="filterResults">Time</label>
                     <select id="filterResults" value={sortType} onChange={(e) => setSortType(e.target.value)} className="p-1 bg-white border">
-                        <option value="date" defaultValue>Current</option>
+                        <option value="date" defaultValue>On View Now</option>
                         {/* <option value="alphabetical">Alphabetical</option> */}
-                        <option value="tonight">Tonight</option>
+                        <option value="tonight">Opening Tonight</option>
                         <option value="thisweek">Opening This Week</option>
                         <option value="thismonth">Opening This Month</option>
                         <option value="nextmonth">Opening Next Month</option>
@@ -234,7 +244,7 @@ export default function displayListings() {
                                 sortedListings
                                     .filter(item => highlightsOnly ? item.Highlight : true)
                                     .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
-                                    .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
+                                    .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
                                     .map((item, index) => {
                                         const location = locations.find(loc => loc.Name === item.locationName);
                                         
@@ -265,13 +275,13 @@ export default function displayListings() {
                                 sortedListings
                                     .filter(item => highlightsOnly ? item.Highlight : true)
                                     .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
-                                    .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.Notes.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
+                                    .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
                                     .map((item, index) => (
                                         <li className="border-b border-dashed border-black py-4 w-full" key={index}>
-                                            <h2 className="font-bold">{item.Event} @ <a className="underline decoration-wavy" href={'/location/' + item.Location._ref}>{item.locationName}</a> {item.Highlight && '★'}</h2>
-                                            <div>{item.StartDate} - {item.EndDate}</div>
+                                            <h2 className="font-bold"><a className="underline decoration-wavy" href={'/listing/' + item._id}>{item.Event}</a> @ <a className="underline decoration-wavy" href={'/location/' + item.Location._ref}>{item.locationName}</a> {item.Highlight && '★'}</h2>
+                                            <div>{formatDate(item.StartDate)} - {formatDate(item.EndDate)}</div>
                                             {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
-                                            <CalendarLink listing={item} />
+                                            <CalendarLink listing={item} location="" />
                                             <button className="text-gray-500 mt-2" onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
                                                 {showDetails[index] ? 'Hide Details' : 'Show Details'}
                                             </button>
