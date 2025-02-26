@@ -277,7 +277,7 @@ export default function displayListings() {
                                     .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
                                     .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
                                     .map((item, index) => (
-                                        <li className="border-b border-dashed border-black py-4 w-full" key={index}>
+                                        <li className="border-b border-dashed border-black py-4 w-full relative" key={index}>
                                             <h2 className="font-bold"><a className="underline decoration-wavy" href={'/listing/' + item._id}>{item.Event}</a> @ <a className="underline decoration-wavy" href={'/location/' + item.Location._ref}>{item.locationName}</a> {item.Highlight && '★'}</h2>
                                             <div>{formatDate(item.StartDate)} - {formatDate(item.EndDate)}</div>
                                             {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}

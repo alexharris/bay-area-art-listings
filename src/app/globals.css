@@ -19,3 +19,13 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.icon-link {
+  stroke: black;
+  width: 20px;
+}
+
+.icon-link:hover {
+  stroke: #0070f3;
+  cursor: pointer;
+}
