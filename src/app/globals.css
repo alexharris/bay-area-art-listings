@@ -29,3 +29,8 @@ body {
   stroke: #0070f3;
   cursor: pointer;
 }
+
+.rdp-caption_label {
+  font-size: 1rem;
+  @apply px-3;
+}

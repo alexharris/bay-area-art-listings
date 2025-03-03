@@ -4,9 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import getListings from './getListings';
 import getLocations from './getLocations';
 import CalendarLink from './calendarLink';
+import DatePicker from './datePicker';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
+
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
@@ -23,8 +25,18 @@ function formatDate(dateString) {
     return format(date, 'MMMM d, yyyy');
 }
 
+function setDateRange() {
+    // set the filterDateRnage state and the react daypicker componenet
+    setFilterDateRange(dateRange);
+    setSortDate({ from: dateRange.from, to: dateRange.to });
+
+}
+
 export default function displayListings() {
-    const [sortType, setSortType] = useState('date');
+    const [sortType, setSortType] = useState('closingFirst');
+    const [sortDate, setSortDate] = useState([]);
+    const [filterDateContext, setFilterDateContext] = useState('onview');
+    const [filterDateRange, setFilterDateRange] = useState([]);
     const [listings, setListings] = useState([]);
     const [highlightsOnly, setHighlightsOnly] = useState(false);
     const [showDetails, setShowDetails] = useState({});
@@ -42,7 +54,7 @@ export default function displayListings() {
             try {
                 const data = await getListings();
                 setListings(data);
-                setSortType('date');
+                setSortType('closingFirst');
                 sortListings(data);
                 const locationData = await getLocations();
                 setLocations(locationData); 
@@ -61,7 +73,7 @@ export default function displayListings() {
             .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
             .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()));
         setDisplayedResults(filteredListings.length);
-    }, [sortType, highlightsOnly, searchTerm, listings, selectedLocation, sortedListings]);
+    }, [sortType, sortDate, filterDateContext, highlightsOnly, searchTerm, listings, selectedLocation, sortedListings]);
 
     useEffect(() => {
         if (isMapView) {
@@ -78,104 +90,102 @@ export default function displayListings() {
 
     function sortListings(listingsToSort = listings) {
         let sorted = [...listingsToSort];
-        if (sortType === 'alphabetical') {
-            sorted = sorted.sort((a, b) => a.Artist.localeCompare(b.Artist));
-        } else if (sortType === 'date') {
-            sorted = sorted.sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate));
-        } else if (sortType === 'thisweek') {
-            sorted = sorted.sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate));
-            const now = new Date();
-            const nextWeek = new Date();
-            nextWeek.setDate(now.getDate() + 7);
-            now.setDate(now.getDate() - 1);
-            sorted = sorted.filter(item => {
-                const startDate = new Date(item.StartDate);
-                return startDate >= now && startDate <= nextWeek;
-            });
+        const now = new Date();
+        const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+        const endOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 6));
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        const endOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+
+        let dateRange = { from: now, to: now };
+
+        if (sortType === 'thisweek') {
+            dateRange = { from: startOfWeek, to: endOfWeek };
         } else if (sortType === 'thismonth') {
-            sorted = sorted.sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate));
-            const now = new Date();
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-            now.setDate(now.getDate() - 1);
-            sorted = sorted.filter(item => {
-                const startDate = new Date(item.StartDate);
-                return startDate >= startOfMonth && startDate <= endOfMonth;
-            });
+            dateRange = { from: startOfMonth, to: endOfMonth };
         } else if (sortType === 'nextmonth') {
-            const now = new Date();
-            const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-            const endOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
-            now.setDate(now.getDate() - 1);
-            sorted = sorted.filter(item => {
-                const startDate = new Date(item.StartDate);
-                return startDate >= startOfNextMonth && startDate <= endOfNextMonth;
-            });
-        } else if (sortType === 'closethisweek') {
-            const now = new Date();
-            const endOfWeek = new Date();
-            endOfWeek.setDate(now.getDate() + 7);
-            now.setDate(now.getDate() - 1);
-            sorted = sorted.filter(item => {
-                const endDate = new Date(item.EndDate);
-                return endDate >= now && endDate <= endOfWeek;
-            });
-        } else if (sortType === 'closethismonth') {
-            const now = new Date();
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-            now.setDate(now.getDate() - 1);
-            sorted = sorted.filter(item => {
-                const endDate = new Date(item.EndDate);
-                return endDate >= startOfMonth && endDate <= endOfMonth;
-            });
+            dateRange = { from: startOfNextMonth, to: endOfNextMonth };
         } else if (sortType === 'tonight') {
-            sorted = sorted.sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate));
-            const now = new Date();
-            const tomorrow = new Date();
-            tomorrow.setDate(now.getDate());
-            now.setDate(now.getDate() - 1);
+            dateRange = { from: now, to: new Date(now.setDate(now.getDate() + 1)) };
+        }
+
+        if (filterDateContext === 'onview') {
             sorted = sorted.filter(item => {
                 const startDate = new Date(item.StartDate);
-                return startDate >= now && startDate <= tomorrow;
+                const endDate = new Date(item.EndDate);
+                return (startDate <= dateRange.to && endDate >= dateRange.from);
+            });
+        } else if (filterDateContext === 'opening') {
+            sorted = sorted.filter(item => {
+                const startDate = new Date(item.StartDate);
+                return startDate >= dateRange.from && startDate <= dateRange.to;
+            });
+        } else if (filterDateContext === 'closing') {
+            sorted = sorted.filter(item => {
+                const endDate = new Date(item.EndDate);
+                return endDate >= dateRange.from && endDate <= dateRange.to;
             });
         }
+
         setSortedListings(sorted);
     }    
 
     useEffect(() => {
         sortListings();
-    }, [sortType, listings, highlightsOnly]);
+    }, [sortType, sortDate, filterDateContext, listings, highlightsOnly]);
 
     return (
-        <>
-        <div className="bg-gray-50 p-4 w-full flex flex-col">
-            <button 
-                onClick={() => {
-                    setSortType('date');
-                    setHighlightsOnly(false);
-                    setSearchTerm('');
-                    setSelectedLocation('');
-                }} 
-                className="place-self-end"
-            >
-                Clear All Filters
-            </button>
-            <div className="flex flex-col items-start md:flex-row flex-wrap justify-start gap-4">
-                <div className="flex flex-col p-2">
-                    <label htmlFor="filterResults">Time</label>
-                    <select id="filterResults" value={sortType} onChange={(e) => setSortType(e.target.value)} className="p-1 bg-white border">
-                        <option value="date" defaultValue>On View Now</option>
-                        {/* <option value="alphabetical">Alphabetical</option> */}
-                        <option value="tonight">Opening Tonight</option>
-                        <option value="thisweek">Opening This Week</option>
-                        <option value="thismonth">Opening This Month</option>
-                        <option value="nextmonth">Opening Next Month</option>
-                        <option value="closethisweek">Closing This Week</option>
-                        <option value="closethismonth">Closing This Month</option>
-                    </select>
+        <div className="flex flex-row w-full gap-4 items-start">
+            
+
+            <div className="w-1/4 flex flex-col gap-4 bg-gray-100 p-4">
+            {JSON.stringify(sortDate)}
+                <div className="flex flex-col grow pb-2 border-b border-gray-200">
+                    <label htmlFor="searchTerm" className="text-sm uppercase font-bold pb-2">Search</label>
+                    <input 
+                        type="text" 
+                        id="searchTerm"
+                        className="p-1 border"
+                        value={searchTerm} 
+                        onChange={(e) => setSearchTerm(e.target.value)} 
+                    />
+                </div>   
+            
+                <div className="pb-2 border-b border-gray-200">
+                    <div className="uppercase text-sm pb-2 font-bold">Calendar</div>
+                    <div className="flex flex-row gap-2 mb-2">
+                        <div className="flex flex-col w-1/2">
+                            <label htmlFor="filterDateContext">Type</label>
+                            <div id="filterDateContext" className="p-1 border cursor-pointer">
+                                <div onClick={() => setfilterDateContext('onview')} className={filterDateContext === 'onview' ? 'bg-gray-200' : ''}>On View</div>
+                                <div onClick={() => setfilterDateContext('opening')} className={filterDateContext === 'opening' ? 'bg-gray-200' : ''}>Opening</div>
+                                <div onClick={() => setfilterDateContext('closing')} className={filterDateContext === 'closing' ? 'bg-gray-200' : ''}>Closing</div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col w-1/2">
+                            <label htmlFor="filterResults">Date Range</label>
+                            <div id="filterResults" className="p-1 border cursor-pointer">
+                                <div onClick={() => setSortType('tonight')} className={sortType === 'tonight' ? 'bg-gray-200' : ''}>Today</div>
+                                <div onClick={() => setSortType('thisweek')} className={sortType === 'thisweek' ? 'bg-gray-200' : ''}>This Week</div>
+                                <div onClick={() => setSortType('thismonth')} className={sortType === 'thismonth' ? 'bg-gray-200' : ''}>This Month</div>
+                                <div onClick={() => setSortType('nextmonth')} className={sortType === 'nextmonth' ? 'bg-gray-200' : ''}>Next Month</div>
+                            </div>
+                        </div>                       
+                    </div>
+                    <div className='border px-1'>
+                        <DatePicker onChange={(date) => {
+                            setSortType('date');
+                            setSortDate(date);
+                            
+                        }} />
+                    </div>
+                        
                 </div>
-                <div className="flex flex-col p-2 w-48">
+
+
+                <div className="flex flex-col pb-2 border-b border-gray-200">
+                    <div className="uppercase text-sm pb-2 font-bold">Location</div>
                     <label htmlFor="locationFilter">Venue</label>
                     <select 
                         id="locationFilter" 
@@ -195,115 +205,122 @@ export default function displayListings() {
                         checked={highlightsOnly} 
                         onChange={toggleHighlights} 
                     />
-                    Highlights Only
+                    Sarah Hotchkiss is excited about it
                 </label>
-                <div className="flex flex-col p-2 grow">
-                    <label htmlFor="searchTerm">Search</label>
-                    <input 
-                        type="text" 
-                        id="searchTerm"
-                        className="p-1 border"
-                        value={searchTerm} 
-                        onChange={(e) => setSearchTerm(e.target.value)} 
-                    />
-                </div>
+
+                <button 
+                    onClick={() => {
+                        setSortType('closingFirst');
+                        setHighlightsOnly(false);
+                        setSearchTerm('');
+                        setSelectedLocation('');
+                        setfilterDateContext('onview');
+                        setSortDate({from: new Date(), to: new Date()});
+                        setSortType('closingFirst');
+                    }} 
+                    className="border p-2 block"
+                >
+                    Clear All Filters
+                </button>                    
+            </div>
+      
+            <div className="w-3/4">
+                {loading ? (
+                    <div className="spinner animate-spin text-3xl text-center w-full">
+                        🎨
+                    </div>
+                ) : (
+                    <>
+                        <div>
+                            <p>{displayedResults} results found</p>
+                        </div>     
+                        <div className="flex flex-row gap-4">
+                            <span 
+                                className={isMapView ? '' : 'font-bold'} 
+                                onClick={() => setIsMapView(false)}
+                            >
+                                List View
+                            </span>
+                            <span 
+                                className={isMapView ? 'font-bold' : ''} 
+                                onClick={() => setIsMapView(true)}
+                            >
+                                Map View
+                            </span>
+                        </div>
+                        {isMapView && L ? (
+                            <div id="map-view" className="w-full">
+                                <div className="h-[50vh] border w-full">
+                                <MapContainer center={[37.7749, -122.4194]} zoom={8} scrollWheelZoom={true} className="h-[50vh] border w-full">
+                                    <TileLayer
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    />
+                                    { 
+                                    sortedListings
+                                        .filter(item => highlightsOnly ? item.Highlight : true)
+                                        .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
+                                        .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
+                                        .map((item, index) => {
+                                            const location = locations.find(loc => loc.Name === item.locationName);
+                                            
+                                            return location && location.Geolocation ? (
+                                                <Marker 
+                                                    key={index} 
+                                                    position={[location.Geolocation.lat, location.Geolocation.lng]} 
+                                                    icon={L.icon({
+                                                        iconUrl: item.Highlight 
+                                                            ? "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cg clip-path='url(%23clip0_1_2)'%3E%3Cpath d='M21 1.16667L22.8025 4.81833L26.8333 5.4075L23.9167 8.24833L24.605 12.2617L21 10.3658L17.395 12.2617L18.0833 8.24833L15.1667 5.4075L19.1975 4.81833L21 1.16667Z' fill='%23FFF700' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_1_2'%3E%3Crect width='14' height='14' fill='white' transform='translate(14)'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A"
+                                                            : "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A",
+                                                    })}
+                                                >
+                                                    <Popup>
+                                                        <div><b>{item.Event}</b><br /><a href={'/location/' + item.Location._ref}>{item.locationName}</a><br />{item.locationAddress}</div>
+                                                    </Popup>
+                                                </Marker>
+                                            ) : null;
+                                        })
+                                    }
+                                </MapContainer>
+                                </div>
+
+                            </div>
+                        ) : (
+                            <ul id="list-view" className="w-full">
+                                {
+                                    sortedListings
+                                        .filter(item => highlightsOnly ? item.Highlight : true)
+                                        .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
+                                        .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
+                                        .map((item, index) => (
+                                            <li className="border-b border-dashed border-black py-4 w-full relative" key={index}>
+                                                <h2 className="font-bold"><a className="underline decoration-wavy" href={'/listing/' + item._id}>{item.Event}</a> @ <a className="underline decoration-wavy" href={'/location/' + item.Location._ref}>{item.locationName}</a> {item.Highlight && '★'}</h2>
+                                                <div>{formatDate(item.StartDate)} - {formatDate(item.EndDate)}</div>
+                                                {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
+                                                <CalendarLink listing={item} location="" />
+                                                <button className="text-gray-500 mt-2" onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
+                                                    {showDetails[index] ? 'Hide Details' : 'Show Details'}
+                                                </button>
+                                                {showDetails[index] && (
+                                                    <div className="border-t border-dashed border-gray-300 pt-2 mt-2">
+                                                        <div className="prose">
+                                                            {/* <div>URL: <a href={item.URL}>{item.URL}</a></div> */}
+                                                            <div>Venue: {item.locationName}</div>
+                                                            <div>Address: {item.locationAddress}</div>
+                                                            <div>Website: <a className="underline" href={item.locationUrl}>{item.locationUrl}</a></div>                                                    
+                                                            
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </li>
+                                    ))
+                                }
+                            </ul>
+                        )}
+                    </>
+                )}
             </div>
         </div>
-            {loading ? (
-                <div className="spinner animate-spin text-3xl text-center w-full">
-                    🎨
-                </div>
-            ) : (
-                <>
-                    <div>
-                        <p>{displayedResults} results found</p>
-                    </div>     
-                    <div className="flex flex-row gap-4">
-                        <span 
-                            className={isMapView ? '' : 'font-bold'} 
-                            onClick={() => setIsMapView(false)}
-                        >
-                            List View
-                        </span>
-                        <span 
-                            className={isMapView ? 'font-bold' : ''} 
-                            onClick={() => setIsMapView(true)}
-                        >
-                            Map View
-                        </span>
-                    </div>
-                    {isMapView && L ? (
-                        <div id="map-view" className="w-full">
-                            <div className="h-[50vh] border w-full">
-                            <MapContainer center={[37.7749, -122.4194]} zoom={8} scrollWheelZoom={true} className="h-[50vh] border w-full">
-                                <TileLayer
-                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                />
-                                { 
-                                sortedListings
-                                    .filter(item => highlightsOnly ? item.Highlight : true)
-                                    .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
-                                    .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
-                                    .map((item, index) => {
-                                        const location = locations.find(loc => loc.Name === item.locationName);
-                                        
-                                        return location && location.Geolocation ? (
-                                            <Marker 
-                                                key={index} 
-                                                position={[location.Geolocation.lat, location.Geolocation.lng]} 
-                                                icon={L.icon({
-                                                    iconUrl: item.Highlight 
-                                                        ? "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cg clip-path='url(%23clip0_1_2)'%3E%3Cpath d='M21 1.16667L22.8025 4.81833L26.8333 5.4075L23.9167 8.24833L24.605 12.2617L21 10.3658L17.395 12.2617L18.0833 8.24833L15.1667 5.4075L19.1975 4.81833L21 1.16667Z' fill='%23FFF700' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_1_2'%3E%3Crect width='14' height='14' fill='white' transform='translate(14)'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A"
-                                                        : "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A",
-                                                })}
-                                            >
-                                                <Popup>
-                                                    <div><b>{item.Event}</b><br /><a href={'/location/' + item.Location._ref}>{item.locationName}</a><br />{item.locationAddress}</div>
-                                                </Popup>
-                                            </Marker>
-                                        ) : null;
-                                    })
-                                }
-                            </MapContainer>
-                            </div>
-
-                        </div>
-                    ) : (
-                        <ul id="list-view" className="w-full">
-                            {
-                                sortedListings
-                                    .filter(item => highlightsOnly ? item.Highlight : true)
-                                    .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
-                                    .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
-                                    .map((item, index) => (
-                                        <li className="border-b border-dashed border-black py-4 w-full relative" key={index}>
-                                            <h2 className="font-bold"><a className="underline decoration-wavy" href={'/listing/' + item._id}>{item.Event}</a> @ <a className="underline decoration-wavy" href={'/location/' + item.Location._ref}>{item.locationName}</a> {item.Highlight && '★'}</h2>
-                                            <div>{formatDate(item.StartDate)} - {formatDate(item.EndDate)}</div>
-                                            {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
-                                            <CalendarLink listing={item} location="" />
-                                            <button className="text-gray-500 mt-2" onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
-                                                {showDetails[index] ? 'Hide Details' : 'Show Details'}
-                                            </button>
-                                            {showDetails[index] && (
-                                                <div className="border-t border-dashed border-gray-300 pt-2 mt-2">
-                                                    <div className="prose">
-                                                        {/* <div>URL: <a href={item.URL}>{item.URL}</a></div> */}
-                                                        <div>Venue: {item.locationName}</div>
-                                                        <div>Address: {item.locationAddress}</div>
-                                                        <div>Website: <a className="underline" href={item.locationUrl}>{item.locationUrl}</a></div>                                                    
-                                                        
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </li>
-                                ))
-                            }
-                        </ul>
-                    )}
-                </>
-            )}
-        </>
     )
 }
 
