@@ -7,7 +7,10 @@ import CalendarLink from './calendarLink';
 import DatePicker from './datePicker';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
-import { format, set } from 'date-fns';
+import { format, set, setDay } from 'date-fns';
+import { calendar } from 'googleapis/build/src/apis/calendar';
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/style.css";
 
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
@@ -16,6 +19,7 @@ const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLaye
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
+// Format date for display
 function formatDate(dateString) {
     const date = new Date(dateString);
     const currentYear = new Date().getFullYear();
@@ -25,39 +29,53 @@ function formatDate(dateString) {
     return format(date, 'MMMM d, yyyy');
 }
 
-function setDateRange() {
-    // set the filterDateRnage state and the react daypicker componenet
-    setFilterDateRange(dateRange);
-    setSortDate({ from: dateRange.from, to: dateRange.to });
 
-}
+
 
 export default function displayListings() {
-    const [sortType, setSortType] = useState('closingFirst');
-    const [sortDate, setSortDate] = useState([]);
-    const [filterDateContext, setFilterDateContext] = useState('onview');
-    const [filterDateRange, setFilterDateRange] = useState([]);
+    // Initial data
     const [listings, setListings] = useState([]);
+    const [locations, setLocations] = useState([]);    
+    // Filtering
+    const [calendarTypeFilter, setCalendarTypeFilter] = useState('onview'); // onview, opening, closing
+    const [calendarDateRangeFilter, setCalendarDateRangeFilter] = useState([]); // actual date range to filter on    
+    const [filteredListings, setFilteredListings] = useState([]);
     const [highlightsOnly, setHighlightsOnly] = useState(false);
-    const [showDetails, setShowDetails] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [displayedResults, setDisplayedResults] = useState(0);
-    const [locations, setLocations] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState('');
+    //  Sorting
+    const [sortDate, setSortDate] = useState([]);
+    // Display
+    const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('thisweek');
+    const [showDetails, setShowDetails] = useState({});
+    const [loading, setLoading] = useState(true);
     const [isMapView, setIsMapView] = useState(false);
-    const [sortedListings, setSortedListings] = useState([]);
     const [L, setL] = useState(null);
+    const [displayedResults, setDisplayedResults] = useState(0); // number of results
 
+
+    // Date Variables
+    const today = new Date();
+    const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+    const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6));
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);    
+
+    // Load initial data
     useEffect(() => {
         async function fetchData() {
             try {
+                // Set Data
                 const data = await getListings();
                 setListings(data);
-                setSortType('closingFirst');
-                sortListings(data);
                 const locationData = await getLocations();
                 setLocations(locationData); 
+                // Set Filter Status
+                setCalendarTypeFilter('onview');
+                setCalendarDateRangeFilter({ from: startOfWeek, to: endOfWeek });
+                setCalendarDateRangePreset('thisweek');
             } catch (error) {
                 console.error('Data retrieval failed:', error);
             } finally {
@@ -67,14 +85,29 @@ export default function displayListings() {
         fetchData();
     }, []);  
 
+    // Update filtered listings when filters change
     useEffect(() => {
-        const filteredListings = sortedListings
+        const filteredListings = listings
             .filter(item => highlightsOnly ? item.Highlight : true)
             .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
-            .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()));
+            .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
+            .filter(item => {
+                const startDate = new Date(item.StartDate);
+                const endDate = new Date(item.EndDate);
+                if (calendarTypeFilter === 'onview') {
+                    return (startDate <= calendarDateRangeFilter.to && endDate >= calendarDateRangeFilter.from);
+                } else if (calendarTypeFilter === 'opening') {
+                    return startDate >= calendarDateRangeFilter.from && startDate <= calendarDateRangeFilter.to;
+                } else if (calendarTypeFilter === 'closing') {
+                    return endDate >= calendarDateRangeFilter.from && endDate <= calendarDateRangeFilter.to;
+                }
+                return true;
+            });
         setDisplayedResults(filteredListings.length);
-    }, [sortType, sortDate, filterDateContext, highlightsOnly, searchTerm, listings, selectedLocation, sortedListings]);
+        setFilteredListings(filteredListings);
+    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, searchTerm, listings, selectedLocation]);
 
+    // Toggle map view
     useEffect(() => {
         if (isMapView) {
             // Dynamically import Leaflet and related assets
@@ -84,63 +117,51 @@ export default function displayListings() {
         }
     }, [isMapView]);
 
+    // Toggle highlights filter
     function toggleHighlights() {
         setHighlightsOnly(!highlightsOnly);
     }
 
-    function sortListings(listingsToSort = listings) {
-        let sorted = [...listingsToSort];
-        const now = new Date();
-        const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-        const endOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 6));
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-        const endOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+    // function filterListings(listingsToFilter = listings) {
+    //     let filtered = [...listingsToFilter];
 
-        let dateRange = { from: now, to: now };
+    //     if (calendarTypeFilter === 'onview') {
+    //         filtered = filtered.filter(item => {
+    //             const startDate = new Date(item.StartDate);
+    //             const endDate = new Date(item.EndDate);
+    //             return (startDate <= calendarDateRangeFilter.to && endDate >= calendarDateRangeFilter.from);
+    //         });
+    //     } else if (calendarTypeFilter === 'opening') {
+    //         filtered = filtered.filter(item => {
+    //             const startDate = new Date(item.StartDate);
+    //             return startDate >= calendarDateRangeFilter.from && startDate <= calendarDateRangeFilter.to;
+    //         });
+    //     } else if (calendarTypeFilter === 'closing') {
+    //         filtered = filtered.filter(item => {
+    //             const endDate = new Date(item.EndDate);
+    //             return endDate >= calendarDateRangeFilter.from && endDate <= calendarDateRangeFilter.to;
+    //         });
+    //     }
 
-        if (sortType === 'thisweek') {
-            dateRange = { from: startOfWeek, to: endOfWeek };
-        } else if (sortType === 'thismonth') {
-            dateRange = { from: startOfMonth, to: endOfMonth };
-        } else if (sortType === 'nextmonth') {
-            dateRange = { from: startOfNextMonth, to: endOfNextMonth };
-        } else if (sortType === 'tonight') {
-            dateRange = { from: now, to: new Date(now.setDate(now.getDate() + 1)) };
-        }
+    //     setFilteredListings(filtered);
+    // }    
 
-        if (filterDateContext === 'onview') {
-            sorted = sorted.filter(item => {
-                const startDate = new Date(item.StartDate);
-                const endDate = new Date(item.EndDate);
-                return (startDate <= dateRange.to && endDate >= dateRange.from);
-            });
-        } else if (filterDateContext === 'opening') {
-            sorted = sorted.filter(item => {
-                const startDate = new Date(item.StartDate);
-                return startDate >= dateRange.from && startDate <= dateRange.to;
-            });
-        } else if (filterDateContext === 'closing') {
-            sorted = sorted.filter(item => {
-                const endDate = new Date(item.EndDate);
-                return endDate >= dateRange.from && endDate <= dateRange.to;
-            });
-        }
+    // useEffect(() => {
+    //     filterListings();
+    // }, [sortDate, calendarTypeFilter, listings, highlightsOnly]);
+    function updateCalendarDateRangeFilter(dateRange){
+        const adjustedFilter = {
+            from: new Date(dateRange.from).setHours(0, 1, 0, 0),
+            to: new Date(dateRange.to).setHours(23, 59, 0, 0)
+        };
+        setCalendarDateRangeFilter(adjustedFilter);
+        setCalendarDateRangePreset('custom');
+    }
 
-        setSortedListings(sorted);
-    }    
-
-    useEffect(() => {
-        sortListings();
-    }, [sortType, sortDate, filterDateContext, listings, highlightsOnly]);
 
     return (
         <div className="flex flex-row w-full gap-4 items-start">
-            
-
             <div className="w-1/4 flex flex-col gap-4 bg-gray-100 p-4">
-            {JSON.stringify(sortDate)}
                 <div className="flex flex-col grow pb-2 border-b border-gray-200">
                     <label htmlFor="searchTerm" className="text-sm uppercase font-bold pb-2">Search</label>
                     <input 
@@ -156,33 +177,36 @@ export default function displayListings() {
                     <div className="uppercase text-sm pb-2 font-bold">Calendar</div>
                     <div className="flex flex-row gap-2 mb-2">
                         <div className="flex flex-col w-1/2">
-                            <label htmlFor="filterDateContext">Type</label>
-                            <div id="filterDateContext" className="p-1 border cursor-pointer">
-                                <div onClick={() => setfilterDateContext('onview')} className={filterDateContext === 'onview' ? 'bg-gray-200' : ''}>On View</div>
-                                <div onClick={() => setfilterDateContext('opening')} className={filterDateContext === 'opening' ? 'bg-gray-200' : ''}>Opening</div>
-                                <div onClick={() => setfilterDateContext('closing')} className={filterDateContext === 'closing' ? 'bg-gray-200' : ''}>Closing</div>
+                            <label htmlFor="calendarTypeFilter">Type</label>
+                            <div id="calendarTypeFilter" className="p-1 border cursor-pointer">
+                                <div onClick={() => setCalendarTypeFilter('onview')} className={calendarTypeFilter === 'onview' ? 'bg-gray-200' : ''}>On View</div>
+                                <div onClick={() => setCalendarTypeFilter('opening')} className={calendarTypeFilter === 'opening' ? 'bg-gray-200' : ''}>Opening</div>
+                                <div onClick={() => setCalendarTypeFilter('closing')} className={calendarTypeFilter === 'closing' ? 'bg-gray-200' : ''}>Closing</div>
                             </div>
                         </div>
                         <div className="flex flex-col w-1/2">
                             <label htmlFor="filterResults">Date Range</label>
                             <div id="filterResults" className="p-1 border cursor-pointer">
-                                <div onClick={() => setSortType('tonight')} className={sortType === 'tonight' ? 'bg-gray-200' : ''}>Today</div>
-                                <div onClick={() => setSortType('thisweek')} className={sortType === 'thisweek' ? 'bg-gray-200' : ''}>This Week</div>
-                                <div onClick={() => setSortType('thismonth')} className={sortType === 'thismonth' ? 'bg-gray-200' : ''}>This Month</div>
-                                <div onClick={() => setSortType('nextmonth')} className={sortType === 'nextmonth' ? 'bg-gray-200' : ''}>Next Month</div>
+                                <div onClick={() => { setCalendarDateRangeFilter({ from: new Date().setHours(0, 0, 0, 0), to: new Date().setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('today'); }} className={calendarDateRangePreset === 'today' ? 'bg-gray-200' : ''}>Today</div>
+                                <div onClick={() => { setCalendarDateRangeFilter({ from: startOfWeek.setHours(0, 0, 0, 0), to: endOfWeek.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('thisweek'); }} className={calendarDateRangePreset === 'thisweek' ? 'bg-gray-200' : ''}>This Week</div>
+                                <div onClick={() => { setCalendarDateRangeFilter({ from: startOfMonth.setHours(0, 0, 0, 0), to: endOfMonth.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('thismonth'); }} className={calendarDateRangePreset === 'thismonth' ? 'bg-gray-200' : ''}>This Month</div>
+                                <div onClick={() => { setCalendarDateRangeFilter({ from: startOfNextMonth.setHours(0, 0, 0, 0), to: endOfNextMonth.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('nextmonth'); }} className={calendarDateRangePreset === 'nextmonth' ? 'bg-gray-200' : ''}>Next Month</div>                                
+                                <div className={calendarDateRangePreset === 'custom' ? 'bg-gray-200' : ''}>Custom</div>
                             </div>
                         </div>                       
                     </div>
                     <div className='border px-1'>
-                        <DatePicker onChange={(date) => {
-                            setSortType('date');
-                            setSortDate(date);
-                            
-                        }} />
+
+                        <DayPicker
+                            mode="range"
+                            onSelect={(dateRange) => updateCalendarDateRangeFilter(dateRange)}
+                            selected={calendarDateRangeFilter}
+                            required
+                            showOutsideDays
+                        />                        
                     </div>
                         
                 </div>
-
 
                 <div className="flex flex-col pb-2 border-b border-gray-200">
                     <div className="uppercase text-sm pb-2 font-bold">Location</div>
@@ -210,13 +234,12 @@ export default function displayListings() {
 
                 <button 
                     onClick={() => {
-                        setSortType('closingFirst');
                         setHighlightsOnly(false);
                         setSearchTerm('');
                         setSelectedLocation('');
-                        setfilterDateContext('onview');
+                        setCalendarTypeFilter('onview');
+                        setCalendarDateRangeFilter({ from: startOfWeek, to: endOfWeek });
                         setSortDate({from: new Date(), to: new Date()});
-                        setSortType('closingFirst');
                     }} 
                     className="border p-2 block"
                 >
@@ -257,7 +280,7 @@ export default function displayListings() {
                                     url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                                     />
                                     { 
-                                    sortedListings
+                                    filteredListings
                                         .filter(item => highlightsOnly ? item.Highlight : true)
                                         .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
                                         .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -288,10 +311,7 @@ export default function displayListings() {
                         ) : (
                             <ul id="list-view" className="w-full">
                                 {
-                                    sortedListings
-                                        .filter(item => highlightsOnly ? item.Highlight : true)
-                                        .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
-                                        .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
+                                    filteredListings
                                         .map((item, index) => (
                                             <li className="border-b border-dashed border-black py-4 w-full relative" key={index}>
                                                 <h2 className="font-bold"><a className="underline decoration-wavy" href={'/listing/' + item._id}>{item.Event}</a> @ <a className="underline decoration-wavy" href={'/location/' + item.Location._ref}>{item.locationName}</a> {item.Highlight && '★'}</h2>

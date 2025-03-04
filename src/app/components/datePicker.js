@@ -4,7 +4,7 @@ import "react-day-picker/style.css";
 
 export default function DatePicker({ onChange }) {
   const [selected, setSelected] = useState();
-
+  console.log(onChange)
   useEffect(() => {
     if (selected) {
       onChange(selected);
