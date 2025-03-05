@@ -9,7 +9,7 @@ export default function Home() {
         <DisplayListings />
       </main>
       <footer className="">
-        {/* footer */}
+        this is the footer
       </footer> 
     </div>
   );

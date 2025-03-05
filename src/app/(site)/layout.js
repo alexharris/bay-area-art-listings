@@ -5,7 +5,7 @@ export default function SiteLayout({ children }) {
 
 
   return (
-    <div className="w-full mx-auto">
+    <div className="w-full mx-auto max-w-7xl">
     <Header />
     {children}
     </div>

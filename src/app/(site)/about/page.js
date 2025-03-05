@@ -46,6 +46,7 @@ export default function About() {
     async function fetchData() {
       try {
         const data = await getContent()
+        console.log(data)
         setContent(data)
       } catch (error) {
         console.error('Data retrieval failed:', error);
@@ -57,6 +58,7 @@ export default function About() {
 
   return (
     <div className="flex flex-col mt-8 px-4 sm:px-4 font-[family-name:var(--font-geist-sans)]">
+      
       {content.map((item, index) => (
         <div className="prose" key={index}>
           <h1>{item.Header}</h1>

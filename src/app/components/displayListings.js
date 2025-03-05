@@ -52,6 +52,7 @@ export default function displayListings() {
     const [isMapView, setIsMapView] = useState(false);
     const [L, setL] = useState(null);
     const [displayedResults, setDisplayedResults] = useState(0); // number of results
+    const [showMenu, setShowMenu] = useState(false);
 
 
     // Date Variables
@@ -160,9 +161,18 @@ export default function displayListings() {
 
 
     return (
-        <div className="flex flex-row w-full gap-4 items-start">
-            <div className="w-1/4 flex flex-col gap-4 bg-gray-100 p-4">
-                <div className="flex flex-col grow pb-2 border-b border-gray-200">
+   
+          
+        <div className="flex flex-row w-full gap-8 items-start">
+
+            {/* Sidebar */}
+            <div className={`${showMenu ? 'flex' : 'hidden'} flex-col fixed md:sticky md:top-2 md:flex inset-0 z-40 p-2 md:inset-unset md:w-96 gap-4 bg-gray-50 `}>
+                
+
+                <svg className="absolute top-2 right-2 md:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
+                    
+                
+                <div className="flex flex-col grow pb-2 border-b border-gray-200 mt-8 md:mt-0">
                     <label htmlFor="searchTerm" className="text-sm uppercase font-bold pb-2">Search</label>
                     <input 
                         type="text" 
@@ -172,7 +182,6 @@ export default function displayListings() {
                         onChange={(e) => setSearchTerm(e.target.value)} 
                     />
                 </div>   
-            
                 <div className="pb-2 border-b border-gray-200">
                     <div className="uppercase text-sm pb-2 font-bold">Calendar</div>
                     <div className="flex flex-row gap-2 mb-2">
@@ -196,7 +205,6 @@ export default function displayListings() {
                         </div>                       
                     </div>
                     <div className='border px-1'>
-
                         <DayPicker
                             mode="range"
                             onSelect={(dateRange) => updateCalendarDateRangeFilter(dateRange)}
@@ -205,9 +213,7 @@ export default function displayListings() {
                             showOutsideDays
                         />                        
                     </div>
-                        
                 </div>
-
                 <div className="flex flex-col pb-2 border-b border-gray-200">
                     <div className="uppercase text-sm pb-2 font-bold">Location</div>
                     <label htmlFor="locationFilter">Venue</label>
@@ -231,7 +237,6 @@ export default function displayListings() {
                     />
                     Sarah Hotchkiss is excited about it
                 </label>
-
                 <button 
                     onClick={() => {
                         setHighlightsOnly(false);
@@ -246,14 +251,23 @@ export default function displayListings() {
                     Clear All Filters
                 </button>                    
             </div>
-      
-            <div className="w-3/4">
+            
+
+            {/* Main Col */}
+            <div className="w-full">
                 {loading ? (
                     <div className="spinner animate-spin text-3xl text-center w-full">
                         🎨
                     </div>
                 ) : (
-                    <>
+                    <>  
+                    <div className="flex flex-row justify-between items-center border-b border-black pb-2">
+
+                        <div className="flex md:hidden icon-link">
+
+                            <svg onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+
+                        </div>    
                         <div>
                             <p>{displayedResults} results found</p>
                         </div>     
@@ -262,15 +276,17 @@ export default function displayListings() {
                                 className={isMapView ? '' : 'font-bold'} 
                                 onClick={() => setIsMapView(false)}
                             >
-                                List View
+                                List
                             </span>
                             <span 
                                 className={isMapView ? 'font-bold' : ''} 
                                 onClick={() => setIsMapView(true)}
                             >
-                                Map View
+                                Map
                             </span>
-                        </div>
+                        </div>                                              
+                    </div>
+
                         {isMapView && L ? (
                             <div id="map-view" className="w-full">
                                 <div className="h-[50vh] border w-full">
@@ -314,7 +330,8 @@ export default function displayListings() {
                                     filteredListings
                                         .map((item, index) => (
                                             <li className="border-b border-dashed border-black py-4 w-full relative" key={index}>
-                                                <h2 className="font-bold"><a className="underline decoration-wavy" href={'/listing/' + item._id}>{item.Event}</a> @ <a className="underline decoration-wavy" href={'/location/' + item.Location._ref}>{item.locationName}</a> {item.Highlight && '★'}</h2>
+                                                <h2 className="font-bold text-xl pr-8"><a className="" href={'/listing/' + item._id}>{item.Event}</a>{item.Highlight && '★'}</h2>
+                                                <a className="underline" href={'/location/' + item.Location._ref}>{item.locationName}</a> 
                                                 <div>{formatDate(item.StartDate)} - {formatDate(item.EndDate)}</div>
                                                 {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
                                                 <CalendarLink listing={item} location="" />
@@ -341,6 +358,7 @@ export default function displayListings() {
                 )}
             </div>
         </div>
+    
     )
 }
 
