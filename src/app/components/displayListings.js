@@ -8,7 +8,6 @@ import DatePicker from './datePicker';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import { format, set, setDay } from 'date-fns';
-import { calendar } from 'googleapis/build/src/apis/calendar';
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 
