@@ -4,11 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import getListings from './getListings';
 import getLocations from './getLocations';
 import CalendarLink from './calendarLink';
-import DatePicker from './datePicker';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import { format, set, setDay } from 'date-fns';
 import { DayPicker } from "react-day-picker";
+import DisplayFilters from './displayFilters';
 import "react-day-picker/style.css";
 
 
@@ -165,7 +165,7 @@ export default function displayListings() {
         <div className="flex flex-row w-full gap-8 items-start">
 
             {/* Sidebar */}
-            <div className={`${showMenu ? 'flex' : 'hidden'} flex-col fixed md:sticky md:top-2 md:flex inset-0 z-40 p-2 md:inset-unset md:w-96 gap-4 bg-gray-50 `}>
+            <div className={`${showMenu ? 'flex' : 'hidden'} flex-col fixed md:sticky overflow-scroll md:top-2 md:flex inset-0 z-40 p-2 md:inset-unset md:min-w-96 gap-4 bg-gray-50 `}>
                 
 
                 <svg className="absolute top-2 right-2 md:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
@@ -260,16 +260,18 @@ export default function displayListings() {
                     </div>
                 ) : (
                     <>  
-                    <div className="flex flex-row justify-between items-center border-b border-black pb-2">
-
-                        <div className="flex md:hidden icon-link">
-
-                            <svg onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-
-                        </div>    
-                        <div>
-                            <p>{displayedResults} results found</p>
-                        </div>     
+                    <div className="flex flex-row justify-between align-bottom items-center border-b border-black pb-2">
+                   
+                           
+                        <div onClick={() => setShowMenu(prev => !prev)} className="flex flex-row gap-2">
+                            <DisplayFilters                                 
+                                type={calendarTypeFilter}
+                                presetRange={calendarDateRangePreset}
+                                customRange={calendarDateRangeFilter}
+                                displayedResults={displayedResults}
+                            />    
+                            <svg className="icon-link" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                         
+                        </div>
                         <div className="flex flex-row gap-4">
                             <span 
                                 className={isMapView ? '' : 'font-bold'} 
