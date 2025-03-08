@@ -165,7 +165,7 @@ export default function displayListings() {
         <div className="flex flex-row w-full gap-8 items-start">
 
             {/* Sidebar */}
-            <div className={`${showMenu ? 'flex' : 'hidden'} flex-col fixed md:sticky overflow-scroll md:top-2 md:flex inset-0 z-40 p-2 md:inset-unset md:min-w-96 gap-4 bg-gray-50 `}>
+            <div className={`${showMenu ? 'flex' : 'hidden'} mb-12 flex-col fixed md:sticky overflow-scroll md:top-2 md:flex inset-0 z-40 p-2 md:inset-unset md:min-w-96 gap-4 bg-gray-50 `}>
                 
 
                 <svg className="absolute top-2 right-2 md:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
@@ -236,7 +236,7 @@ export default function displayListings() {
                     />
                     Sarah Hotchkiss is excited about it
                 </label>
-                <button 
+                <span 
                     onClick={() => {
                         setHighlightsOnly(false);
                         setSearchTerm('');
@@ -245,10 +245,20 @@ export default function displayListings() {
                         setCalendarDateRangeFilter({ from: startOfWeek, to: endOfWeek });
                         setSortDate({from: new Date(), to: new Date()});
                     }} 
-                    className="border p-2 block"
+                    className="underline"
                 >
                     Clear All Filters
-                </button>                    
+                </span> 
+                <div className="w-full fixed sm:hidden bottom-0 right-0 left-0 bg-white">
+                    <button 
+                        onClick={() => {
+                            setShowMenu(false);
+                        }} 
+                        className="bg-blue-800 p-2 w-full block text-white text-center border-2 border-gray-50"
+                    >
+                    View Results ({displayedResults})
+                    </button>     
+                </div>                                   
             </div>
             
 
