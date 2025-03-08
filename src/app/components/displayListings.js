@@ -52,6 +52,7 @@ export default function displayListings() {
     const [L, setL] = useState(null);
     const [displayedResults, setDisplayedResults] = useState(0); // number of results
     const [showMenu, setShowMenu] = useState(false);
+    const [showCustomCalendar, setShowCustomCalendar] = useState(false);
 
 
     // Date Variables
@@ -165,13 +166,13 @@ export default function displayListings() {
         <div className="flex flex-row w-full gap-8 items-start">
 
             {/* Sidebar */}
-            <div className={`${showMenu ? 'flex' : 'hidden'} mb-12 flex-col fixed md:sticky overflow-scroll md:top-2 md:flex inset-0 z-40 p-2 md:inset-unset md:min-w-96 gap-4 bg-gray-50 `}>
+            <div className={`${showMenu ? 'flex' : 'hidden'} flex-col fixed md:sticky overflow-scroll md:top-2 md:flex inset-0 z-40 p-2 md:inset-unset md:min-w-96 gap-4 bg-gray-50 `}>
                 
 
                 <svg className="absolute top-2 right-2 md:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
                     
                 
-                <div className="flex flex-col grow pb-2 border-b border-gray-200 mt-8 md:mt-0">
+                <div className="flex flex-col pb-2 border-b border-gray-200 mt-8 md:mt-0">
                     <label htmlFor="searchTerm" className="text-sm uppercase font-bold pb-2">Search</label>
                     <input 
                         type="text" 
@@ -195,23 +196,25 @@ export default function displayListings() {
                         <div className="flex flex-col w-1/2">
                             <label htmlFor="filterResults">Date Range</label>
                             <div id="filterResults" className="p-1 border cursor-pointer">
-                                <div onClick={() => { setCalendarDateRangeFilter({ from: new Date().setHours(0, 0, 0, 0), to: new Date().setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('today'); }} className={calendarDateRangePreset === 'today' ? 'bg-gray-200' : ''}>Today</div>
-                                <div onClick={() => { setCalendarDateRangeFilter({ from: startOfWeek.setHours(0, 0, 0, 0), to: endOfWeek.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('thisweek'); }} className={calendarDateRangePreset === 'thisweek' ? 'bg-gray-200' : ''}>This Week</div>
-                                <div onClick={() => { setCalendarDateRangeFilter({ from: startOfMonth.setHours(0, 0, 0, 0), to: endOfMonth.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('thismonth'); }} className={calendarDateRangePreset === 'thismonth' ? 'bg-gray-200' : ''}>This Month</div>
-                                <div onClick={() => { setCalendarDateRangeFilter({ from: startOfNextMonth.setHours(0, 0, 0, 0), to: endOfNextMonth.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('nextmonth'); }} className={calendarDateRangePreset === 'nextmonth' ? 'bg-gray-200' : ''}>Next Month</div>                                
-                                <div className={calendarDateRangePreset === 'custom' ? 'bg-gray-200' : ''}>Custom</div>
+                                <div onClick={() => { setShowCustomCalendar(false); setCalendarDateRangeFilter({ from: new Date().setHours(0, 0, 0, 0), to: new Date().setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('today'); }} className={calendarDateRangePreset === 'today' ? 'bg-gray-200' : ''}>Today</div>
+                                <div onClick={() => { setShowCustomCalendar(false); setCalendarDateRangeFilter({ from: startOfWeek.setHours(0, 0, 0, 0), to: endOfWeek.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('thisweek'); }} className={calendarDateRangePreset === 'thisweek' ? 'bg-gray-200' : ''}>This Week</div>
+                                <div onClick={() => { setShowCustomCalendar(false); setCalendarDateRangeFilter({ from: startOfMonth.setHours(0, 0, 0, 0), to: endOfMonth.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('thismonth'); }} className={calendarDateRangePreset === 'thismonth' ? 'bg-gray-200' : ''}>This Month</div>
+                                <div onClick={() => { setShowCustomCalendar(false); setCalendarDateRangeFilter({ from: startOfNextMonth.setHours(0, 0, 0, 0), to: endOfNextMonth.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('nextmonth'); }} className={calendarDateRangePreset === 'nextmonth' ? 'bg-gray-200' : ''}>Next Month</div>                                
+                                <div onClick={() => {setShowCustomCalendar(true); setCalendarDateRangePreset('custom')}} className={calendarDateRangePreset === 'custom' ? 'bg-gray-200' : ''}>Custom</div>
                             </div>
                         </div>                       
                     </div>
-                    <div className='border px-1'>
-                        <DayPicker
-                            mode="range"
-                            onSelect={(dateRange) => updateCalendarDateRangeFilter(dateRange)}
-                            selected={calendarDateRangeFilter}
-                            required
-                            showOutsideDays
-                        />                        
-                    </div>
+                    {showCustomCalendar &&
+                        <div className='border px-1'>
+                            <DayPicker
+                                mode="range"
+                                onSelect={(dateRange) => updateCalendarDateRangeFilter(dateRange)}
+                                selected={calendarDateRangeFilter}
+                                required
+                                showOutsideDays
+                            />                        
+                        </div>
+                    }
                 </div>
                 <div className="flex flex-col pb-2 border-b border-gray-200">
                     <div className="uppercase text-sm pb-2 font-bold">Location</div>
@@ -249,16 +252,16 @@ export default function displayListings() {
                 >
                     Clear All Filters
                 </span> 
-                <div className="w-full fixed sm:hidden bottom-0 right-0 left-0 bg-white">
-                    <button 
-                        onClick={() => {
-                            setShowMenu(false);
-                        }} 
-                        className="bg-blue-800 p-2 w-full block text-white text-center border-2 border-gray-50"
-                    >
-                    View Results ({displayedResults})
-                    </button>     
-                </div>                                   
+               
+                <button 
+                    onClick={() => {
+                        setShowMenu(false);
+                    }} 
+                    className="bg-blue-800 p-2 w-full block text-white text-center border-2 border-gray-50"
+                >
+                View Results ({displayedResults})
+                </button>     
+                                              
             </div>
             
 
