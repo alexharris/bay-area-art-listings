@@ -22,13 +22,13 @@ export default function DisplayFilters({ type, presetRange, customRange, display
   };
 
   return (
-    <div className="text-3xl">
+    <div className="text-4xl">
       {presetRange !== 'custom' ? (
-        <div className="capitalize">{type} {formatPresetRange()} ({displayedResults})</div>
+        <div className="capitalize">{type} {formatPresetRange()}</div>
       ) : formatDate(customRange.from) === formatDate(customRange.to) ? (
-        <div className="capitalize">{type} {formatDate(customRange.to)} ({displayedResults})</div>
+        <div className="capitalize">{type} {formatDate(customRange.to)}</div>
       ) : (
-        <div className="capitalize">{type} {formatDate(customRange.from)} - {formatDate(customRange.to)} ({displayedResults})</div>
+        <div className="capitalize">{type} {formatDate(customRange.from)} - {formatDate(customRange.to)}</div>
       )}
     </div>
   );

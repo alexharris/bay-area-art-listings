@@ -123,33 +123,6 @@ export default function displayListings() {
         setHighlightsOnly(!highlightsOnly);
     }
 
-    // function filterListings(listingsToFilter = listings) {
-    //     let filtered = [...listingsToFilter];
-
-    //     if (calendarTypeFilter === 'onview') {
-    //         filtered = filtered.filter(item => {
-    //             const startDate = new Date(item.StartDate);
-    //             const endDate = new Date(item.EndDate);
-    //             return (startDate <= calendarDateRangeFilter.to && endDate >= calendarDateRangeFilter.from);
-    //         });
-    //     } else if (calendarTypeFilter === 'opening') {
-    //         filtered = filtered.filter(item => {
-    //             const startDate = new Date(item.StartDate);
-    //             return startDate >= calendarDateRangeFilter.from && startDate <= calendarDateRangeFilter.to;
-    //         });
-    //     } else if (calendarTypeFilter === 'closing') {
-    //         filtered = filtered.filter(item => {
-    //             const endDate = new Date(item.EndDate);
-    //             return endDate >= calendarDateRangeFilter.from && endDate <= calendarDateRangeFilter.to;
-    //         });
-    //     }
-
-    //     setFilteredListings(filtered);
-    // }    
-
-    // useEffect(() => {
-    //     filterListings();
-    // }, [sortDate, calendarTypeFilter, listings, highlightsOnly]);
     function updateCalendarDateRangeFilter(dateRange){
         const adjustedFilter = {
             from: new Date(dateRange.from).setHours(0, 1, 0, 0),
@@ -166,28 +139,28 @@ export default function displayListings() {
         <div className="flex flex-row w-full gap-8 items-start">
 
             {/* Sidebar */}
-            <div className={`${showMenu ? 'flex' : 'hidden'} flex-col fixed md:sticky overflow-scroll md:top-2 md:flex inset-0 z-40 p-2 md:inset-unset md:min-w-96 gap-4 bg-gray-50 `}>
+            <div className={`${showMenu ? 'flex' : 'hidden'} flex-col fixed md:sticky overflow-scroll md:top-2 md:flex inset-0 z-40 p-2 md:inset-unset md:min-w-96 gap-4 border border-gray-300 bg-white`}>
                 
 
                 <svg className="absolute top-2 right-2 md:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
                     
                 
-                <div className="flex flex-col pb-2 border-b border-gray-200 mt-8 md:mt-0">
-                    <label htmlFor="searchTerm" className="text-sm uppercase font-bold pb-2">Search</label>
+                <div className="flex flex-col pb-2 border-b border-gray-300 mt-8 md:mt-0">
+                    <label htmlFor="searchTerm" className="text-2xl pb-2">Search</label>
                     <input 
                         type="text" 
                         id="searchTerm"
-                        className="p-1 border"
+                        className="p-1 border border-gray-300"
                         value={searchTerm} 
                         onChange={(e) => setSearchTerm(e.target.value)} 
                     />
                 </div>   
-                <div className="pb-2 border-b border-gray-200">
-                    <div className="uppercase text-sm pb-2 font-bold">Calendar</div>
+                <div className="pb-2 border-b border-gray-300">
+                    <div className="text-2xl pb-2">Calendar</div>
                     <div className="flex flex-row gap-2 mb-2">
                         <div className="flex flex-col w-1/2">
                             <label htmlFor="calendarTypeFilter">Type</label>
-                            <div id="calendarTypeFilter" className="p-1 border cursor-pointer">
+                            <div id="calendarTypeFilter" className="p-1 border border-gray-300 cursor-pointer">
                                 <div onClick={() => setCalendarTypeFilter('onview')} className={calendarTypeFilter === 'onview' ? 'bg-gray-200' : ''}>On View</div>
                                 <div onClick={() => setCalendarTypeFilter('opening')} className={calendarTypeFilter === 'opening' ? 'bg-gray-200' : ''}>Opening</div>
                                 <div onClick={() => setCalendarTypeFilter('closing')} className={calendarTypeFilter === 'closing' ? 'bg-gray-200' : ''}>Closing</div>
@@ -195,7 +168,7 @@ export default function displayListings() {
                         </div>
                         <div className="flex flex-col w-1/2">
                             <label htmlFor="filterResults">Date Range</label>
-                            <div id="filterResults" className="p-1 border cursor-pointer">
+                            <div id="filterResults" className="p-1 border border-gray-300 cursor-pointer">
                                 <div onClick={() => { setShowCustomCalendar(false); setCalendarDateRangeFilter({ from: new Date().setHours(0, 0, 0, 0), to: new Date().setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('today'); }} className={calendarDateRangePreset === 'today' ? 'bg-gray-200' : ''}>Today</div>
                                 <div onClick={() => { setShowCustomCalendar(false); setCalendarDateRangeFilter({ from: startOfWeek.setHours(0, 0, 0, 0), to: endOfWeek.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('thisweek'); }} className={calendarDateRangePreset === 'thisweek' ? 'bg-gray-200' : ''}>This Week</div>
                                 <div onClick={() => { setShowCustomCalendar(false); setCalendarDateRangeFilter({ from: startOfMonth.setHours(0, 0, 0, 0), to: endOfMonth.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('thismonth'); }} className={calendarDateRangePreset === 'thismonth' ? 'bg-gray-200' : ''}>This Month</div>
@@ -205,7 +178,7 @@ export default function displayListings() {
                         </div>                       
                     </div>
                     {showCustomCalendar &&
-                        <div className='border px-1'>
+                        <div className='border border-gray-300 px-1'>
                             <DayPicker
                                 mode="range"
                                 onSelect={(dateRange) => updateCalendarDateRangeFilter(dateRange)}
@@ -216,13 +189,13 @@ export default function displayListings() {
                         </div>
                     }
                 </div>
-                <div className="flex flex-col pb-2 border-b border-gray-200">
-                    <div className="uppercase text-sm pb-2 font-bold">Location</div>
+                <div className="flex flex-col pb-2 border-b border-gray-300">
+                    <div className="text-3xl pb-2">Location</div>
                     <label htmlFor="locationFilter">Venue</label>
                     <select 
                         id="locationFilter" 
                         onChange={(e) => setSelectedLocation(e.target.value)} 
-                        className="p-1 bg-white border"
+                        className="p-1 bg-white border border-gray-300"
                     >
                         <option value="">All Locations</option>
                         {locations.map((location, index) => (
@@ -257,7 +230,7 @@ export default function displayListings() {
                     onClick={() => {
                         setShowMenu(false);
                     }} 
-                    className="bg-blue-800 p-2 w-full block text-white text-center border-2 border-gray-50"
+                    className={`${showMenu ? 'block' : 'hidden'} bg-blue-800 p-2 w-full text-white text-center border-2 border-gray-300`}
                 >
                 View Results ({displayedResults})
                 </button>     
@@ -268,12 +241,12 @@ export default function displayListings() {
             {/* Main Col */}
             <div className="w-full">
                 {loading ? (
-                    <div className="spinner animate-spin text-3xl text-center w-full">
+                    <div className="spinner animate-spin text-5xl text-center w-full">
                         🎨
                     </div>
                 ) : (
                     <>  
-                    <div className="flex flex-row justify-between align-bottom items-center border-b border-black pb-2">
+                    <div className="flex flex-row justify-between align-bottom items-center border-b border-black pb-2 mb-2">
                    
                            
                         <div onClick={() => setShowMenu(prev => !prev)} className="flex flex-row gap-2">
@@ -283,8 +256,11 @@ export default function displayListings() {
                                 customRange={calendarDateRangeFilter}
                                 displayedResults={displayedResults}
                             />    
-                            <svg className="icon-link" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                         
+                            <svg className="icon-link block md:hidden" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                         
                         </div>
+                                             
+                    </div>
+                    <div className="flex flex-row gap-4 justify-between border-b border-black pb-2 mb-2">
                         <div className="flex flex-row gap-4">
                             <span 
                                 className={isMapView ? '' : 'font-bold'} 
@@ -298,13 +274,16 @@ export default function displayListings() {
                             >
                                 Map
                             </span>
-                        </div>                                              
-                    </div>
+                        </div>
+                        <div>
+                            {displayedResults} results
+                        </div>
+                    </div>                     
 
                         {isMapView && L ? (
                             <div id="map-view" className="w-full">
-                                <div className="h-[50vh] border w-full">
-                                <MapContainer center={[37.7749, -122.4194]} zoom={8} scrollWheelZoom={true} className="h-[50vh] border w-full">
+                                <div className="h-[70vh] border w-full">
+                                <MapContainer center={[37.7749, -122.4194]} zoom={9} scrollWheelZoom={true} className="h-[70vh] border w-full">
                                     <TileLayer
                                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                     url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
