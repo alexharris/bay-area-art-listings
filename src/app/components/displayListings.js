@@ -190,7 +190,7 @@ export default function displayListings() {
                     }
                 </div>
                 <div className="flex flex-col pb-2 border-b border-gray-300">
-                    <div className="text-3xl pb-2">Location</div>
+                    <div className="text-2xl pb-2">Location</div>
                     <label htmlFor="locationFilter">Venue</label>
                     <select 
                         id="locationFilter" 
