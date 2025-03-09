@@ -1,9 +1,21 @@
-export default function DisplayFilters({ type, presetRange, customRange, displayedResults }) {
-  console.log(customRange.to);
+export default function DisplayFilters({ type, presetRange, customRange, displayedResults, selectedCounty }) {
 
   const formatDate = (date) => {
     const options = { day: 'numeric', month: 'long' };
     return new Date(date).toLocaleDateString(undefined, options);
+  };
+
+  const formatType = () => {
+    switch (type) {
+      case 'onview':
+        return 'On view';
+      case 'opening':
+        return 'Opening';
+      case 'closing':
+        return 'Closing';
+      default:
+        return type
+    } 
   };
 
   const formatPresetRange = () => {
@@ -11,25 +23,29 @@ export default function DisplayFilters({ type, presetRange, customRange, display
       case 'today':
         return 'Today';
       case 'thisweek':
-        return 'This Week';
+        return 'this week';
       case 'thismonth':
-        return 'This Month';
+        return 'this month';
       case 'nextmonth':
-        return 'Next Month';
+        return 'next month';
       default:
         return 'Custom Range';
     }
   };
 
   return (
-    <div className="text-4xl">
+    <div className="text-5xl normal-case leading-1 mb-6">
       {presetRange !== 'custom' ? (
-        <div className="capitalize">{type} {formatPresetRange()}</div>
+        <>{formatType(type)} {formatPresetRange()}</>
       ) : formatDate(customRange.from) === formatDate(customRange.to) ? (
-        <div className="capitalize">{type} {formatDate(customRange.to)}</div>
+        <>{formatType(type)} {formatDate(customRange.to)}</>
       ) : (
-        <div className="capitalize">{type} {formatDate(customRange.from)} - {formatDate(customRange.to)}</div>
-      )}
+        <>{formatType(type)} {formatDate(customRange.from)} - {formatDate(customRange.to)}</>
+      )} 
+      {selectedCounty[0] && (
+          <> in {selectedCounty[0].county} county</>
+        )}
+        
     </div>
   );
 }

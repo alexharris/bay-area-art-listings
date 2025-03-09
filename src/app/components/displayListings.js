@@ -141,7 +141,7 @@ export default function displayListings() {
           
         <div className="flex flex-row w-full gap-8 items-start">
 
-            {selectedCounty[0] && console.log(selectedCounty[0].zipcodes)}
+            {/* {selectedCounty[0] && console.log(selectedCounty[0].zipcodes)} */}
             {/* Sidebar */}
             <div className={`${showMenu ? 'flex' : 'hidden'} flex-col fixed md:sticky overflow-scroll md:top-2 md:flex inset-0 z-40 p-2 md:inset-unset md:min-w-96 gap-4 border border-gray-300 bg-white`}>
                 
@@ -255,13 +255,13 @@ export default function displayListings() {
                     <>  
                     <div className="flex flex-row justify-between align-bottom items-center border-b border-black pb-2 mb-2">
                    
-                           
                         <div onClick={() => setShowMenu(prev => !prev)} className="flex flex-row gap-2">
                             <DisplayFilters                                 
                                 type={calendarTypeFilter}
                                 presetRange={calendarDateRangePreset}
                                 customRange={calendarDateRangeFilter}
                                 displayedResults={displayedResults}
+                                selectedCounty={selectedCounty}
                             />    
                             <svg className="icon-link block md:hidden" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                         
                         </div>
