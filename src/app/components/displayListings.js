@@ -9,6 +9,7 @@ import 'leaflet/dist/leaflet.css';
 import { format, set, setDay } from 'date-fns';
 import { DayPicker } from "react-day-picker";
 import DisplayFilters from './displayFilters';
+import CountySelector from './countySelector';
 import "react-day-picker/style.css";
 
 
@@ -42,6 +43,7 @@ export default function displayListings() {
     const [highlightsOnly, setHighlightsOnly] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
+    const [selectedCounty, setSelectedCounty] = useState({});
     //  Sorting
     const [sortDate, setSortDate] = useState([]);
     // Display
@@ -92,6 +94,7 @@ export default function displayListings() {
             .filter(item => highlightsOnly ? item.Highlight : true)
             .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
             .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
+            .filter(item => selectedCounty[0] ? selectedCounty[0].zipcodes.some(zipcode => item.locationAddress.includes(zipcode)) : true)
             .filter(item => {
                 const startDate = new Date(item.StartDate);
                 const endDate = new Date(item.EndDate);
@@ -106,7 +109,7 @@ export default function displayListings() {
             });
         setDisplayedResults(filteredListings.length);
         setFilteredListings(filteredListings);
-    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, searchTerm, listings, selectedLocation]);
+    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, searchTerm, listings, selectedLocation, selectedCounty]);
 
     // Toggle map view
     useEffect(() => {
@@ -138,6 +141,7 @@ export default function displayListings() {
           
         <div className="flex flex-row w-full gap-8 items-start">
 
+            {selectedCounty[0] && console.log(selectedCounty[0].zipcodes)}
             {/* Sidebar */}
             <div className={`${showMenu ? 'flex' : 'hidden'} flex-col fixed md:sticky overflow-scroll md:top-2 md:flex inset-0 z-40 p-2 md:inset-unset md:min-w-96 gap-4 border border-gray-300 bg-white`}>
                 
@@ -189,8 +193,9 @@ export default function displayListings() {
                         </div>
                     }
                 </div>
-                <div className="flex flex-col pb-2 border-b border-gray-300">
+                <div className="flex flex-col pb-4 border-b border-gray-300">
                     <div className="text-2xl pb-2">Location</div>
+                    <CountySelector onCountyChange={setSelectedCounty} />                    
                     <label htmlFor="locationFilter">Venue</label>
                     <select 
                         id="locationFilter" 
@@ -202,6 +207,8 @@ export default function displayListings() {
                             <option key={index} value={location.Name}>{location.Name}</option>
                         ))}
                     </select>
+                    
+
                 </div>                 
                 <label className="p-2">
                     <input 
