@@ -22,7 +22,7 @@ body {
 
 .icon-link {
   stroke: black;
-  width: 20px;
+  cursor: pointer;
 }
 
 .icon-link:hover {

@@ -142,13 +142,9 @@ export default function displayListings() {
         <div className="flex flex-row w-full gap-8 items-start">
 
             {/* {selectedCounty[0] && console.log(selectedCounty[0].zipcodes)} */}
-            {/* Sidebar */}
-            <div className={`${showMenu ? 'flex' : 'hidden'} flex-col fixed md:sticky overflow-scroll md:top-2 md:flex inset-0 z-40 p-2 md:inset-unset md:min-w-96 gap-4 border border-gray-300 bg-white`}>
-                
-
+            {/* /* Sidebar */ }
+            <div className={`${showMenu ? 'translate-x-0' : '-translate-x-full'} transform transition-transform duration-300 flex flex-col fixed md:sticky overflow-scroll md:top-2 md:flex inset-0 right-8 left-0 z-40 p-2 md:inset-unset md:min-w-96 gap-4 border border-gray-300 bg-white`}>
                 <svg className="absolute top-2 right-2 md:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
-                    
-                
                 <div className="flex flex-col pb-2 border-b border-gray-300 mt-8 md:mt-0">
                     <label htmlFor="searchTerm" className="text-2xl pb-2">Search</label>
                     <input 
@@ -243,7 +239,12 @@ export default function displayListings() {
                 </button>     
                                               
             </div>
-            
+            {showMenu && (
+                    <div 
+                        className="fixed inset-0 bg-black opacity-50 z-30 md:hidden" 
+                        onClick={() => setShowMenu(false)}
+                    ></div>
+                )}            
 
             {/* Main Col */}
             <div className="w-full">
@@ -255,7 +256,7 @@ export default function displayListings() {
                     <>  
                     <div className="flex flex-row justify-between align-bottom items-center border-b border-black pb-2 mb-2">
                    
-                        <div onClick={() => setShowMenu(prev => !prev)} className="flex flex-row gap-2">
+                        <div onClick={() => setShowMenu(prev => !prev)} className="flex flex-row items-start">
                             <DisplayFilters                                 
                                 type={calendarTypeFilter}
                                 presetRange={calendarDateRangePreset}
@@ -263,7 +264,7 @@ export default function displayListings() {
                                 displayedResults={displayedResults}
                                 selectedCounty={selectedCounty}
                             />    
-                            <svg className="icon-link block md:hidden" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                         
+                            <svg className="icon-link block md:hidden w-12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                         
                         </div>
                                              
                     </div>
