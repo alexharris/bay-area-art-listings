@@ -333,9 +333,12 @@ export default function displayListings() {
                                             <li className="border-b border-dashed border-black py-4 w-full relative" key={index}>
                                                 <h2 className="font-bold text-xl pr-8"><a className="" href={'/listing/' + item._id}>{item.Event}</a>{item.Highlight && '★'}</h2>
                                                 <a className="underline" href={'/location/' + item.Location._ref}>{item.locationName}</a> 
-                                                <div>{formatDate(item.StartDate)} - {formatDate(item.EndDate)}</div>
+                                                <div className="flex flex-row gap-2 items-center">
+                                                    {formatDate(item.StartDate)} - {formatDate(item.EndDate)}
+                                                    <CalendarLink listing={item} location="" />
+                                                </div>
                                                 {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
-                                                <CalendarLink listing={item} location="" />
+                                                
                                                 <button className="text-gray-500 mt-2" onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
                                                     {showDetails[index] ? 'Hide Details' : 'Show Details'}
                                                 </button>
