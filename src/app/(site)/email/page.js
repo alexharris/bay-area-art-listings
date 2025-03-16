@@ -1,39 +1,44 @@
-'use client';
+'use client'
 
 import { useState } from 'react';
 
-export default function EmailPage() {
-  const [loading, setLoading] = useState(false);
+
+export default function SendEmailPage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
 
   const sendEmail = async () => {
-    setLoading(true);
-    const response = await fetch('/api/email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        to: 'hello@alexharris.online',
-        subject: 'Test Email',
-        text: 'This is a test email.',
-      }),
-    });
-    console.log(response)
+    setIsLoading(true);
+    setMessage('');
 
-    if (response.ok) {
-      alert('Email sent successfully');
-    } else {
-      alert('Failed to send email 1');
+    try {
+      const response = await fetch('/api/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({}) // Empty body since our function doesn't require any data
+      });
+
+      const result = await response.json();
+      console.log('Email sent:', result);
+      setMessage('Email sent successfully!');
+    } catch (error) {
+      console.error('Error sending email:', error);
+      setMessage('Failed to send email. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-    setLoading(false);
   };
 
   return (
     <div>
-      <h1>Send Email</h1>
-      <button onClick={sendEmail} disabled={loading}>
-        {loading ? 'Sending...' : 'Send Email'}
-      </button>
+        <h1>Send Email</h1>
+        <button onClick={sendEmail} disabled={isLoading}>
+            {isLoading ? 'Sending...' : 'Send Email'}
+        </button>
+        {message && <p>{message}</p>}
     </div>
   );
 }
