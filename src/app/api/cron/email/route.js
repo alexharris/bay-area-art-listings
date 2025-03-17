@@ -1,35 +1,32 @@
-import { createClient as createSanityClient } from '@sanity/client';
+export const dynamic = "force-dynamic";
+
+import postmark from 'postmark';
+
+const serverToken = process.env.POSTMARK_SERVER_TOKEN;
+
+if (!serverToken) {
+  throw new Error('POSTMARK_SERVER_TOKEN environment variable is not set');
+}
+
+const client = new postmark.ServerClient(serverToken);
 
 export async function GET() {
-  console.log('hello')
+  console.log('hello');
 
-  const sanity = createSanityClient({
-    projectId: 'ride9vgj',
-    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
-    useCdn: false,
-    apiVersion: 'v2022-03-07'
-  });
+  try {
+    const response = await client.sendEmail({
+      "From": "hello@alexharris.online",
+      "To": "hello@alexharris.online",
+      "Subject": "Hello World from Vercel Serverless",
+      "TextBody": 'HELLO WORLD',
+      "MessageStream": "broadcast"
+    });
+    console.log(`Email sent to hello@alexharris.online:`, response);
 
-  async function getListings() {
-    const today = new Date().toISOString().split('T')[0];
-    const nextWeek = new Date();
-    nextWeek.setDate(nextWeek.getDate() + 7);
-    const nextWeekDate = nextWeek.toISOString().split('T')[0];
-
-    let existingLocations = await sanity.fetch(`*[_type == "listing" && StartDate >= "${today}" && StartDate <= "${nextWeekDate}"]`);
-    const formattedListings = existingLocations.map(location => {
-        return `Title: ${location.Event}\nStart Date: ${location.StartDate}\nEnd Date: ${location.EndDate}\n\n`;
-    }).join('');
-
-    return formattedListings;
+    return new Response(JSON.stringify({ message: 'Emails sent successfully' }), { status: 200 });
+  } catch (error) {
+    console.error('Error sending emails:', error);
+    return new Response(JSON.stringify({ message: 'Error sending emails', error: error.message }), { status: 500 });
   }
 
-  var formattedListings = await getListings()
-
-  console.log(formattedListings)
-
-
-  return new Response(JSON.stringify({ message: 'Hello World' }), {
-    headers: { 'Content-Type': 'application/json' }
-  })
 }
