@@ -1,8 +1,8 @@
 {
-    "crons": [
-      {
-        "path": "/cron/email",
-        "schedule": "0 10 * * *"
-      }
-    ]
-  }
+  "crons": [
+    {
+      "path": "/cron/email",
+      "schedule": "0 10 * * *"
+    }
+  ]
+}

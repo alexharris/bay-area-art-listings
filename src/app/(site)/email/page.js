@@ -32,6 +32,18 @@ export default function SendEmailPage() {
     }
   };
 
+  async function testCron(req, res) {
+    const response = await fetch('/api/cron/email', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+
+    });    
+    const result = await response.json();
+    console.log('Cron test:', result)
+  }
+
   return (
     <div>
         <h1>Send Email</h1>
@@ -39,6 +51,10 @@ export default function SendEmailPage() {
             {isLoading ? 'Sending...' : 'Send Email'}
         </button>
         {message && <p>{message}</p>}
+        -----
+        <button onClick={testCron}>
+          test cron
+        </button>
     </div>
   );
 }

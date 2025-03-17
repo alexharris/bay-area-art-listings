@@ -54,7 +54,7 @@ export async function POST(req) {
   var formattedListings = await getListings()
   
   var emails = await getEmails()
-console.log(emails)
+    console.log(emails)
 
 try {
     for (const email of emails) {
