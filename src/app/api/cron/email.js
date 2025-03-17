@@ -14,3 +14,5 @@ export async function sendEmail() {
     console.error('Error sending email:', error);
   }
 }
+
+sendEmail();
