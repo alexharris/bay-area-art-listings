@@ -17,6 +17,7 @@ const supabase = createSupabaseClient(
     process.env.SUPABASE_KEY
 )
 
+
 async function getEmails() {
     const { data, error } = await supabase
         .from('emails')
