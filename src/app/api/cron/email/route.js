@@ -1,6 +1,6 @@
 export async function GET() {
   console.log('hello world1');
-  const response = await fetch('http://localhost:3333/api/email', {
+  const response = await fetch(process.env.URL + '/api/email', {
     method: 'POST', 
     headers: {
       'Content-Type': 'application/json'
