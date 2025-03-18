@@ -1,6 +1,8 @@
-import * as postmark from 'postmark';
-import { createClient as createSanityClient } from '@sanity/client';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+const postmark = require('postmark');
+
+const { createClient: createSanityClient } = require('@sanity/client');
+const { createClient: createSupabaseClient } = require('@supabase/supabase-js');
+
 
 const serverToken = process.env.POSTMARK_SERVER_TOKEN;
 const client = new postmark.ServerClient(serverToken);
@@ -56,21 +58,20 @@ export async function POST(req) {
   var emails = await getEmails()
     console.log(emails)
 
-try {
-    for (const email of emails) {
-        const response = await client.sendEmail({
-            "From": "hello@alexharris.online",
-            "To": email,
-            "Subject": "Hello World from Vercel Serverless",
-            "TextBody": formattedListings,
-            "MessageStream": "broadcast"
-        });
-        console.log(`Email sent to ${email}:`, response);
+    try {
+        for (const email of emails) {
+            const response = await client.sendEmail({
+                "From": "hello@alexharris.online",
+                "To": email,
+                "Subject": "Hello World from Vercel Serverless",
+                "TextBody": formattedListings,
+                "MessageStream": "broadcast"
+            });
+            console.log(`Email sent to ${email}:`, response);
+        }
+        return new Response(JSON.stringify({ message: 'Emails sent successfully' }), { status: 200 });
+    } catch (error) {
+        console.error('Error sending emails:', error);
+        return new Response(JSON.stringify({ message: 'Error sending emails', error: error.message }), { status: 500 });
     }
-
-    return new Response(JSON.stringify({ message: 'Emails sent successfully' }), { status: 200 });
-} catch (error) {
-    console.error('Error sending emails:', error);
-    return new Response(JSON.stringify({ message: 'Error sending emails', error: error.message }), { status: 500 });
-}
 }

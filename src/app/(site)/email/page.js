@@ -46,11 +46,12 @@ export default function SendEmailPage() {
 
   return (
     <div>
-        <h1>Send Email</h1>
+        <h1>Send Emailz</h1>
         <button onClick={sendEmail} disabled={isLoading}>
             {isLoading ? 'Sending...' : 'Send Email'}
         </button>
         {message && <p>{message}</p>}
+        <br />
         -----
         <button onClick={testCron}>
           test cron
