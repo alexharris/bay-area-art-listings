@@ -63,8 +63,9 @@ export async function POST(req) {
             const response = await client.sendEmail({
                 "From": "hello@alexharris.online",
                 "To": email,
-                "Subject": "Hello World from Vercel Serverless",
+                "Subject": "Hello World from Vercel",
                 "TextBody": formattedListings,
+                "TemplateId": "39436158",
                 "MessageStream": "broadcast"
             });
             console.log(`Email sent to ${email}:`, response);
