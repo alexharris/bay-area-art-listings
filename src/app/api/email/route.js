@@ -43,19 +43,41 @@ async function getListings() {
 
     let listings = await sanity.fetch(`*[_type == "listing" && StartDate >= "${today}" && StartDate <= "${nextWeekDate}"]`);
     
+    // get the locations reference by the listing
+    const locations = await Promise.all(listings.map(async listing => {
+        const location = await sanity.fetch(`*[_type == "location" && _id == "${listing.Location._ref}"]`);
+        return location
+    }));
+  
+    // combine them
+    listings = listings.map((listing, index) => ({
+        ...listing,
+        locationName: locations[index][0]?.Name || 'Unknown',
+        locationAddress: locations[index][0]?.Address || 'Address Not Listed',
+        locationUrl: locations[index][0]?.Url || ''
+    }));
+   
 
       
     // const formattedListings = listings.map(listing => {
     //     return `Title: ${listing.Event}\nStart Date: ${listing.StartDate}\nEnd Date: ${listing.EndDate}\n\n`;
     // }).join('');
 
+    listings = listings.map(listing => ({
+        ...listing,
+        StartDate: new Date(listing.StartDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+        EndDate: new Date(listing.EndDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    }));
 
       
     var listingObjects = listings.map(listing => {
         return {
             "name": listing.Event,
             "startDate": listing.StartDate,
-            "endDate": listing.EndDate
+            "endDate": listing.EndDate,
+            "locationName": listing.locationName,
+            "locationAddress": listing.locationAddress,
+            "locationUrl": listing.locationUrl
         }
     })
     
@@ -67,15 +89,18 @@ async function getListings() {
 
 
 export async function POST(req) {
-  if (req.method !== 'POST') {
+    if (req.method !== 'POST') {
     return new Response(JSON.stringify({ message: 'Method Not Allowed' }), { status: 405 });
-  }
-  
-  var formattedListings = await getListings()
-  console.log(formattedListings)
-  
-  var emails = await getEmails()
-    console.log(emails)
+    }
+
+    var formattedListings = await getListings()
+
+    formattedListings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+    var emails = await getEmails()
+
+    let todayNice = new Date(today).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    let nextWeekDateNice = new Date(nextWeekDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
     try {
         for (const email of emails) {
@@ -85,8 +110,8 @@ export async function POST(req) {
                 "TemplateAlias": "main",
                 "MessageStream": "broadcast",
                 "TemplateModel": {
-                    "today": today,
-                    "nextWeekDate": nextWeekDate,
+                    "today": todayNice,
+                    "nextWeekDate": nextWeekDateNice,
                     "listings": formattedListings
                 }              
             });
