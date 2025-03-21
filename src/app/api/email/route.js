@@ -33,16 +33,34 @@ async function getEmails() {
     return data.map(record => record.email);
 }
 
-async function getListings() {
-    const today = new Date().toISOString().split('T')[0];
-    const nextWeek = new Date();
-    nextWeek.setDate(nextWeek.getDate() + 7);
-    const nextWeekDate = nextWeek.toISOString().split('T')[0];
+const today = new Date().toISOString().split('T')[0];
+const nextWeek = new Date();
+nextWeek.setDate(nextWeek.getDate() + 7);
+const nextWeekDate = nextWeek.toISOString().split('T')[0];
 
-    let existingLocations = await sanity.fetch(`*[_type == "listing" && StartDate >= "${today}" && StartDate <= "${nextWeekDate}"]`);
-    const formattedListings = existingLocations.map(location => {
-        return `Title: ${location.Event}\nStart Date: ${location.StartDate}\nEnd Date: ${location.EndDate}\n\n`;
-    }).join('');
+
+async function getListings() {
+
+    let listings = await sanity.fetch(`*[_type == "listing" && StartDate >= "${today}" && StartDate <= "${nextWeekDate}"]`);
+    
+
+      
+    // const formattedListings = listings.map(listing => {
+    //     return `Title: ${listing.Event}\nStart Date: ${listing.StartDate}\nEnd Date: ${listing.EndDate}\n\n`;
+    // }).join('');
+
+
+      
+    var listingObjects = listings.map(listing => {
+        return {
+            "name": listing.Event,
+            "startDate": listing.StartDate,
+            "endDate": listing.EndDate
+        }
+    })
+    
+
+    const formattedListings = listingObjects
 
     return formattedListings;
 }
@@ -54,19 +72,23 @@ export async function POST(req) {
   }
   
   var formattedListings = await getListings()
+  console.log(formattedListings)
   
   var emails = await getEmails()
     console.log(emails)
 
     try {
         for (const email of emails) {
-            const response = await client.sendEmail({
+            const response = await client.sendEmailWithTemplate({
                 "From": "hello@alexharris.online",
                 "To": email,
-                "Subject": "Hello World from Vercel",
-                "TextBody": formattedListings,
-                "TemplateId": "39436158",
-                "MessageStream": "broadcast"
+                "TemplateAlias": "main",
+                "MessageStream": "broadcast",
+                "TemplateModel": {
+                    "today": today,
+                    "nextWeekDate": nextWeekDate,
+                    "listings": formattedListings
+                }              
             });
             console.log(`Email sent to ${email}:`, response);
         }
