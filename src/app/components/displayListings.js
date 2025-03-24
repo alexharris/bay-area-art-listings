@@ -11,6 +11,7 @@ import { DayPicker } from "react-day-picker";
 import DisplayFilters from './displayFilters';
 import CountySelector from './countySelector';
 import "react-day-picker/style.css";
+import AddEmailForm from './addEmailForm';
 
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
@@ -227,7 +228,7 @@ export default function displayListings() {
                 >
                     Clear All Filters
                 </span> 
-               
+                            
                 <button 
                     onClick={() => {
                         setShowMenu(false);
@@ -238,6 +239,7 @@ export default function displayListings() {
                 </button>     
                                               
             </div>
+            
             {/* dark mobile sidebar background */}
             {showMenu && (
                 <div 
@@ -360,7 +362,9 @@ export default function displayListings() {
                         )}
                     </>
                 )}
+                <AddEmailForm />  
             </div>
+            
         </div>
     
     )
