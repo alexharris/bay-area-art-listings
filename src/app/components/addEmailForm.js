@@ -35,9 +35,10 @@ const AddEmailForm = () => {
   };
 
   return (
-    <div className="border border-gray-300 p-4 ">
+    <div className="bg-gray-100 p-4 rounded-lg">
       <form onSubmit={handleSubmit} className="flex flex-col items-stretch space-y-2">
-        <label className="text-center w-full" htmlFor="email">Weekly Update</label>
+        <div className="text-2xl">Weekly Update</div>        
+        <label className="w-full" htmlFor="email">Add your email address to receive a weekly email</label>
         <input
           className="p-2 border"
           type="email"
@@ -46,7 +47,7 @@ const AddEmailForm = () => {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <button className="block bg-gray-200 w-full p-2" type="submit">Submit</button>
+        <button className="block button" type="submit">Submit</button>
       </form>
       {success && <p>Thank you! Your email has been submitted.</p>}
     </div>

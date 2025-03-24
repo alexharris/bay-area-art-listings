@@ -34,3 +34,11 @@ body {
   font-size: 1rem;
   @apply px-3;
 }
+
+.button {
+  @apply px-3 py-2 rounded-md text-white bg-blue-700;
+  &:hover {
+    @apply bg-blue-800;
+  }
+}
+
