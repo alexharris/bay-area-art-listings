@@ -143,9 +143,10 @@ export default function displayListings() {
         <div className="flex flex-row w-full md:gap-8 items-start">
 
             {/* /* Sidebar */ }
-            <div className="flex flex-col md:gap-4 fixed md:sticky md:top-2 w-full z-40 inset-0 md:w-96">
+            
+            <div className={`${showMenu ? 'inset-0': ''} flex flex-col md:gap-4 fixed md:sticky md:top-2 w-full z-40 md:w-96`}>
                 {/* Filter Menu */}
-                <div className={`${showMenu ? 'translate-x-0' : '-translate-x-full hidden'}   
+                <div className={`${showMenu ? 'translate-x-0 inset-0 ' : '-translate-x-full hidden'}   
                 transform 
                 md:transform-none 
                 transition-transform 
@@ -154,7 +155,7 @@ export default function displayListings() {
                 flex-col 
                 overflow-scroll 
                 md:flex 
-                inset-0 
+                
                 right-8 
                 left-0 
                 z-40 
