@@ -12,6 +12,7 @@ import DisplayFilters from './displayFilters';
 import CountySelector from './countySelector';
 import "react-day-picker/style.css";
 import AddEmailForm from './addEmailForm';
+import { getFilteredListings } from '../../utils/filters';
 
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
@@ -91,25 +92,41 @@ export default function displayListings() {
 
     // Update filtered listings when filters change
     useEffect(() => {
-        const filteredListings = listings
-            .filter(item => highlightsOnly ? item.Highlight : true)
-            .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
-            .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
-            .filter(item => selectedCounty[0] ? selectedCounty[0].zipcodes.some(zipcode => item.locationAddress.includes(zipcode)) : true)
-            .filter(item => {
-                const startDate = new Date(item.StartDate);
-                const endDate = new Date(item.EndDate);
-                if (calendarTypeFilter === 'onview') {
-                    return (startDate <= calendarDateRangeFilter.to && endDate >= calendarDateRangeFilter.from);
-                } else if (calendarTypeFilter === 'opening') {
-                    return startDate >= calendarDateRangeFilter.from && startDate <= calendarDateRangeFilter.to;
-                } else if (calendarTypeFilter === 'closing') {
-                    return endDate >= calendarDateRangeFilter.from && endDate <= calendarDateRangeFilter.to;
-                }
-                return true;
-            });
-        setDisplayedResults(filteredListings.length);
+        // Create an object of all of the filter variables
+        const filters = {
+            highlightsOnly: highlightsOnly,
+            searchTerm: searchTerm,
+            selectedLocation: selectedLocation,
+            selectedCounty: selectedCounty,
+            calendarTypeFilter: calendarTypeFilter,
+            calendarDateRangeFilter: calendarDateRangeFilter,
+        };
+
+        // const filteredListings = listings
+        //     .filter(item => highlightsOnly ? item.Highlight : true)
+        //     .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
+        //     .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
+        //     .filter(item => selectedCounty[0] ? selectedCounty[0].zipcodes.some(zipcode => item.locationAddress.includes(zipcode)) : true)
+        //     .filter(item => {
+        //         const startDate = new Date(item.StartDate);
+        //         const endDate = new Date(item.EndDate);
+        //         if (calendarTypeFilter === 'onview') {
+        //             return (startDate <= calendarDateRangeFilter.to && endDate >= calendarDateRangeFilter.from);
+        //         } else if (calendarTypeFilter === 'opening') {
+        //             return startDate >= calendarDateRangeFilter.from && startDate <= calendarDateRangeFilter.to;
+        //         } else if (calendarTypeFilter === 'closing') {
+        //             return endDate >= calendarDateRangeFilter.from && endDate <= calendarDateRangeFilter.to;
+        //         }
+        //         return true;
+        //     });
+        
+        const filteredListings = getFilteredListings(filters, listings);
+        
         setFilteredListings(filteredListings);
+        setDisplayedResults(filteredListings.length);
+        
+        // getListingsForThisWeek(filters, listings);
+
     }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, searchTerm, listings, selectedLocation, selectedCounty]);
 
     // Toggle map view
@@ -155,7 +172,6 @@ export default function displayListings() {
                 flex-col 
                 overflow-scroll 
                 md:flex 
-                
                 right-8 
                 left-0 
                 z-40 
