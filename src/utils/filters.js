@@ -52,7 +52,7 @@ const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
 const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);    
 
-export function getListingsForThisWeek(filters, listings) {
+export function getFilteredListings(filters, listings) {
 
   let filteredListings = listings
   .filter(item => filters.highlightsOnly ? item.Highlight : true) //Highlights Only
