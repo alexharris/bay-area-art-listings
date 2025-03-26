@@ -1,36 +1,37 @@
 // Things Needed to Determine Filters
+// =================
 // Search term
-// -----------------------
+// -
 // A string entered into the search bar
 // Variable name: searchTerm
-// -----------------------
+// =================
 // Selected Location
-// ---
+// -
 // A string selected from the location dropdown
 // Variable name: selectedLocation
-// -----------------------
+// =================
 // Selected County
-// ---
+// -
 // An array of objects with a name and zipcodes property
 // Variable name: selectedCounty
-// -----------------------
+// =================
 // Highlights Only
-// ---
+// -
 // A boolean value
 // Variable name: highlightsOnly
-// -----------------------
+// =================
 // Calendar Type Filter
-// ---
+// -
 // A string selected from the calendar type dropdown
 // Variable name: calendarTypeFilter
-// -----------------------
+// =================
 // Calendar Date Range Filter
-// ---
+// -
 // An object with from and to properties
 // Variable name: calendarDateRangeFilter
-// -----------------------
+// =================
 // Filter Object
-// ---
+// -
 // The filter object looks like this:
 // const filters = {
 //   highlightsOnly: highlightsOnly,
@@ -46,13 +47,27 @@
 // Date Variables
 const today = new Date();
 const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6));
+
+const nextWeek = new Date();
+nextWeek.setDate(today.getDate() + 7);
+const endOfWeek = nextWeek.toISOString().split('T')[0];
+// const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6));
 const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
 const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);    
 
 export function getFilteredListings(filters, listings) {
+
+  // Set default filter values
+  filters = {
+    highlightsOnly: filters.highlightsOnly || false,
+    searchTerm: filters.searchTerm || '',
+    selectedLocation: filters.selectedLocation || '',
+    selectedCounty: filters.selectedCounty || [],
+    calendarTypeFilter: filters.calendarTypeFilter || '',
+    calendarDateRangeFilter: filters.calendarDateRangeFilter || { from: startOfWeek, to: endOfWeek },
+  };
 
   let filteredListings = listings
   .filter(item => filters.highlightsOnly ? item.Highlight : true) //Highlights Only
