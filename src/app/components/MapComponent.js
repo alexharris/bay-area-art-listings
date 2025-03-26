@@ -14,7 +14,7 @@ const MapComponent = ({ geolocation }) => {
   });
 
   return (
-    <MapContainer center={[geolocation.lat, geolocation.lng]} zoom={14} scrollWheelZoom={true} className="h-[50vh] border w-full">
+    <MapContainer center={[geolocation.lat, geolocation.lng]} zoom={13} scrollWheelZoom={true} className="h-96 border w-96">
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"

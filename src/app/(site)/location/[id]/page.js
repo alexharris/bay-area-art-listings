@@ -1,5 +1,5 @@
 import { createClient } from '@sanity/client';
-import MapComponent from './MapComponent';
+import MapComponent from '../../../components/MapComponent';
 
 
 const client = createClient({

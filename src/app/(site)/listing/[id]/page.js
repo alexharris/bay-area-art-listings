@@ -1,6 +1,8 @@
 import { createClient } from '@sanity/client';
 import { formatDate } from '../../../../utils/dates';
 import { getLocationFromRef } from '../../../../utils/locations';
+import MapComponent from '../../../components/MapComponent';
+
 
 const client = createClient({
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
@@ -32,6 +34,7 @@ export default async function Location({ params }) {
       {location[0].Name}<br />
       {location[0].Address}<br />
       {location[0].Url}<br />
+      <MapComponent geolocation={location[0].Geolocation} />      
     </div>  
   );
 }
