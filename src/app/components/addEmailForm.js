@@ -37,8 +37,8 @@ const AddEmailForm = () => {
   return (
     <div className="bg-gray-100 p-4 rounded-lg">
       <form onSubmit={handleSubmit} className="flex flex-col items-stretch space-y-2">
-        <div className="text-2xl">Weekly Update</div>        
-        <label className="w-full" htmlFor="email">Add your email address to receive a weekly email</label>
+        <div className="text-sm uppercase">Weekly Update</div>        
+        <label className="w-full" htmlFor="email">Add your email address to receive a weekly email of art openings.</label>
         <input
           className="p-2 border"
           type="email"

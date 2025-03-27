@@ -184,7 +184,7 @@ export default function displayListings() {
                 `}>
                     <svg className="absolute top-2 right-2 md:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
                     <div className="flex flex-col pb-2 border-b border-gray-300 mt-8 md:mt-0">
-                        <label htmlFor="searchTerm" className="text-2xl pb-2">Search</label>
+                        <label htmlFor="searchTerm" className="text-sm uppercase pb-2">Search</label>
                         <input 
                             type="text" 
                             id="searchTerm"
@@ -194,7 +194,8 @@ export default function displayListings() {
                         />
                     </div>   
                     <div className="pb-2 border-b border-gray-300">
-                        <div className="text-2xl pb-2">Calendar</div>
+                        <div className="text-sm uppercase pb-2">Calendar</div>
+
                         <div className="flex flex-row gap-2 mb-2">
                             <div className="flex flex-col w-1/2">
                                 <label htmlFor="calendarTypeFilter">Type</label>
@@ -228,7 +229,7 @@ export default function displayListings() {
                         }
                     </div>
                     <div className="flex flex-col pb-4 border-b border-gray-300">
-                        <div className="text-2xl pb-2">Location</div>
+                        <div className="text-sm uppercase pb-2">Location</div>
                         <CountySelector onCountyChange={setSelectedCounty} />                    
                         <label htmlFor="locationFilter">Venue</label>
                         <select 
@@ -262,7 +263,7 @@ export default function displayListings() {
                             setCalendarDateRangeFilter({ from: startOfWeek, to: endOfWeek });
                             setSortDate({from: new Date(), to: new Date()});
                         }} 
-                        className="underline"
+                        className="underline cursor-pointer"
                     >
                         Clear All Filters
                     </span> 
@@ -359,7 +360,7 @@ export default function displayListings() {
                                                     })}
                                                 >
                                                     <Popup>
-                                                        <div><b>{item.Event}</b><br /><a href={'/location/' + item.Location._ref}>{item.locationName}</a><br />{item.locationAddress}</div>
+                                                        <div><a href={'/listing/' + item._id}><b>{item.Event}</b></a><br /><a href={'/location/' + item.Location._ref}>{item.locationName}</a><br />{item.locationAddress}</div>
                                                     </Popup>
                                                 </Marker>
                                             ) : null;
