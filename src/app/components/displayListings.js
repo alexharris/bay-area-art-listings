@@ -380,7 +380,8 @@ export default function displayListings() {
                                                 <a className="underline" href={'/location/' + item.Location._ref}>{item.locationName}</a> 
                                                 <div className="flex flex-row gap-2 items-center">
                                                     {formatDate(item.StartDate)} - {formatDate(item.EndDate)}
-                                                    <CalendarLink listing={item} location="" />
+                                                    <CalendarLink listing={item} location="" />  
+                                                    {item.StartDate}                                               
                                                 </div>
                                                 {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
                                                 

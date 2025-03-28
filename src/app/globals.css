@@ -42,3 +42,8 @@ body {
   }
 }
 
+.atcb-button {
+  border: 1px solid red !important;
+  box-shadow: none;
+}
+
