@@ -8,7 +8,6 @@ export default function calendarLink(data) {
     const [selectedDate, setSelectedDate] = useState('start');
     const [icsEvent, setIcsEvent] = useState({})
 
-    console.log(data)
 
 
     // Set the initial state for the ICS event based on the selected date

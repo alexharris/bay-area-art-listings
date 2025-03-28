@@ -14,25 +14,31 @@ import "react-day-picker/style.css";
 import AddEmailForm from './addEmailForm';
 import { getFilteredListings } from '../../utils/filters';
 
-
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
-// Format date for display
+
+// TODO
+// dont show year if its the current year
 function formatDate(dateString) {
-    const date = new Date(dateString);
-    const currentYear = new Date().getFullYear();
-    if (date.getFullYear() === currentYear) {
-        return format(date, 'MMMM d');
+    const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+        throw new Error('Invalid date string');
     }
-    return format(date, 'MMMM d, yyyy');
+    
+    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
-
-
-
 
 export default function displayListings() {
     // Initial data
@@ -380,8 +386,7 @@ export default function displayListings() {
                                                 <a className="underline" href={'/location/' + item.Location._ref}>{item.locationName}</a> 
                                                 <div className="flex flex-row gap-2 items-center">
                                                     {formatDate(item.StartDate)} - {formatDate(item.EndDate)}
-                                                    <CalendarLink listing={item} location="" />  
-                                                    {item.StartDate}                                               
+                                                    <CalendarLink listing={item} location="" />                                              
                                                 </div>
                                                 {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
                                                 

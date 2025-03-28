@@ -1,8 +1,5 @@
 function downloadAppleCalendarEvent(icsEvent) {
-    // Event details (customize these)
-    console.log(icsEvent)
   
-
     function formatDateToICS(date) {
         const dateObj = new Date(date);
         const pad = (num) => num.toString().padStart(2, '0');
