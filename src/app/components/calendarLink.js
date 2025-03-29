@@ -8,11 +8,10 @@ export default function calendarLink(data) {
     const [selectedDate, setSelectedDate] = useState('start');
     const [icsEvent, setIcsEvent] = useState({})
 
-
-
     // Set the initial state for the ICS event based on the selected date
     // For APPLE calendar
     useEffect(() => {
+        console.log(selectedDate)
         if (selectedDate === 'start') {
             setIcsEvent({
                 title: data.listing.Event,
@@ -77,9 +76,6 @@ export default function calendarLink(data) {
         }
     };
 
-
-
-
     return (
         <>
             <svg onClick={() => setIsModalOpen(true)} className="icon-link" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="butt" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -92,10 +88,9 @@ export default function calendarLink(data) {
                         </span>
                         <h1 className="font-bold pb-4">Add To Calendar</h1>
                         <form 
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                        }}
-                        
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                            }}
                         >
                             <fieldset className="flex flex-col items-start space-y-2">
                             <label>
@@ -134,10 +129,9 @@ export default function calendarLink(data) {
                                 <button onClick={() => { handleAddToCalendar(); }} className="mt-4 p-2 bg-blue-500 text-white rounded">
                                     Google Calendar
                                 </button>
-                                <AddToAppleCalendar data={icsEvent} />                            
+                                <AddToAppleCalendar data={icsEvent} selectedDate={selectedDate} />                            
                             </div>
                         </form>
-                        
                     </div>
                 </div>
             )}

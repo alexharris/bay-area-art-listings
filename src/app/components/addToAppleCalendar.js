@@ -1,5 +1,4 @@
-function downloadAppleCalendarEvent(icsEvent) {
-  
+function downloadAppleCalendarEvent({icsEvent, selectedDate}) {
     function formatDateToICS(date) {
         const dateObj = new Date(date);
         const pad = (num) => num.toString().padStart(2, '0');
@@ -11,6 +10,16 @@ function downloadAppleCalendarEvent(icsEvent) {
         const seconds = pad(dateObj.getUTCSeconds());
         return `${year}${month}${day}T${hours}${minutes}${seconds}Z`;
       }
+
+    var formattedDate = (() => {
+        if (selectedDate === 'start') {
+            return 'Opening';
+        } else if (selectedDate === 'end') {
+            return 'Closing';
+        } else if (selectedDate === 'range') {
+            return '';
+        }
+    })();
   
     // Create the .ics file content with VTIMEZONE
     const icsContent = [
@@ -33,16 +42,16 @@ function downloadAppleCalendarEvent(icsEvent) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `${icsEvent.title.replace(/\s+/g, '_')}.ics`);
+    link.setAttribute('download', `${icsEvent.title.replace(/\s+/g, '_')}_${formattedDate}.ics`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   }
   
 
-  export default function addToAppleCalendar(data) {
+  export default function addToAppleCalendar({data, selectedDate}) {
     return (
-        <button onClick={() => downloadAppleCalendarEvent(data.data)} className="mt-4 p-2 bg-blue-500 text-white rounded">
+        <button onClick={() => downloadAppleCalendarEvent({icsEvent: data, selectedDate})} className="mt-4 p-2 bg-blue-500 text-white rounded">
             Apple Calendar
         </button>
     );
