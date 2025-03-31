@@ -13,6 +13,7 @@ import CountySelector from './countySelector';
 import "react-day-picker/style.css";
 import AddEmailForm from './addEmailForm';
 import { getFilteredListings } from '../../utils/filters';
+import MobileIconMenu from './mobileIconMenu';
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
@@ -418,7 +419,7 @@ export default function displayListings() {
                 )}
                 
             </div>
-            
+            <MobileIconMenu toggleMenu={() => setShowMenu(prev => !prev)} />
         </div>
     
     )

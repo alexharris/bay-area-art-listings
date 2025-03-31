@@ -8,7 +8,7 @@ export default function Home() {
       <main className="flex flex-col gap-8 row-start-2 sm:items-start w-full">
         <DisplayListings />
       </main>
-      <footer className="border border-black w-full p-8 flex flex-row justify-between">
+      <footer className="w-full py-8 px-1 flex flex-col md:flex-row justify-between">
         <div>Bay Area Art List</div>
         <div>
           this is the footer
