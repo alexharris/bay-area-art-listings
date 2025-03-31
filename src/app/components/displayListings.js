@@ -293,12 +293,12 @@ export default function displayListings() {
                 )}            
 
                 <div className="hidden md:block">
-                    <AddEmailForm />  
+                    <AddEmailForm /> 
                 </div>
             </div>
 
             {/* Main Col */}
-            <div className="w-full flex-grow">
+            <div className="w-full flex-grow flex flex-col justify-start">
                 {loading ? (
                     <div className="spinner animate-spin text-5xl text-center w-full">
                         🎨
@@ -337,7 +337,12 @@ export default function displayListings() {
                         <div>
                             {displayedResults} results
                         </div>
-                    </div>                     
+                    </div>         
+                    {displayedResults === 0 && 
+                        <div className="text-center flex-grow flex flex-col justify-center text-2xl py-36">
+                            <p className="pb-4">No Results</p>
+                        ¯\_(ツ)_/¯
+                        </div>}            
 
                         {isMapView && L ? (
                             <div id="map-view" className="w-full">
