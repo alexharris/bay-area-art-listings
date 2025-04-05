@@ -20,6 +20,70 @@ export default function Process() {
     setCsvData(prevCsvData => prevCsvData + csvRow);
   }
 
+  // The goal here is to turn a single date string into two parts, start and end
+  function bigBeefyDateProcessor(dateString) {
+    console.log('------------------')
+    const monthPattern = /\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b/;
+    const yearPattern = /\b\d{4}\b/;
+
+    var dateParts = [];
+    // first, check if it has times, which means it is a one day event    
+    if (dateString.toLowerCase().includes('a.m.') || dateString.toLowerCase().includes('p.m.')) {
+      // Single Day
+      // console.log(dateString)
+      dateParts = dateString.includes('–') ? dateString.split('–') : dateString.split('&');
+      dateParts[1] = dateParts[0]
+
+      // // Strip out 'a.m.' or 'p.m.' from the strings
+      dateParts = dateParts.map(part => part.replace(/a\.m\.|p\.m\./gi, '').trim());
+      
+    } else if (dateString.includes('–') || dateString.includes('&')) {
+      // Multi Day
+      dateParts = dateString.includes('–') ? dateString.split('–') : dateString.split('&');
+      
+      // If one part contains a month and the other does not, we need to add the month to the part that doesn't have it
+      
+      if (!monthPattern.test(dateParts[0].trim()) && monthPattern.test(dateParts[1].trim())) {
+        const month = dateParts[1].trim().match(monthPattern)[0];
+        dateParts[0] = `${month} ${dateParts[0].trim()}`;
+      } else if (!monthPattern.test(dateParts[1].trim()) && monthPattern.test(dateParts[0].trim())) {
+        const month = dateParts[0].trim().match(monthPattern)[0];
+        dateParts[1] = `${month} ${dateParts[1].trim()}`;
+      }
+
+      // If one part contains a year and the other does not, we need to add the year to the part that doesn't have it
+      if (!yearPattern.test(dateParts[0].trim()) && yearPattern.test(dateParts[1].trim())) {
+        console.log('1')
+        const year = dateParts[1].trim().match(yearPattern)[0];
+        dateParts[0] = `${dateParts[0].trim()} ${year}`;
+      } else if (!yearPattern.test(dateParts[1].trim()) && yearPattern.test(dateParts[0].trim())) {
+        console.log('2')
+        const year = dateParts[0].trim().match(yearPattern)[0];
+        dateParts[1] = `${dateParts[1].trim()} ${year}`;
+      } else if (!yearPattern.test(dateParts[0].trim()) && !yearPattern.test(dateParts[1].trim())) {
+        console.log('3')
+        const currentYear = new Date().getFullYear();
+        dateParts[0] = `${dateParts[0].trim()} ${currentYear}`;
+        dateParts[1] = `${dateParts[1].trim()} ${currentYear}`;
+      }
+
+      
+      // console.log(dateParts[0].trim())
+      // console.log(dateParts[1].trim())      
+      
+
+      
+      
+
+    } else {
+      // Not sure what this is
+      console.log('Cant parse:' + dateString);
+    }
+    console.log(dateParts )
+    
+    return dateParts;
+  }
+
   // this goes through the initial text dump and breaks it up into entries by looking for new lines that are blank
   // it then takes an entry and passes it to processEntry for processing
   const processTextToCSV = () => {
@@ -32,16 +96,11 @@ export default function Process() {
     const headerRow = 'Id\tHighlight\tEvent\tLocation\tStartDate\tEndDate\tNotes\n';
     setCsvData(headerRow);
     
-
-    
     rows.forEach(row => {
-      console.log(row)
       if(row.trim() === '') {
         // this means we have reached the end of a chunk, so we are ready to process the row
         processEntry(entry)
         entry = {};
-
-        
       } else {
         const datePattern = /\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b/;
 
@@ -53,12 +112,20 @@ export default function Process() {
           entry['title'] = row.substring(0, atIndex).replace('★', '').trim();
           entry['location'] = row.substring(atIndex + 1).trim();
         } else if (datePattern.test(row)) {
-            const dateParts = row.split('–');
-            const startDatePattern = /\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b \d{1,2}/;
-            entry['startDate'] = startDatePattern.test(dateParts[0].trim()) ? dateParts[0].trim().match(startDatePattern)[0] : '';
-            const endDate = dateParts[1] ? dateParts[1].trim() : '';
-            const endDatePattern = /\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b \d{1,2}/;
-            entry['endDate'] = endDatePattern.test(endDate) ? endDate : '';
+          var dateParts = bigBeefyDateProcessor(row);
+          // Split the date into two parts
+          // const dateParts = row.includes('–') ? row.split('–') : row.split('&');
+          
+          // // Check if the first part contains a date
+          // // Pattern to match the start date
+          // const startDatePattern = /\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b \d{1,2}/;
+          // // Check the first part against teh pattern
+          // entry['startDate'] = startDatePattern.test(dateParts[0].trim()) ? dateParts[0].trim().match(startDatePattern)[0] : '';
+          // const endDate = dateParts[1] ? dateParts[1].trim() : '';
+          // const endDatePattern = /\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\b \d{1,2}/;
+          // entry['endDate'] = endDatePattern.test(endDate) ? endDate : '';
+          entry['startDate'] = dateParts[0].trim();
+          entry['endDate'] = dateParts[1].trim();
         } else {
           entry['notes'] = row;
         }

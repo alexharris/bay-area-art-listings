@@ -10,7 +10,6 @@ const client = createClient({
 export default async function getListings() {
   try {
     // get the listing
-    // let data = await client.fetch('*[_type == "listing"]');
     let today = new Date().toISOString().split('T')[0];
     let data = await client.fetch('*[_type == "listing" && EndDate > $today]', {today});    
 
