@@ -88,6 +88,9 @@ export default function Process() {
     } else {
       // Not sure what this is
       console.log('Cant parse:' + dateString);
+      dateParts[0] = dateString;
+      dateParts[1] = dateString;
+      status = 'something wrong with this date'
     }
     
     const result = {
@@ -143,7 +146,7 @@ export default function Process() {
 
 
           entry['startDate'] = results.dateParts[0].trim();
-          entry['endDate'] = results.dateParts[0].trim();
+          entry['endDate'] = results.dateParts[1].trim();
           entry['status'] = results.status;
 
 
