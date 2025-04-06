@@ -316,7 +316,7 @@ export default function displayListings() {
                                 displayedResults={displayedResults}
                                 selectedCounty={selectedCounty}
                             />    
-                            <svg className="icon-link block md:hidden w-12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                         
+                            <svg className="icon-link block md:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                         
                         </div>
                                              
                     </div>
@@ -348,7 +348,7 @@ export default function displayListings() {
                         {isMapView && L ? (
                             <div id="map-view" className="w-full">
                                 <div className="h-[70vh] border w-full">
-                                <MapContainer center={[37.7749, -122.4194]} zoom={9} scrollWheelZoom={true} className="h-[70vh] border w-full">
+                                <MapContainer center={[37.7749, -122.4194]} zoom={9} scrollWheelZoom={true} className="h-[70vh] border w-full z-0">
                                     <TileLayer
                                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                     url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"

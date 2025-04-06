@@ -17,7 +17,7 @@ export default function Process() {
   function processEntry(entry) {
     // current row:
     // Id	Highlight	Event	Location	StartDate	EndDate	Notes
-    console.log(entry.status)
+    
     if(entry.status === 'ok') {
       const csvRow = `${uuidv4()}\t${entry.highlight === 'yes' ? '★' : ''}\t${entry.title || ''}\t${entry.location || ''}\t${entry.startDate || ''}\t${entry.endDate || ''}\t${entry.notes || ''}\n`;
       setCsvData(prevCsvData => prevCsvData + csvRow);
@@ -76,10 +76,7 @@ export default function Process() {
         dateParts[0] = `${dateParts[0].trim()} ${currentYear}`;
         dateParts[1] = `${dateParts[1].trim()} ${currentYear}`;
       }
-
-      
-      // console.log(dateParts[0].trim())
-      // console.log(dateParts[1].trim())      
+  
       
       status = 'ok'
       
@@ -88,8 +85,8 @@ export default function Process() {
     } else {
       // Not sure what this is
       console.log('Cant parse:' + dateString);
-      dateParts[0] = dateString;
-      dateParts[1] = dateString;
+      dateParts[0] = '1';
+      dateParts[1] = '2';
       status = 'something wrong with this date'
     }
     
