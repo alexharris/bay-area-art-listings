@@ -75,11 +75,29 @@ export function getFilteredListings(filters, listings) {
   .filter(item => item.Event.toLowerCase().includes(filters.searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(filters.searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(filters.searchTerm.toLowerCase())) // Search Term
   .filter(item => filters.selectedCounty[0] ? filters.selectedCounty[0].zipcodes.some(zipcode => item.locationAddress.includes(zipcode)) : true) // Selected County
   .filter(item => {
-      const startDate = new Date(item.StartDate);
-      const endDate = new Date(item.EndDate);
+      const startDate = new Date(item.StartDate + 'T00:00:00');
+      const endDate = new Date(item.EndDate + 'T23:59:59Z');
+      if(item.Event === 'Alex Olson, Letters') {
+        console.log('------ test');
+        console.log(item.StartDate)
+        console.log(startDate)
+      }
       if (filters.calendarTypeFilter === 'onview') {
+        if(item.Event === 'Alex Olson, Letters') {
+          console.log('------ onview ');
+          console.log(item.Event);
+          console.log('startDate', startDate);
+          console.log('filters', new Date(filters.calendarDateRangeFilter.from));           
+        }
           return (startDate <= filters.calendarDateRangeFilter.to && endDate >= filters.calendarDateRangeFilter.from);
       } else if (filters.calendarTypeFilter === 'opening') {
+        if(item.Event === 'Alex Olson, Letters') {
+          console.log('------ opening');
+
+          console.log(item.Event);
+          console.log('startDate', startDate);
+          console.log('filters', new Date(filters.calendarDateRangeFilter.from));        
+        }
           return startDate >= filters.calendarDateRangeFilter.from && startDate <= filters.calendarDateRangeFilter.to;
       } else if (filters.calendarTypeFilter === 'closing') {
           return endDate >= filters.calendarDateRangeFilter.from && endDate <= filters.calendarDateRangeFilter.to;
