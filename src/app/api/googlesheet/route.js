@@ -1,4 +1,4 @@
-export const maxDuration = 600; // This function can run for a maximum of 20 seconds
+export const maxDuration = 60; // This function can run for a maximum of 20 seconds
 
 import { google } from 'googleapis';
 import {createClient} from '@sanity/client'
