@@ -13,6 +13,7 @@ import CountySelector from './countySelector';
 import "react-day-picker/style.css";
 import AddEmailForm from './addEmailForm';
 import { getFilteredListings } from '../../utils/filters';
+import { sortListingsChronologically } from '../../utils/sort'; 
 import MobileIconMenu from './mobileIconMenu';
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
@@ -128,8 +129,9 @@ export default function displayListings() {
         //     });
         
         const filteredListings = getFilteredListings(filters, listings);
+        const sortedListings = sortListingsChronologically(filteredListings)
         
-        setFilteredListings(filteredListings);
+        setFilteredListings(sortedListings);
         setDisplayedResults(filteredListings.length);
         
         // getListingsForThisWeek(filters, listings);
