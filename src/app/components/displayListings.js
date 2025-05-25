@@ -359,6 +359,7 @@ export default function displayListings() {
                                     filteredListings
                                         .filter(item => highlightsOnly ? item.Highlight : true)
                                         .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
+                                        .filter(item => item.locationName.toLowerCase() !== 'various')
                                         .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
                                         .map((item, index) => {
                                             const location = locations.find(loc => loc.Name === item.locationName);
@@ -391,7 +392,10 @@ export default function displayListings() {
                                         .map((item, index) => (
                                             <li className="border-b border-dashed border-black py-4 w-full relative" key={index}>
                                                 <h2 className="font-bold text-xl pr-8"><a className="" href={'/listing/' + item._id}>{item.Event}</a>{item.Highlight && '★'}</h2>
-                                                <a className="underline" href={'/location/' + item.Location._ref}>{item.locationName}</a> 
+                                                {item.locationName.toLowerCase() === 'various' 
+                                                    ? <div>{item.locationName}</div> 
+                                                    : <a className="underline" href={'/location/' + item.Location._ref}>{item.locationName}</a>}
+                                                
                                                 <div className="flex flex-row gap-2 items-center">
                                                     {formatDate(item.StartDate)} - {formatDate(item.EndDate)}
                                                     <CalendarLink listing={item} location="" />                                              

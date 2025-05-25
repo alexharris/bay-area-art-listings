@@ -1,4 +1,4 @@
-export const maxDuration = 60; // This function can run for a maximum of 20 seconds
+export const maxDuration = 60; // This function can run for a maximum of 60 seconds
 
 import { google } from 'googleapis';
 import {createClient} from '@sanity/client'
@@ -92,8 +92,6 @@ async function getExistingLocationsFromSanity() {
 
 async function addGooglePlaceToSanity(googlePlace, newLocation, sanityClient, controller) {
   
-
-
   await sanityClient.create({
     _type: 'location',
     Name: googlePlace.displayName.text,
@@ -146,9 +144,6 @@ async function updateLocationInSanity(googlePlace, existingLocation, sanityClien
     .catch((err) => {
       console.error('Oh no, the update failed: ', err.message)
     });
-  
-  
-
   return
 }
 
@@ -204,6 +199,7 @@ export async function GET(req, res) {
     useCdn: false,
     apiVersion: 'v2022-03-07'
   });
+  
   // Create a new ReadableStream
   // used to stream data to the client
   const readableStream = new ReadableStream({
@@ -228,6 +224,7 @@ export async function GET(req, res) {
           writeMessageToClient(`Checking ${newLocation}`, controller);
           const locationExistsAlready = existingLocations.some(existingLocation => existingLocation.OriginalName === newLocation);
           if (!locationExistsAlready) {
+
             writeMessageToClient(`Location does not exist: ${newLocation}. Googling it.`, controller);
             let googlePlace = await getPlaceDetailsFromGoogle(newLocation);
             if(googlePlace) {
@@ -236,12 +233,18 @@ export async function GET(req, res) {
             } else {
               writeMessageToClient(`Couldn't find info about ${newLocation}. Manually Review.`, controller);
             }
+            
+
 
           } else {
             writeMessageToClient(`Location exists: ${newLocation}`, controller);
-            let existingLocation = existingLocations.find(existingLocation => existingLocation.OriginalName === newLocation);          
-            let googlePlace = await getPlaceDetailsFromGoogle(newLocation);
-            await updateLocationInSanity(googlePlace, existingLocation, sanityClient, controller);
+            if(newLocation === 'various' || newLocation === 'Various') {
+              writeMessageToClient(`Location is 'various' Special treatment.`, controller);
+            } else {            
+              let existingLocation = existingLocations.find(existingLocation => existingLocation.OriginalName === newLocation);          
+              let googlePlace = await getPlaceDetailsFromGoogle(newLocation);
+              await updateLocationInSanity(googlePlace, existingLocation, sanityClient, controller);
+            }
           }
         }
 
