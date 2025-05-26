@@ -111,22 +111,18 @@ export default function displayListings() {
                 setCalendarTypeFilter('onview');    
             }
 
-            
-            
-            // Handle date range parameters - more complex but possible
+            // Handle date range parameters
             if (params.has('dateFrom') && params.has('dateTo')) {
                 try {
                     const from = new Date(params.get('dateFrom'));
-                    const to = new Date(params.get('dateTo'));
-                    
+                    const to = new Date(params.get('dateTo'));                    
                     
                     if (!isNaN(from.getTime()) && !isNaN(to.getTime())) {
                         console.log('Date parameters:', params.get('dateFrom'), params.get('dateTo'));
                         updateCalendarDateRangeFilter({
                             from: params.get('dateFrom'),
                             to: params.get('dateTo')
-                        });
-                        // Note: updateCalendarDateRangeFilter already sets calendarDateRangePreset to 'custom'
+                        });                        
                     }
                 } catch (e) {
                     console.error('Invalid date format in URL parameters:', e);
@@ -432,6 +428,13 @@ export default function displayListings() {
                                     setCalendarDateRangeFilter({ from: startOfMay, to: endOfMay });
                                     setCalendarDateRangePreset('custom');
                                 }}
+                                className={`cursor-pointer hover:underline ${
+                                    calendarTypeFilter === 'opening' && 
+                                    calendarDateRangeFilter.from && 
+                                    calendarDateRangeFilter.from.getMonth() === 4 && 
+                                    calendarDateRangeFilter.from.getDate() === 1 ? 
+                                    'font-bold' : ''
+                                }`}
                             >
                                 Opening in May
                             </span>
@@ -448,6 +451,13 @@ export default function displayListings() {
                                     setCalendarDateRangeFilter({ from: startOfMay, to: endOfMay });
                                     setCalendarDateRangePreset('custom');
                                 }}
+                                className={`cursor-pointer hover:underline ${
+                                    calendarTypeFilter === 'closing' && 
+                                    calendarDateRangeFilter.from && 
+                                    calendarDateRangeFilter.from.getMonth() === 4 && 
+                                    calendarDateRangeFilter.from.getDate() === 1 ? 
+                                    'font-bold' : ''
+                                }`}                                
                             >
                                 Closing in May
                             </span>                            
@@ -464,6 +474,13 @@ export default function displayListings() {
                                     setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
                                     setCalendarDateRangePreset('custom');
                                 }}
+                                className={`cursor-pointer hover:underline ${
+                                    calendarTypeFilter === 'opening' && 
+                                    calendarDateRangeFilter.from && 
+                                    calendarDateRangeFilter.from.getMonth() === 5 && 
+                                    calendarDateRangeFilter.from.getDate() === 1 ? 
+                                    'font-bold' : ''
+                                }`}                                
                             >
                                 Opening in June
                             </span>   
@@ -480,6 +497,13 @@ export default function displayListings() {
                                     setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
                                     setCalendarDateRangePreset('custom');
                                 }}
+                                className={`cursor-pointer hover:underline ${
+                                    calendarTypeFilter === 'closing' && 
+                                    calendarDateRangeFilter.from && 
+                                    calendarDateRangeFilter.from.getMonth() === 5 && 
+                                    calendarDateRangeFilter.from.getDate() === 1 ? 
+                                    'font-bold' : ''
+                                }`}                                
                             >
                                 Closing in June
                             </span>                                                      
