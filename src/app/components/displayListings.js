@@ -7,7 +7,7 @@ import CalendarLink from './calendarLink';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import { format, set, setDay } from 'date-fns';
-import { DayPicker } from "react-day-picker";
+import { DayPicker, Select } from "react-day-picker";
 import DisplayFilters from './displayFilters';
 import CountySelector from './countySelector';
 import "react-day-picker/style.css";
@@ -21,6 +21,11 @@ const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapCo
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
+
+// Feature flags
+const sidebarCalendarIsEnabled = false; // Set to false to disable calendar features
+const simpleDateSelectEnable = true; // Set to true to enable simple date select
+
 
 
 // TODO
@@ -66,6 +71,75 @@ export default function displayListings() {
     const [showMenu, setShowMenu] = useState(false);
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
 
+    // Add this new effect to handle URL parameters
+    useEffect(() => {
+        console.log('Checking URL parameters and setting initial state...');
+        // Only run in the browser
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            
+            // Handle searchTerm parameter
+            if (params.has('searchTerm')) {
+                setSearchTerm(params.get('searchTerm'));
+            }
+            
+            // Handle selectedLocation parameter
+            if (params.has('selectedLocation')) {
+                console.log('Selected Location:', params.get('selectedLocation'));
+                setSelectedLocation(params.get('selectedLocation'));
+            }
+            
+            // Handle selectedCounty parameter
+            // if (params.has('selectedCounty')) {
+            //     console.log('Selected County:', params.get('selectedCounty'));
+            //     setSelectedCounty(params.get('selectedCounty'));
+            // }
+            
+            // Handle highlightsOnly parameter
+            if (params.has('highlightsOnly')) {
+                setHighlightsOnly(params.get('highlightsOnly') === 'true');
+            }
+            
+            // Handle calendarTypeFilter parameter
+            if (params.has('calendarTypeFilter')) {
+                const type = params.get('calendarTypeFilter');
+                if (['onview', 'opening', 'closing'].includes(type)) {
+                    setCalendarTypeFilter(type);
+                }
+            } else {
+                // Default to 'onview' if no type is specified
+                setCalendarTypeFilter('onview');    
+            }
+
+            
+            
+            // Handle date range parameters - more complex but possible
+            if (params.has('dateFrom') && params.has('dateTo')) {
+                try {
+                    const from = new Date(params.get('dateFrom'));
+                    const to = new Date(params.get('dateTo'));
+                    
+                    
+                    if (!isNaN(from.getTime()) && !isNaN(to.getTime())) {
+                        console.log('Date parameters:', params.get('dateFrom'), params.get('dateTo'));
+                        updateCalendarDateRangeFilter({
+                            from: params.get('dateFrom'),
+                            to: params.get('dateTo')
+                        });
+                        // Note: updateCalendarDateRangeFilter already sets calendarDateRangePreset to 'custom'
+                    }
+                } catch (e) {
+                    console.error('Invalid date format in URL parameters:', e);
+                }
+            }
+            
+            // Handle view mode parameter
+            if (params.has('view')) {
+                setIsMapView(params.get('view') === 'map');
+            }
+        }
+    }, []);
+
 
     // Date Variables
     const today = new Date();
@@ -86,9 +160,13 @@ export default function displayListings() {
                 const locationData = await getLocations();
                 setLocations(locationData); 
                 // Set Filter Status
-                setCalendarTypeFilter('onview');
-                setCalendarDateRangeFilter({ from: startOfWeek, to: endOfWeek });
-                setCalendarDateRangePreset('thisweek');
+                // setCalendarTypeFilter('onview');
+                
+                // Only set calendar filters if the feature flag is enabled
+                if (sidebarCalendarIsEnabled) {
+                    setCalendarDateRangeFilter({ from: startOfWeek, to: endOfWeek });
+                    setCalendarDateRangePreset('thisweek');
+                }
             } catch (error) {
                 console.error('Data retrieval failed:', error);
             } finally {
@@ -136,6 +214,37 @@ export default function displayListings() {
         
         // getListingsForThisWeek(filters, listings);
 
+        console.log('updating url params when filters change')
+
+        // Update URL parameters based on filters
+        const params = new URLSearchParams();
+
+        // // Only add non-default values to URL params
+        if (searchTerm) params.set('searchTerm', searchTerm);
+        if (selectedLocation) params.set('selectedLocation', selectedLocation);
+        if (selectedCounty && selectedCounty[0] && selectedCounty[0].county) {
+            params.set('selectedCounty', selectedCounty[0].county);
+        }
+        if (highlightsOnly) params.set('highlightsOnly', 'true');
+
+        if (calendarTypeFilter && calendarTypeFilter !== 'onview') {
+            params.set('calendarTypeFilter', calendarTypeFilter);
+        }
+
+        if (calendarDateRangeFilter.from && calendarDateRangeFilter.to) {
+            params.set('dateFrom', format(new Date(calendarDateRangeFilter.from), 'yyyy-MM-dd'));
+            params.set('dateTo', format(new Date(calendarDateRangeFilter.to), 'yyyy-MM-dd'));
+        }
+
+        // if (isMapView) params.set('view', 'map');
+
+        // // Only update URL if we have params, otherwise clear the search params
+        const newUrl = params.toString() 
+            ? `${window.location.pathname}?${params.toString()}`
+            : window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+
+
     }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, searchTerm, listings, selectedLocation, selectedCounty]);
 
     // Toggle map view
@@ -154,10 +263,32 @@ export default function displayListings() {
     }
 
     function updateCalendarDateRangeFilter(dateRange){
+        // Handle dates properly to avoid timezone issues
+        let fromDate, toDate;
+        
+        if (typeof dateRange.from === 'string') {
+            // Parse date strings properly to maintain the correct day
+            const [year, month, day] = dateRange.from.split('-').map(Number);
+            fromDate = new Date(year, month - 1, day); // month is 0-indexed in JS Date
+        } else {
+            // If it's already a Date object
+            fromDate = new Date(dateRange.from);
+        }
+        fromDate.setHours(0, 0, 0, 0);
+        
+        if (typeof dateRange.to === 'string') {
+            const [year, month, day] = dateRange.to.split('-').map(Number);
+            toDate = new Date(year, month - 1, day);
+        } else {
+            toDate = new Date(dateRange.to);
+        }
+        toDate.setHours(23, 59, 59, 999);
+        
         const adjustedFilter = {
-            from: new Date(dateRange.from).setHours(0, 1, 0, 0),
-            to: new Date(dateRange.to).setHours(23, 59, 0, 0)
+            from: fromDate,
+            to: toDate
         };
+        
         setCalendarDateRangeFilter(adjustedFilter);
         setCalendarDateRangePreset('custom');
     }
@@ -202,41 +333,158 @@ export default function displayListings() {
                             onChange={(e) => setSearchTerm(e.target.value)} 
                         />
                     </div>   
-                    <div className="pb-2 border-b border-gray-300">
-                        <div className="text-sm uppercase pb-2">Calendar</div>
+                    {sidebarCalendarIsEnabled &&
+                        <div className="pb-2 border-b border-gray-300">
+                            <div className="text-sm uppercase pb-2">Calendar</div>
 
-                        <div className="flex flex-row gap-2 mb-2">
-                            <div className="flex flex-col w-1/2">
-                                <label htmlFor="calendarTypeFilter">Type</label>
-                                <div id="calendarTypeFilter" className="p-1 border border-gray-300 cursor-pointer">
-                                    <div onClick={() => setCalendarTypeFilter('onview')} className={calendarTypeFilter === 'onview' ? 'bg-gray-200' : ''}>On View</div>
-                                    <div onClick={() => setCalendarTypeFilter('opening')} className={calendarTypeFilter === 'opening' ? 'bg-gray-200' : ''}>Opening</div>
-                                    <div onClick={() => setCalendarTypeFilter('closing')} className={calendarTypeFilter === 'closing' ? 'bg-gray-200' : ''}>Closing</div>
+                            <div className="flex flex-row gap-2 mb-2">
+                                <div className="flex flex-col w-1/2">
+                                    <label htmlFor="calendarTypeFilter">Type</label>
+                                    {/* <select size="3" id="calendarTypeFilter" className="p-1 border border-gray-300 cursor-pointer">
+                                        <option value="onview" onClick={() => setCalendarTypeFilter('onview')}>On View</option>
+                                        <option value="opening" onClick={() => setCalendarTypeFilter('opening')}>Opening</option>
+                                        <option value="closing" onClick={() => setCalendarTypeFilter('closing')}>Closing</option>
+                                    </select> */}
+                                    <select 
+                                        id="calendarTypeFilter" 
+                                        className="p-1 border border-gray-300 cursor-pointer" 
+                                        size="3"
+                                        value={calendarTypeFilter}
+                                        onChange={(e) => setCalendarTypeFilter(e.target.value)}
+                                    >
+                                        <option value="onview">On View</option>
+                                        <option value="opening">Opening</option>
+                                        <option value="closing">Closing</option>
+                                    </select>                                
+                                    {/* <div id="calendarTypeFilter" className="p-1 border border-gray-300 cursor-pointer">
+                                        <div onClick={() => setCalendarTypeFilter('onview')} className={calendarTypeFilter === 'onview' ? 'bg-gray-200' : ''}>On View</div>
+                                        <div onClick={() => setCalendarTypeFilter('opening')} className={calendarTypeFilter === 'opening' ? 'bg-gray-200' : ''}>Opening</div>
+                                        <div onClick={() => setCalendarTypeFilter('closing')} className={calendarTypeFilter === 'closing' ? 'bg-gray-200' : ''}>Closing</div>
+                                    </div> */}
                                 </div>
+                                <div className="flex flex-col w-1/2">
+                                    <label htmlFor="filterResults">Date Range</label>
+                                    <div id="filterResults" className="p-1 border border-gray-300 cursor-pointer">
+                                        <div onClick={() => { 
+                                            setShowCustomCalendar(false); 
+                                            const todayFrom = new Date();
+                                            todayFrom.setHours(0, 0, 0, 0);
+                                            const todayTo = new Date();
+                                            todayTo.setHours(23, 59, 59, 999);
+                                            setCalendarDateRangeFilter({ from: todayFrom, to: todayTo }); 
+                                            setCalendarDateRangePreset('today'); 
+                                        }} className={calendarDateRangePreset === 'today' ? 'bg-gray-200' : ''}>Today</div>
+                                        <div onClick={() => { 
+                                            setShowCustomCalendar(false); 
+                                            const weekFrom = new Date(startOfWeek);
+                                            weekFrom.setHours(0, 0, 0, 0);
+                                            const weekTo = new Date(endOfWeek);
+                                            weekTo.setHours(23, 59, 59, 999);
+                                            setCalendarDateRangeFilter({ from: weekFrom, to: weekTo }); 
+                                            setCalendarDateRangePreset('thisweek'); 
+                                        }} className={calendarDateRangePreset === 'thisweek' ? 'bg-gray-200' : ''}>This Week</div>
+                                        <div onClick={() => { 
+                                            setShowCustomCalendar(false); 
+                                            const monthFrom = new Date(startOfMonth);
+                                            monthFrom.setHours(0, 0, 0, 0);
+                                            const monthTo = new Date(endOfMonth);
+                                            monthTo.setHours(23, 59, 59, 999);
+                                            setCalendarDateRangeFilter({ from: monthFrom, to: monthTo }); 
+                                            setCalendarDateRangePreset('thismonth'); 
+                                        }} className={calendarDateRangePreset === 'thismonth' ? 'bg-gray-200' : ''}>This Month</div>
+                                        <div onClick={() => { 
+                                            setShowCustomCalendar(false); 
+                                            const nextMonthFrom = new Date(startOfNextMonth);
+                                            nextMonthFrom.setHours(0, 0, 0, 0);
+                                            const nextMonthTo = new Date(endOfNextMonth);
+                                            nextMonthTo.setHours(23, 59, 59, 999);
+                                            setCalendarDateRangeFilter({ from: nextMonthFrom, to: nextMonthTo }); 
+                                            setCalendarDateRangePreset('nextmonth'); 
+                                        }} className={calendarDateRangePreset === 'nextmonth' ? 'bg-gray-200' : ''}>Next Month</div>                                
+                                        <div onClick={() => {setShowCustomCalendar(true); setCalendarDateRangePreset('custom')}} className={calendarDateRangePreset === 'custom' ? 'bg-gray-200' : ''}>Custom</div>
+                                    </div>
+                                </div>                       
                             </div>
-                            <div className="flex flex-col w-1/2">
-                                <label htmlFor="filterResults">Date Range</label>
-                                <div id="filterResults" className="p-1 border border-gray-300 cursor-pointer">
-                                    <div onClick={() => { setShowCustomCalendar(false); setCalendarDateRangeFilter({ from: new Date().setHours(0, 0, 0, 0), to: new Date().setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('today'); }} className={calendarDateRangePreset === 'today' ? 'bg-gray-200' : ''}>Today</div>
-                                    <div onClick={() => { setShowCustomCalendar(false); setCalendarDateRangeFilter({ from: startOfWeek.setHours(0, 0, 0, 0), to: endOfWeek.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('thisweek'); }} className={calendarDateRangePreset === 'thisweek' ? 'bg-gray-200' : ''}>This Week</div>
-                                    <div onClick={() => { setShowCustomCalendar(false); setCalendarDateRangeFilter({ from: startOfMonth.setHours(0, 0, 0, 0), to: endOfMonth.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('thismonth'); }} className={calendarDateRangePreset === 'thismonth' ? 'bg-gray-200' : ''}>This Month</div>
-                                    <div onClick={() => { setShowCustomCalendar(false); setCalendarDateRangeFilter({ from: startOfNextMonth.setHours(0, 0, 0, 0), to: endOfNextMonth.setHours(23, 59, 59, 999) }); setCalendarDateRangePreset('nextmonth'); }} className={calendarDateRangePreset === 'nextmonth' ? 'bg-gray-200' : ''}>Next Month</div>                                
-                                    <div onClick={() => {setShowCustomCalendar(true); setCalendarDateRangePreset('custom')}} className={calendarDateRangePreset === 'custom' ? 'bg-gray-200' : ''}>Custom</div>
+                            {showCustomCalendar &&
+                                <div className='border border-gray-300 px-1'>
+                                    <DayPicker
+                                        mode="range"
+                                        onSelect={(dateRange) => updateCalendarDateRangeFilter(dateRange)}
+                                        selected={calendarDateRangeFilter}
+                                        required
+                                        showOutsideDays
+                                    />                        
                                 </div>
-                            </div>                       
+                            }
                         </div>
-                        {showCustomCalendar &&
-                            <div className='border border-gray-300 px-1'>
-                                <DayPicker
-                                    mode="range"
-                                    onSelect={(dateRange) => updateCalendarDateRangeFilter(dateRange)}
-                                    selected={calendarDateRangeFilter}
-                                    required
-                                    showOutsideDays
-                                />                        
-                            </div>
-                        }
-                    </div>
+                    }
+                    {simpleDateSelectEnable &&
+                        <div className="pb-2 border-b border-gray-300">
+                            <span 
+                                onClick={() => {
+                                    setCalendarTypeFilter('opening');
+                                    const may = new Date();
+                                    may.setMonth(4); // May is month 4 (0-indexed)
+                                    const startOfMay = new Date(may.getFullYear(), 4, 1);
+                                    startOfMay.setHours(0, 0, 0, 0);
+                                    const endOfMay = new Date(may.getFullYear(), 4 + 1, 0);
+                                    endOfMay.setHours(23, 59, 59, 999);
+                                    setCalendarDateRangeFilter({ from: startOfMay, to: endOfMay });
+                                    setCalendarDateRangePreset('custom');
+                                }}
+                            >
+                                Opening in May
+                            </span>
+                            <br />
+                            <span 
+                                onClick={() => {
+                                    setCalendarTypeFilter('closing');
+                                    const may = new Date();
+                                    may.setMonth(4); // May is month 4 (0-indexed)
+                                    const startOfMay = new Date(may.getFullYear(), 4, 1);
+                                    startOfMay.setHours(0, 0, 0, 0);
+                                    const endOfMay = new Date(may.getFullYear(), 4 + 1, 0);
+                                    endOfMay.setHours(23, 59, 59, 999);
+                                    setCalendarDateRangeFilter({ from: startOfMay, to: endOfMay });
+                                    setCalendarDateRangePreset('custom');
+                                }}
+                            >
+                                Closing in May
+                            </span>                            
+                            <br />
+                            <span 
+                                onClick={() => {
+                                    setCalendarTypeFilter('opening');
+                                    const june = new Date();
+                                    june.setMonth(5); // June is month 5 (0-indexed)
+                                    const startOfMonth = new Date(june.getFullYear(), 5, 1);
+                                    startOfMonth.setHours(0, 0, 0, 0);
+                                    const endOfMonth = new Date(june.getFullYear(), 5 + 1, 0);
+                                    endOfMonth.setHours(23, 59, 59, 999);
+                                    setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
+                                    setCalendarDateRangePreset('custom');
+                                }}
+                            >
+                                Opening in June
+                            </span>   
+                            <br />
+                            <span 
+                                onClick={() => {
+                                    setCalendarTypeFilter('closing');
+                                    const june = new Date();
+                                    june.setMonth(5); // June is month 5 (0-indexed)
+                                    const startOfMonth = new Date(june.getFullYear(), 5, 1);
+                                    startOfMonth.setHours(0, 0, 0, 0);
+                                    const endOfMonth = new Date(june.getFullYear(), 5 + 1, 0);
+                                    endOfMonth.setHours(23, 59, 59, 999);
+                                    setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
+                                    setCalendarDateRangePreset('custom');
+                                }}
+                            >
+                                Closing in June
+                            </span>                                                      
+                        </div>
+                    }
                     <div className="flex flex-col pb-4 border-b border-gray-300">
                         <div className="text-sm uppercase pb-2">Location</div>
                         <CountySelector onCountyChange={setSelectedCounty} />                    
@@ -244,6 +492,7 @@ export default function displayListings() {
                         <select 
                             id="locationFilter" 
                             onChange={(e) => setSelectedLocation(e.target.value)} 
+                            value={selectedLocation}
                             className="p-1 bg-white border border-gray-300"
                         >
                             <option value="">All Locations</option>
@@ -269,7 +518,14 @@ export default function displayListings() {
                             setSearchTerm('');
                             setSelectedLocation('');
                             setCalendarTypeFilter('onview');
-                            setCalendarDateRangeFilter({ from: startOfWeek, to: endOfWeek });
+                            
+                            // Create proper Date objects for startOfWeek and endOfWeek
+                            const weekFrom = new Date(startOfWeek);
+                            weekFrom.setHours(0, 0, 0, 0);
+                            const weekTo = new Date(endOfWeek);
+                            weekTo.setHours(23, 59, 59, 999);
+                            
+                            setCalendarDateRangeFilter({ from: weekFrom, to: weekTo });
                             setSortDate({from: new Date(), to: new Date()});
                         }} 
                         className="underline cursor-pointer"

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import bayAreaZipcodes from '../../data/bay-area-zipcodes.json';
 
 
@@ -8,12 +8,38 @@ function getZipcodesByCounty(county) {
 }
 
 const CountySelector = ({ onCountyChange }) => {
+
+  const [selectedCounty, setSelectedCounty] = useState('');
+  
+  useEffect(() => {
+    // Only run in the browser
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      
+      if (params.has('selectedCounty')) {
+        const countyFromURL = params.get('selectedCounty');
+        setSelectedCounty(countyFromURL);
+        
+        // Call the onCountyChange with the zipcodes for this county
+        onCountyChange(getZipcodesByCounty(countyFromURL));
+      }
+    }
+  }, [onCountyChange]);
+  
+  const handleCountyChange = (e) => {
+    const county = e.target.value;
+    setSelectedCounty(county);
+    onCountyChange(getZipcodesByCounty(county));
+  };
+  
+  
   return (
     <div className="flex flex-col pb-2">
       <label htmlFor="countyFilter">County</label>
       <select 
         id="countyFilter" 
-        onChange={(e) => onCountyChange(getZipcodesByCounty(e.target.value))} 
+        value={selectedCounty}
+        onChange={handleCountyChange}
         className="p-1 bg-white border border-gray-300"
       >
         <option value="">All Counties</option>
