@@ -15,6 +15,7 @@ import AddEmailForm from './addEmailForm';
 import { getFilteredListings } from '../../utils/filters';
 import { sortListingsChronologically } from '../../utils/sort'; 
 import MobileIconMenu from './mobileIconMenu';
+import Link from "next/link";
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
@@ -62,7 +63,7 @@ export default function displayListings() {
     //  Sorting
     const [sortDate, setSortDate] = useState([]);
     // Display
-    const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('thismonth');
+    const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('custom');
     const [showDetails, setShowDetails] = useState({});
     const [loading, setLoading] = useState(true);
     const [isMapView, setIsMapView] = useState(false);
@@ -108,7 +109,7 @@ export default function displayListings() {
                 }
             } else {
                 // Default to 'onview' if no type is specified
-                setCalendarTypeFilter('onview');    
+                setCalendarTypeFilter('opening');    
             }
 
             // Handle date range parameters
@@ -159,10 +160,10 @@ export default function displayListings() {
                 // setCalendarTypeFilter('onview');
                 
                 // Only set calendar filters if the feature flag is enabled
-                if (sidebarCalendarIsEnabled) {
-                    setCalendarDateRangeFilter({ from: startOfWeek, to: endOfWeek });
-                    setCalendarDateRangePreset('thisweek');
-                }
+                // if (sidebarCalendarIsEnabled) {
+                setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
+                setCalendarDateRangePreset('thismonth');
+                // }
             } catch (error) {
                 console.error('Data retrieval failed:', error);
             } finally {
@@ -223,13 +224,29 @@ export default function displayListings() {
         }
         if (highlightsOnly) params.set('highlightsOnly', 'true');
 
-        if (calendarTypeFilter && calendarTypeFilter !== 'onview') {
+        if (calendarTypeFilter && calendarTypeFilter !== 'opening') {
             params.set('calendarTypeFilter', calendarTypeFilter);
         }
 
+        // only need to display the date range in the URL if it's not the default month range
         if (calendarDateRangeFilter.from && calendarDateRangeFilter.to) {
-            params.set('dateFrom', format(new Date(calendarDateRangeFilter.from), 'yyyy-MM-dd'));
-            params.set('dateTo', format(new Date(calendarDateRangeFilter.to), 'yyyy-MM-dd'));
+            const today = new Date();
+            const startOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            const endOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            
+            startOfCurrentMonth.setHours(0, 0, 0, 0);
+            endOfCurrentMonth.setHours(0,0,0,0);
+            
+            const isDefaultMonthRange = 
+                calendarDateRangeFilter.from.getTime() === startOfCurrentMonth.getTime() && 
+                calendarDateRangeFilter.to.getTime() === endOfCurrentMonth.getTime();
+            
+            console.log(calendarDateRangeFilter.from.getTime(), startOfCurrentMonth.getTime(), calendarDateRangeFilter.to.getTime(), endOfCurrentMonth.getTime(), isDefaultMonthRange);
+
+            if (!isDefaultMonthRange) {
+                params.set('dateFrom', format(new Date(calendarDateRangeFilter.from), 'yyyy-MM-dd'));
+                params.set('dateTo', format(new Date(calendarDateRangeFilter.to), 'yyyy-MM-dd'));
+            }
         }
 
         // if (isMapView) params.set('view', 'map');
@@ -320,10 +337,12 @@ export default function displayListings() {
                 `}>
                     {/* Logo at the top of the sidebar */}
                     <div className="flex justify-center mb-2">
-                        <img 
-                            src="/baal-logo.png" 
-                            alt="Bay Area Art List Logo"                            
-                        />
+                        <Link href="/">
+                            <img 
+                                src="/baal-logo.png" 
+                                alt="Bay Area Art List Logo"                            
+                            />
+                        </Link>
                     </div>
                     <svg className="absolute top-2 right-2 md:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
 
@@ -537,8 +556,8 @@ export default function displayListings() {
                     <div className="flex flex-row pb-2 md:mt-0 gap-2 items-center">
                         <label htmlFor="searchTerm">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M14 14L11.1 11.1" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M14 14L11.1 11.1" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                         </label>
                         <input 
@@ -617,18 +636,18 @@ export default function displayListings() {
                             {/* <svg className="icon-link block md:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
                             <div className="flex flex-row gap-2">
                                 <svg onClick={() => setIsMapView(false)} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M5.33337 4H14" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M5.33337 8H14" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M5.33337 12H14" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M2 4H2.00667" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M2 8H2.00667" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M2 12H2.00667" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M5.33337 4H14" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M5.33337 8H14" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M5.33337 12H14" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M2 4H2.00667" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M2 8H2.00667" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M2 12H2.00667" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                                 <svg onClick={() => setIsMapView(true)} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"> 
-                                    <g clip-path="url(#clip0_4_48)">
-                                    <path d="M0.666626 4V14.6667L5.33329 12L10.6666 14.6667L15.3333 12V1.33334L10.6666 4L5.33329 1.33334L0.666626 4Z" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M5.33337 1.33334V12" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M10.6666 4V14.6667" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <g clipPath="url(#clip0_4_48)">
+                                    <path d="M0.666626 4V14.6667L5.33329 12L10.6666 14.6667L15.3333 12V1.33334L10.6666 4L5.33329 1.33334L0.666626 4Z" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M5.33337 1.33334V12" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M10.6666 4V14.6667" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
                                     </g>
                                     <defs>
                                     <clipPath id="clip0_4_48">
@@ -691,8 +710,8 @@ export default function displayListings() {
                                                     position={[location.Geolocation.lat, location.Geolocation.lng]} 
                                                     icon={L.icon({
                                                         iconUrl: item.Highlight 
-                                                            ? "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cg clip-path='url(%23clip0_1_2)'%3E%3Cpath d='M21 1.16667L22.8025 4.81833L26.8333 5.4075L23.9167 8.24833L24.605 12.2617L21 10.3658L17.395 12.2617L18.0833 8.24833L15.1667 5.4075L19.1975 4.81833L21 1.16667Z' fill='%23FFF700' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_1_2'%3E%3Crect width='14' height='14' fill='white' transform='translate(14)'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A"
-                                                            : "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A",
+                                                            ? "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' stroke-width='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' stroke-width='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cg clipPath='url(%23clip0_1_2)'%3E%3Cpath d='M21 1.16667L22.8025 4.81833L26.8333 5.4075L23.9167 8.24833L24.605 12.2617L21 10.3658L17.395 12.2617L18.0833 8.24833L15.1667 5.4075L19.1975 4.81833L21 1.16667Z' fill='%23FFF700' stroke='black' stroke-width='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_1_2'%3E%3Crect width='14' height='14' fill='white' transform='translate(14)'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A"
+                                                            : "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' stroke-width='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' stroke-width='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A",
                                                     })}
                                                 >
                                                     <Popup>
@@ -712,9 +731,9 @@ export default function displayListings() {
                                     filteredListings
                                         .map((item, index) => (
                                             <li className="border-b border-dashed border-gray-200 py-4 w-full relative" key={index}>
-                                                <h2 className="font-bold pr-8 pb-2"><a className="" href={'/listing/' + item._id}>{item.Event}</a>{item.Highlight && '★'}</h2>
+                                                <h2 className="font-bold pr-8 pb-1"><a className="" href={'/listing/' + item._id}>{item.Event}</a>{item.Highlight && '★'}</h2>
                                                 
-                                                <div className="flex flex-row gap-2 items-center pb-2">
+                                                <div className="flex flex-row gap-2 items-center pb-1">
                                                     {formatDate(item.StartDate)} - {formatDate(item.EndDate)}
                                                     <CalendarLink listing={item} location="" />                                              
                                                 </div>
