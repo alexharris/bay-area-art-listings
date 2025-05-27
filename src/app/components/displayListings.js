@@ -52,7 +52,7 @@ export default function displayListings() {
     const [listings, setListings] = useState([]);
     const [locations, setLocations] = useState([]);    
     // Filtering
-    const [calendarTypeFilter, setCalendarTypeFilter] = useState('onview'); // onview, opening, closing
+    const [calendarTypeFilter, setCalendarTypeFilter] = useState('opening'); // onview, opening, closing
     const [calendarDateRangeFilter, setCalendarDateRangeFilter] = useState([]); // actual date range to filter on    
     const [filteredListings, setFilteredListings] = useState([]);
     const [highlightsOnly, setHighlightsOnly] = useState(false);
@@ -62,7 +62,7 @@ export default function displayListings() {
     //  Sorting
     const [sortDate, setSortDate] = useState([]);
     // Display
-    const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('thisweek');
+    const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('thismonth');
     const [showDetails, setShowDetails] = useState({});
     const [loading, setLoading] = useState(true);
     const [isMapView, setIsMapView] = useState(false);
@@ -293,7 +293,7 @@ export default function displayListings() {
     return (
    
           
-        <div className="flex flex-row w-full md:gap-8 items-start">
+        <div className="flex flex-row w-full items-start">
 
             {/* /* Sidebar */ }
             
@@ -315,20 +315,18 @@ export default function displayListings() {
                 md:inset-unset 
                 md:min-w-96 
                 gap-2 
-                bg-gray-100 
-                md:rounded-lg
+                bg-white
+                
                 `}>
-                    <svg className="absolute top-2 right-2 md:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
-                    <div className="flex flex-col pb-2 border-b border-gray-300 mt-8 md:mt-0">
-                        <label htmlFor="searchTerm" className="text-sm uppercase pb-2">Search</label>
-                        <input 
-                            type="text" 
-                            id="searchTerm"
-                            className="p-1 border border-gray-300"
-                            value={searchTerm} 
-                            onChange={(e) => setSearchTerm(e.target.value)} 
+                    {/* Logo at the top of the sidebar */}
+                    <div className="flex justify-center mb-2">
+                        <img 
+                            src="/baal-logo.png" 
+                            alt="Bay Area Art List Logo"                            
                         />
-                    </div>   
+                    </div>
+                    <svg className="absolute top-2 right-2 md:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
+
                     {sidebarCalendarIsEnabled &&
                         <div className="pb-2 border-b border-gray-300">
                             <div className="text-sm uppercase pb-2">Calendar</div>
@@ -415,7 +413,7 @@ export default function displayListings() {
                         </div>
                     }
                     {simpleDateSelectEnable &&
-                        <div className="pb-2 border-b border-gray-300">
+                        <div className="pb-1">
                             <span 
                                 onClick={() => {
                                     setCalendarTypeFilter('opening');
@@ -509,10 +507,10 @@ export default function displayListings() {
                             </span>                                                      
                         </div>
                     }
-                    <div className="flex flex-col pb-4 border-b border-gray-300">
-                        <div className="text-sm uppercase pb-2">Location</div>
+                    <div className="flex flex-col">
+                        {/* <div className="text-sm uppercase pb-2">Location</div> */}
                         <CountySelector onCountyChange={setSelectedCounty} />                    
-                        <label htmlFor="locationFilter">Venue</label>
+                        {/* <label htmlFor="locationFilter">Venue</label>
                         <select 
                             id="locationFilter" 
                             onChange={(e) => setSelectedLocation(e.target.value)} 
@@ -523,11 +521,11 @@ export default function displayListings() {
                             {locations.map((location, index) => (
                                 <option key={index} value={location.Name}>{location.Name}</option>
                             ))}
-                        </select>
+                        </select> */}
                         
 
                     </div>                 
-                    <label className="p-2">
+                    <label className="pb-2">
                         <input 
                             type="checkbox" 
                             className="mr-2"
@@ -536,7 +534,22 @@ export default function displayListings() {
                         />
                         Sarah Hotchkiss is excited about it
                     </label>
-                    <span 
+                    <div className="flex flex-row pb-2 md:mt-0 gap-2 items-center">
+                        <label htmlFor="searchTerm">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 14L11.1 11.1" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="searchTerm"
+                            className="bg-gray-100"
+                            value={searchTerm} 
+                            onChange={(e) => setSearchTerm(e.target.value)} 
+                        />
+                    </div>                       
+                    {/* <span 
                         onClick={() => {
                             setHighlightsOnly(false);
                             setSearchTerm('');
@@ -555,7 +568,7 @@ export default function displayListings() {
                         className="underline cursor-pointer"
                     >
                         Clear All Filters
-                    </span> 
+                    </span>  */}
                                 
                     <button 
                         onClick={() => {
@@ -590,19 +603,47 @@ export default function displayListings() {
                     <>  
                     <div className="flex flex-row justify-between align-bottom items-center border-b border-black pb-2 mb-2">
                    
-                        <div onClick={() => setShowMenu(prev => !prev)} className="flex flex-row items-start">
-                            <DisplayFilters                                 
-                                type={calendarTypeFilter}
-                                presetRange={calendarDateRangePreset}
-                                customRange={calendarDateRangeFilter}
-                                displayedResults={displayedResults}
-                                selectedCounty={selectedCounty}
-                            />    
-                            <svg className="icon-link block md:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                         
+                        <div onClick={() => setShowMenu(prev => !prev)} className="flex flex-row items-center justify-between w-full">
+                            <div className="flex flex-row gap-2 items-center">
+                                <DisplayFilters                                 
+                                    type={calendarTypeFilter}
+                                    presetRange={calendarDateRangePreset}
+                                    customRange={calendarDateRangeFilter}
+                                    displayedResults={displayedResults}
+                                    selectedCounty={selectedCounty}
+                                />                                    
+                                <span>{displayedResults} results</span>
+                            </div>
+                            {/* <svg className="icon-link block md:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
+                            <div className="flex flex-row gap-2">
+                                <svg onClick={() => setIsMapView(false)} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5.33337 4H14" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M5.33337 8H14" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M5.33337 12H14" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 4H2.00667" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 8H2.00667" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 12H2.00667" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <svg onClick={() => setIsMapView(true)} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"> 
+                                    <g clip-path="url(#clip0_4_48)">
+                                    <path d="M0.666626 4V14.6667L5.33329 12L10.6666 14.6667L15.3333 12V1.33334L10.6666 4L5.33329 1.33334L0.666626 4Z" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M5.33337 1.33334V12" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M10.6666 4V14.6667" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </g>
+                                    <defs>
+                                    <clipPath id="clip0_4_48">
+                                    <rect width="16" height="16" fill="white"/>
+                                    </clipPath>
+                                    </defs>
+                                </svg>
+
+                            </div>
+
+
                         </div>
                                              
                     </div>
-                    <div className="flex flex-row gap-4 justify-between border-b border-black pb-2 mb-2">
+                    {/* <div className="flex flex-row gap-4 justify-between border-b border-black pb-2 mb-2">
                         <div className="flex flex-row gap-4">
                             <span 
                                 className={isMapView ? '' : 'font-bold'} 
@@ -620,7 +661,7 @@ export default function displayListings() {
                         <div>
                             {displayedResults} results
                         </div>
-                    </div>         
+                    </div>          */}
                     {displayedResults === 0 && 
                         <div className="text-center flex-grow flex flex-col justify-center text-2xl py-36">
                             <p className="pb-4">No Results</p>
@@ -670,20 +711,21 @@ export default function displayListings() {
                                 {
                                     filteredListings
                                         .map((item, index) => (
-                                            <li className="border-b border-dashed border-black py-4 w-full relative" key={index}>
-                                                <h2 className="font-bold text-xl pr-8"><a className="" href={'/listing/' + item._id}>{item.Event}</a>{item.Highlight && '★'}</h2>
-                                                {item.locationName.toLowerCase() === 'various' 
-                                                    ? <div>{item.locationName}</div> 
-                                                    : <a className="underline" href={'/location/' + item.Location._ref}>{item.locationName}</a>}
+                                            <li className="border-b border-dashed border-gray-200 py-4 w-full relative" key={index}>
+                                                <h2 className="font-bold pr-8 pb-2"><a className="" href={'/listing/' + item._id}>{item.Event}</a>{item.Highlight && '★'}</h2>
                                                 
-                                                <div className="flex flex-row gap-2 items-center">
+                                                <div className="flex flex-row gap-2 items-center pb-2">
                                                     {formatDate(item.StartDate)} - {formatDate(item.EndDate)}
                                                     <CalendarLink listing={item} location="" />                                              
                                                 </div>
+                                                {item.locationName.toLowerCase() === 'various' 
+                                                    ? <div>{item.locationName}</div> 
+                                                    : <a className="underline" href={'/location/' + item.Location._ref}>{item.locationName}</a>
+                                                }                                                
                                                 {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
                                                 
-                                                <button className="text-gray-500 mt-2" onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
-                                                    {showDetails[index] ? 'Hide Details' : 'Show Details'}
+                                                <button className="text-gray-500 mt-2 w-full text-left" onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
+                                                    {showDetails[index] ? 'Hide Details' : 'Details'}
                                                 </button>
                                                 {showDetails[index] && (
                                                     <div className="border-t border-dashed border-gray-300 pt-2 mt-2">

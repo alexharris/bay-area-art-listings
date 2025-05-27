@@ -34,15 +34,23 @@ const CountySelector = ({ onCountyChange }) => {
   
   
   return (
-    <div className="flex flex-col pb-2">
-      <label htmlFor="countyFilter">County</label>
+    <div className="flex flex-row items-center pb-1 relative">
+      <svg width="8" height="10" viewBox="0 0 8 10" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute z-10 pointer-events-none">
+        <path d="M0.330059 9.33014L0.330059 0.669885L7.83006 5.00001L0.330059 9.33014Z" fill="black"/>
+      </svg>
+
+      <label htmlFor="countyFilter" className="sr-only">County</label>
       <select 
         id="countyFilter" 
         value={selectedCounty}
         onChange={handleCountyChange}
-        className="p-1 bg-white border border-gray-300"
+        className="p-1 pl-3 bg-white appearance-none"
+        style={{ 
+          WebkitAppearance: 'none',
+          MozAppearance: 'none' 
+        }}
       >
-        <option value="">All Counties</option>
+        <option value="">Select a county</option>
         <option value="Alameda">Alameda</option>
         <option value="Contra Costa">Contra Costa</option>
         <option value="Marin">Marin</option>
