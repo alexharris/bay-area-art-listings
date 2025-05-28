@@ -6,7 +6,7 @@ export default async function header() {
     <Link href="/">
       <img 
         className="h-24 md:hidden"
-        src="/baal-logo.png" 
+        src="/baal-handwritten-logo.png" 
         alt="Bay Area Art List Logo"                            
       />    
     </Link>

@@ -339,8 +339,9 @@ export default function displayListings() {
                     <div className="flex justify-center mb-2">
                         <Link href="/">
                             <img 
-                                src="/baal-logo.png" 
-                                alt="Bay Area Art List Logo"                            
+                                src="/baal-handwritten-logo.png" 
+                                alt="Bay Area Art List Logo"     
+                                className="w-2/3"                       
                             />
                         </Link>
                     </div>
