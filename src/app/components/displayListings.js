@@ -310,11 +310,11 @@ export default function displayListings() {
     return (
    
           
-        <div className="flex flex-row w-full items-start">
+        <div className="flex flex-row w-full items-start md:gap-4">
 
             {/* /* Sidebar */ }
             
-            <div className={`${showMenu ? 'inset-0': ''} flex flex-col md:gap-4 fixed md:sticky md:top-2 w-full z-40 md:w-96`}>
+            <div className={`${showMenu ? 'inset-0': ''} flex flex-col md:gap-4 fixed md:sticky md:top-2 w-full z-40 md:w-1/3`}>
                 {/* Filter Menu */}
                 <div className={`${showMenu ? 'translate-x-0 inset-0 ' : '-translate-x-full hidden'}   
                 transform 
@@ -328,9 +328,9 @@ export default function displayListings() {
                 right-8 
                 left-0 
                 z-40 
-                p-2 
+                p-2
+                md:p-0
                 md:inset-unset 
-                md:min-w-96 
                 gap-2 
                 bg-white
                 
@@ -593,7 +593,7 @@ export default function displayListings() {
                         onClick={() => {
                             setShowMenu(false);
                         }} 
-                        className={`${showMenu ? 'block' : 'hidden'} button`}
+                        className={`${showMenu ? 'block md:hidden' : 'hidden'} button`}
                     >
                     View Results ({displayedResults})
                     </button>     
@@ -623,7 +623,7 @@ export default function displayListings() {
                     <div className="flex flex-row justify-between align-bottom items-center border-b border-black pb-2 mb-2">
                    
                         <div onClick={() => setShowMenu(prev => !prev)} className="flex flex-row items-center justify-between w-full">
-                            <div className="flex flex-row gap-2 items-center">
+                            <div className="flex flex-row gap-2 md:items-center justify-between md:justify-start w-full">
                                 <DisplayFilters                                 
                                     type={calendarTypeFilter}
                                     presetRange={calendarDateRangePreset}
@@ -634,7 +634,7 @@ export default function displayListings() {
                                 <span>{displayedResults} results</span>
                             </div>
                             {/* <svg className="icon-link block md:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
-                            <div className="flex flex-row gap-2">
+                            <div className="hidden md:flex flex-row gap-2">
                                 <svg onClick={() => setIsMapView(false)} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M5.33337 4H14" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
                                     <path d="M5.33337 8H14" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
@@ -766,7 +766,14 @@ export default function displayListings() {
                 )}
                 
             </div>
-            <MobileIconMenu toggleMenu={() => setShowMenu(prev => !prev)} />
+            <MobileIconMenu 
+                toggleMenu={() => setShowMenu(prev => !prev)} 
+                isMapView={isMapView}
+                displayedResults={displayedResults}
+                toggleMapView={() => setIsMapView(true)}
+                toggleListView={() => setIsMapView(false)}
+
+            />
         </div>
     
     )

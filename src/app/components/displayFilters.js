@@ -34,7 +34,7 @@ export default function DisplayFilters({ type, presetRange, customRange, display
   };
 
   return (
-    <div className="normal-case leading-1 pr-4 font-bold">
+    <div className="normal-case leading-1 pr-4 font-bold w-1/2">
       {presetRange !== 'custom' ? (
         <>{formatType(type)} {formatPresetRange()}</>
       ) : formatDate(customRange.from) === formatDate(customRange.to) ? (

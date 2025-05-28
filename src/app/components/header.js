@@ -10,7 +10,7 @@ export default async function header() {
         alt="Bay Area Art List Logo"                            
       />    
     </Link>
-    <Link className="md:hidden" href="/">Bay Area Art Listings</Link>
+    <Link className="hidden" href="/">Bay Area Art Listings</Link>
   </header>
  )
 }

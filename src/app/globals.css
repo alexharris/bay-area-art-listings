@@ -36,9 +36,9 @@ body {
 }
 
 .button {
-  @apply px-3 py-2 rounded-md text-white bg-blue-700;
+  @apply px-3 py-2 rounded-md text-black border border-black;
   &:hover {
-    @apply bg-blue-800;
+    @apply bg-gray-200;
   }
 }
 
