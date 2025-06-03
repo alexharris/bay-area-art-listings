@@ -114,7 +114,7 @@ export default function calendarLink(data) {
                                 />
                                 End Date ({listing.EndDate})
                             </label>
-                            <label>
+                            {/* <label>
                                 <input
                                     type="radio"
                                     name="date"
@@ -123,7 +123,7 @@ export default function calendarLink(data) {
                                     className="mr-2"
                                 />
                                 Full Date Range ({listing.StartDate} - {listing.EndDate})
-                            </label>
+                            </label> */}
                             </fieldset>
                             <div className="flex flex-row gap-2">
                                 <button onClick={() => { handleAddToCalendar(); }} className="mt-4 p-2 bg-blue-500 text-white rounded">

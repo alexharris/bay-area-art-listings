@@ -24,7 +24,7 @@ const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { 
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
 // Feature flags
-const sidebarCalendarIsEnabled = false; // Set to false to disable calendar features
+const sidebarCalendarIsEnabled = true; // Set to false to disable calendar features
 const simpleDateSelectEnable = true; // Set to true to enable simple date select
 
 
@@ -70,6 +70,7 @@ export default function displayListings() {
     const [L, setL] = useState(null);
     const [displayedResults, setDisplayedResults] = useState(0); // number of results
     const [showMenu, setShowMenu] = useState(false);
+    const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
 
     // Add this new effect to handle URL parameters
@@ -314,7 +315,7 @@ export default function displayListings() {
 
             {/* /* Sidebar */ }
             
-            <div className={`${showMenu ? 'inset-0': ''} flex flex-col md:gap-4 fixed md:sticky md:top-2 w-full z-40 md:w-1/3`}>
+            <div className={`${showMenu ? 'inset-0': ''} flex flex-col md:gap-4 fixed md:sticky md:top-2 w-full z-40 md:w-[355px]`}>
                 {/* Filter Menu */}
                 <div className={`${showMenu ? 'translate-x-0 inset-0 ' : '-translate-x-full hidden'}   
                 transform 
@@ -347,14 +348,148 @@ export default function displayListings() {
                     </div>
                     <svg className="absolute top-2 right-2 md:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
 
-                    {sidebarCalendarIsEnabled &&
-                        <div className="pb-2 border-b border-gray-300">
-                            <div className="text-sm uppercase pb-2">Calendar</div>
+
+                    {simpleDateSelectEnable &&
+                        <div className="pb-1">
+                            <span 
+                                onClick={() => {
+                                    setCalendarTypeFilter('onview');
+                                    const todayFrom = new Date();
+                                    todayFrom.setHours(0, 0, 0, 0);
+                                    const todayTo = new Date();
+                                    todayTo.setHours(23, 59, 59, 999);
+                                    setCalendarDateRangeFilter({ from: todayFrom, to: todayTo }); 
+                                    setCalendarDateRangePreset('today');
+                                    setShowAdvancedFilters(false);
+                                }}
+                                className={`cursor-pointer hover:underline ${
+                                    calendarTypeFilter === 'onview' && 
+                                    calendarDateRangeFilter.from && 
+                                    calendarDateRangeFilter.from.toDateString() === new Date().toDateString() ? 
+                                    'font-bold' : ''
+                                }`}                                
+                            >
+                                On view today
+                            </span>                               
+                            <br />                             
+                            <span 
+                                onClick={() => {
+                                    setCalendarTypeFilter('opening');
+                                    const june = new Date();
+                                    june.setMonth(5); // June is month 5 (0-indexed)
+                                    const startOfMonth = new Date(june.getFullYear(), 5, 1);
+                                    startOfMonth.setHours(0, 0, 0, 0);
+                                    const endOfMonth = new Date(june.getFullYear(), 5 + 1, 0);
+                                    endOfMonth.setHours(23, 59, 59, 999);
+                                    setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
+                                    setCalendarDateRangePreset('custom')
+                                    setShowAdvancedFilters(false);
+                                }}
+                                className={`cursor-pointer hover:underline ${
+                                    calendarTypeFilter === 'opening' && 
+                                    calendarDateRangeFilter.from && 
+                                    calendarDateRangeFilter.from.getMonth() === 5 && 
+                                    calendarDateRangeFilter.from.getDate() === 1 ? 
+                                    'font-bold' : ''
+                                }`}                                
+                            >
+                                Opening in June
+                            </span>   
+                            <br />
+                            <span 
+                                onClick={() => {
+                                    setCalendarTypeFilter('closing');
+                                    const june = new Date();
+                                    june.setMonth(5); // June is month 5 (0-indexed)
+                                    const startOfMonth = new Date(june.getFullYear(), 5, 1);
+                                    startOfMonth.setHours(0, 0, 0, 0);
+                                    const endOfMonth = new Date(june.getFullYear(), 5 + 1, 0);
+                                    endOfMonth.setHours(23, 59, 59, 999);
+                                    setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
+                                    setCalendarDateRangePreset('custom');
+                                    setShowAdvancedFilters(false);
+                                }}
+                                className={`cursor-pointer hover:underline ${
+                                    calendarTypeFilter === 'closing' && 
+                                    calendarDateRangeFilter.from && 
+                                    calendarDateRangeFilter.from.getMonth() === 5 && 
+                                    calendarDateRangeFilter.from.getDate() === 1 ? 
+                                    'font-bold' : ''
+                                }`}                                
+                            >
+                                Closing in June
+                            </span>   
+                            <br />
+                            <span 
+                                onClick={() => {
+                                    setCalendarTypeFilter('opening');
+                                    const date = new Date();
+                                    date.setMonth(6); 
+                                    const startOfMonth = new Date(date.getFullYear(), 6, 1);
+                                    startOfMonth.setHours(0, 0, 0, 0);
+                                    const endOfMonth = new Date(date.getFullYear(), 6 + 1, 0);
+                                    endOfMonth.setHours(23, 59, 59, 999);
+                                    setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
+                                    setCalendarDateRangePreset('custom');
+                                    setShowAdvancedFilters(false);
+                                }}
+                                className={`cursor-pointer hover:underline ${
+                                    calendarTypeFilter === 'opening' && 
+                                    calendarDateRangeFilter.from && 
+                                    calendarDateRangeFilter.from.getMonth() === 6 && 
+                                    calendarDateRangeFilter.from.getDate() === 1 ? 
+                                    'font-bold' : ''
+                                }`}                                
+                            >
+                                Opening in July
+                            </span>                               
+                            <br />
+                            <span 
+                                onClick={() => {
+                                    setCalendarTypeFilter('closing');
+                                    const date = new Date();
+                                    date.setMonth(6); 
+                                    const startOfMonth = new Date(date.getFullYear(), 6, 1);
+                                    startOfMonth.setHours(0, 0, 0, 0);
+                                    const endOfMonth = new Date(date.getFullYear(), 6 + 1, 0);
+                                    endOfMonth.setHours(23, 59, 59, 999);
+                                    setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
+                                    setCalendarDateRangePreset('custom');
+                                    setShowAdvancedFilters(false);
+                                }}
+                                className={`cursor-pointer hover:underline ${
+                                    calendarTypeFilter === 'closing' && 
+                                    calendarDateRangeFilter.from && 
+                                    calendarDateRangeFilter.from.getMonth() === 6 && 
+                                    calendarDateRangeFilter.from.getDate() === 1 ? 
+                                    'font-bold' : ''
+                                }`}                                
+                            >
+                                Closing in July
+                            </span>                               
+                            <br />   
+                                                    
+                            <span 
+                                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)} 
+                                className="flex flex-row items-center"
+                            >   
+                                <svg className={`${showAdvancedFilters ? 'translate rotate-90' : ''} `} width="8" height="10" viewBox="0 0 8 10" fill="none" xmlns="http://www.w3.org/2000/svg" >
+                                    <path d="M0.330059 9.33014L0.330059 0.669885L7.83006 5.00001L0.330059 9.33014Z" fill="black"/>
+                                </svg>
+                                <span className="pl-1">Advanced Filters</span>
+                            </span>                          
+                        </div>
+                    }
+
+                            
+                    {sidebarCalendarIsEnabled && showAdvancedFilters &&
+                        <div className="p-4 mb-2 bg-gray-50">
+                            
 
                             <div className="flex flex-row gap-2 mb-2">
                                 <div className="flex flex-col w-1/2">
                                     <label htmlFor="calendarTypeFilter">Type</label>
-                                    {/* <select size="3" id="calendarTypeFilter" className="p-1 border border-gray-300 cursor-pointer">
+                                    {/* <select size="3" id="calendarTypeFilter" className="p-1 border border-gray-300 cur</div>sor-pointer">
                                         <option value="onview" onClick={() => setCalendarTypeFilter('onview')}>On View</option>
                                         <option value="opening" onClick={() => setCalendarTypeFilter('opening')}>Opening</option>
                                         <option value="closing" onClick={() => setCalendarTypeFilter('closing')}>Closing</option>
@@ -367,8 +502,8 @@ export default function displayListings() {
                                         onChange={(e) => setCalendarTypeFilter(e.target.value)}
                                     >
                                         <option value="onview">On View</option>
-                                        <option value="opening">Opening</option>
-                                        <option value="closing">Closing</option>
+                                        <option value="opening">Opening Date</option>
+                                        <option value="closing">Closing Date</option>
                                     </select>                                
                                     {/* <div id="calendarTypeFilter" className="p-1 border border-gray-300 cursor-pointer">
                                         <div onClick={() => setCalendarTypeFilter('onview')} className={calendarTypeFilter === 'onview' ? 'bg-gray-200' : ''}>On View</div>
@@ -431,102 +566,7 @@ export default function displayListings() {
                                 </div>
                             }
                         </div>
-                    }
-                    {simpleDateSelectEnable &&
-                        <div className="pb-1">
-                            <span 
-                                onClick={() => {
-                                    setCalendarTypeFilter('opening');
-                                    const may = new Date();
-                                    may.setMonth(4); // May is month 4 (0-indexed)
-                                    const startOfMay = new Date(may.getFullYear(), 4, 1);
-                                    startOfMay.setHours(0, 0, 0, 0);
-                                    const endOfMay = new Date(may.getFullYear(), 4 + 1, 0);
-                                    endOfMay.setHours(23, 59, 59, 999);
-                                    setCalendarDateRangeFilter({ from: startOfMay, to: endOfMay });
-                                    setCalendarDateRangePreset('custom');
-                                }}
-                                className={`cursor-pointer hover:underline ${
-                                    calendarTypeFilter === 'opening' && 
-                                    calendarDateRangeFilter.from && 
-                                    calendarDateRangeFilter.from.getMonth() === 4 && 
-                                    calendarDateRangeFilter.from.getDate() === 1 ? 
-                                    'font-bold' : ''
-                                }`}
-                            >
-                                Opening in May
-                            </span>
-                            <br />
-                            <span 
-                                onClick={() => {
-                                    setCalendarTypeFilter('closing');
-                                    const may = new Date();
-                                    may.setMonth(4); // May is month 4 (0-indexed)
-                                    const startOfMay = new Date(may.getFullYear(), 4, 1);
-                                    startOfMay.setHours(0, 0, 0, 0);
-                                    const endOfMay = new Date(may.getFullYear(), 4 + 1, 0);
-                                    endOfMay.setHours(23, 59, 59, 999);
-                                    setCalendarDateRangeFilter({ from: startOfMay, to: endOfMay });
-                                    setCalendarDateRangePreset('custom');
-                                }}
-                                className={`cursor-pointer hover:underline ${
-                                    calendarTypeFilter === 'closing' && 
-                                    calendarDateRangeFilter.from && 
-                                    calendarDateRangeFilter.from.getMonth() === 4 && 
-                                    calendarDateRangeFilter.from.getDate() === 1 ? 
-                                    'font-bold' : ''
-                                }`}                                
-                            >
-                                Closing in May
-                            </span>                            
-                            <br />
-                            <span 
-                                onClick={() => {
-                                    setCalendarTypeFilter('opening');
-                                    const june = new Date();
-                                    june.setMonth(5); // June is month 5 (0-indexed)
-                                    const startOfMonth = new Date(june.getFullYear(), 5, 1);
-                                    startOfMonth.setHours(0, 0, 0, 0);
-                                    const endOfMonth = new Date(june.getFullYear(), 5 + 1, 0);
-                                    endOfMonth.setHours(23, 59, 59, 999);
-                                    setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
-                                    setCalendarDateRangePreset('custom');
-                                }}
-                                className={`cursor-pointer hover:underline ${
-                                    calendarTypeFilter === 'opening' && 
-                                    calendarDateRangeFilter.from && 
-                                    calendarDateRangeFilter.from.getMonth() === 5 && 
-                                    calendarDateRangeFilter.from.getDate() === 1 ? 
-                                    'font-bold' : ''
-                                }`}                                
-                            >
-                                Opening in June
-                            </span>   
-                            <br />
-                            <span 
-                                onClick={() => {
-                                    setCalendarTypeFilter('closing');
-                                    const june = new Date();
-                                    june.setMonth(5); // June is month 5 (0-indexed)
-                                    const startOfMonth = new Date(june.getFullYear(), 5, 1);
-                                    startOfMonth.setHours(0, 0, 0, 0);
-                                    const endOfMonth = new Date(june.getFullYear(), 5 + 1, 0);
-                                    endOfMonth.setHours(23, 59, 59, 999);
-                                    setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
-                                    setCalendarDateRangePreset('custom');
-                                }}
-                                className={`cursor-pointer hover:underline ${
-                                    calendarTypeFilter === 'closing' && 
-                                    calendarDateRangeFilter.from && 
-                                    calendarDateRangeFilter.from.getMonth() === 5 && 
-                                    calendarDateRangeFilter.from.getDate() === 1 ? 
-                                    'font-bold' : ''
-                                }`}                                
-                            >
-                                Closing in June
-                            </span>                                                      
-                        </div>
-                    }
+                    }                    
                     <div className="flex flex-col">
                         {/* <div className="text-sm uppercase pb-2">Location</div> */}
                         <CountySelector onCountyChange={setSelectedCounty} />                    
@@ -614,7 +654,7 @@ export default function displayListings() {
             </div>
 
             {/* Main Col */}
-            <div className="w-full flex-grow flex flex-col justify-start">
+            <div className="flex-grow flex flex-col justify-start">
                 {loading ? (
                     <div className="spinner animate-spin text-5xl text-center w-full">
                         🎨
@@ -685,7 +725,10 @@ export default function displayListings() {
                     {displayedResults === 0 && 
                         <div className="text-center flex-grow flex flex-col justify-center text-2xl py-36">
                             <p className="pb-4">No Results</p>
-                        ¯\_(ツ)_/¯
+                            <p className="pb-4">¯\_(ツ)_/¯</p>
+                            <p>Try changing your filters.</p>
+                        
+
                         </div>}            
 
                         {isMapView && L ? (
@@ -711,8 +754,8 @@ export default function displayListings() {
                                                     position={[location.Geolocation.lat, location.Geolocation.lng]} 
                                                     icon={L.icon({
                                                         iconUrl: item.Highlight 
-                                                            ? "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' stroke-width='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' stroke-width='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cg clipPath='url(%23clip0_1_2)'%3E%3Cpath d='M21 1.16667L22.8025 4.81833L26.8333 5.4075L23.9167 8.24833L24.605 12.2617L21 10.3658L17.395 12.2617L18.0833 8.24833L15.1667 5.4075L19.1975 4.81833L21 1.16667Z' fill='%23FFF700' stroke='black' stroke-width='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_1_2'%3E%3Crect width='14' height='14' fill='white' transform='translate(14)'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A"
-                                                            : "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' stroke-width='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' stroke-width='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A",
+                                                            ? "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cg clipPath='url(%23clip0_1_2)'%3E%3Cpath d='M21 1.16667L22.8025 4.81833L26.8333 5.4075L23.9167 8.24833L24.605 12.2617L21 10.3658L17.395 12.2617L18.0833 8.24833L15.1667 5.4075L19.1975 4.81833L21 1.16667Z' fill='%23FFF700' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_1_2'%3E%3Crect width='14' height='14' fill='white' transform='translate(14)'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A"
+                                                            : "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A",
                                                     })}
                                                 >
                                                     <Popup>
@@ -732,7 +775,7 @@ export default function displayListings() {
                                     filteredListings
                                         .map((item, index) => (
                                             <li className="border-b border-dashed border-gray-200 py-4 w-full relative" key={index}>
-                                                <h2 className="font-bold pr-8 pb-1"><a className="" href={'/listing/' + item._id}>{item.Event}</a>{item.Highlight && '★'}</h2>
+                                                <h2 className="font-bold pr-8 pb-1">{item.Event}{item.Highlight && '★'}</h2>
                                                 
                                                 <div className="flex flex-row gap-2 items-center pb-1">
                                                     {formatDate(item.StartDate)} - {formatDate(item.EndDate)}
@@ -753,7 +796,8 @@ export default function displayListings() {
                                                             {/* <div>URL: <a href={item.URL}>{item.URL}</a></div> */}
                                                             <div>Venue: {item.locationName}</div>
                                                             <div>Address: {item.locationAddress}</div>
-                                                            <div>Website: <a className="underline" href={item.locationUrl}>{item.locationUrl}</a></div>                                                    
+                                                            <div>Website: <a className="underline" href={item.locationUrl}>{item.locationUrl}</a></div>
+                                                            {console.log(item)}                                                    
                                                             
                                                         </div>
                                                     </div>
