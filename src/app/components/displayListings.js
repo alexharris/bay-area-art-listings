@@ -16,6 +16,7 @@ import { getFilteredListings } from '../../utils/filters';
 import { sortListingsChronologically } from '../../utils/sort'; 
 import MobileIconMenu from './mobileIconMenu';
 import Link from "next/link";
+import Listing from './listing';
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
@@ -25,7 +26,7 @@ const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ss
 
 // Feature flags
 const sidebarCalendarIsEnabled = true; // Set to false to disable calendar features
-const simpleDateSelectEnable = true; // Set to true to enable simple date select
+const simpleDateSelectEnable = false; // Set to true to enable simple date select
 
 
 
@@ -53,7 +54,7 @@ export default function displayListings() {
     const [listings, setListings] = useState([]);
     const [locations, setLocations] = useState([]);    
     // Filtering
-    const [calendarTypeFilter, setCalendarTypeFilter] = useState('opening'); // onview, opening, closing
+    const [calendarTypeFilter, setCalendarTypeFilter] = useState('onview'); // onview, opening, closing
     const [calendarDateRangeFilter, setCalendarDateRangeFilter] = useState([]); // actual date range to filter on    
     const [filteredListings, setFilteredListings] = useState([]);
     const [highlightsOnly, setHighlightsOnly] = useState(false);
@@ -110,7 +111,7 @@ export default function displayListings() {
                 }
             } else {
                 // Default to 'onview' if no type is specified
-                setCalendarTypeFilter('opening');    
+                setCalendarTypeFilter('onview');    
             }
 
             // Handle date range parameters
@@ -479,7 +480,61 @@ export default function displayListings() {
                                 <span className="pl-1">Advanced Filters</span>
                             </span>                          
                         </div>
-                    }
+                    } 
+
+                    <div className="flex flex-col w-full">
+                        <label htmlFor="filterResults" className="sr-only">Date Range</label>
+                        <div id="filterResults" className="cursor-pointer">
+                            <div onClick={() => { 
+                                setShowCustomCalendar(false); 
+                                const todayFrom = new Date();
+                                todayFrom.setHours(0, 0, 0, 0);
+                                const todayTo = new Date();
+                                todayTo.setHours(23, 59, 59, 999);
+                                setCalendarDateRangeFilter({ from: todayFrom, to: todayTo }); 
+                                setCalendarDateRangePreset('today'); 
+                            }} className={calendarDateRangePreset === 'today' ? 'font-bold' : ''}>Today</div>
+                            <div onClick={() => { 
+                                setShowCustomCalendar(false); 
+                                const weekFrom = new Date(startOfWeek);
+                                weekFrom.setHours(0, 0, 0, 0);
+                                const weekTo = new Date(endOfWeek);
+                                weekTo.setHours(23, 59, 59, 999);
+                                setCalendarDateRangeFilter({ from: weekFrom, to: weekTo }); 
+                                setCalendarDateRangePreset('thisweek'); 
+                            }} className={calendarDateRangePreset === 'thisweek' ? 'font-bold' : ''}>This Week</div>
+                            <div onClick={() => { 
+                                setShowCustomCalendar(false); 
+                                const monthFrom = new Date(startOfMonth);
+                                monthFrom.setHours(0, 0, 0, 0);
+                                const monthTo = new Date(endOfMonth);
+                                monthTo.setHours(23, 59, 59, 999);
+                                setCalendarDateRangeFilter({ from: monthFrom, to: monthTo }); 
+                                setCalendarDateRangePreset('thismonth'); 
+                            }} className={calendarDateRangePreset === 'thismonth' ? 'font-bold' : ''}>This Month</div>
+                            <div onClick={() => { 
+                                setShowCustomCalendar(false); 
+                                const nextMonthFrom = new Date(startOfNextMonth);
+                                nextMonthFrom.setHours(0, 0, 0, 0);
+                                const nextMonthTo = new Date(endOfNextMonth);
+                                nextMonthTo.setHours(23, 59, 59, 999);
+                                setCalendarDateRangeFilter({ from: nextMonthFrom, to: nextMonthTo }); 
+                                setCalendarDateRangePreset('nextmonth'); 
+                            }} className={calendarDateRangePreset === 'nextmonth' ? 'font-bold' : ''}>Next Month</div>                                
+                            <div onClick={() => {setShowCustomCalendar(true); setCalendarDateRangePreset('custom')}} className={calendarDateRangePreset === 'custom' ? 'font-bold' : ''}>Custom</div>
+                        </div>
+                    </div>   
+                    {showCustomCalendar &&
+                        <div >
+                            <DayPicker
+                                mode="range"
+                                onSelect={(dateRange) => updateCalendarDateRangeFilter(dateRange)}
+                                selected={calendarDateRangeFilter}
+                                required
+                                showOutsideDays
+                            />                        
+                        </div>
+                    }                    
 
                             
                     {sidebarCalendarIsEnabled && showAdvancedFilters &&
@@ -770,42 +825,7 @@ export default function displayListings() {
 
                             </div>
                         ) : (
-                            <ul id="list-view" className="w-full">
-                                {
-                                    filteredListings
-                                        .map((item, index) => (
-                                            <li className="border-b border-dashed border-gray-200 py-4 w-full relative" key={index}>
-                                                <h2 className="font-bold pr-8 pb-1">{item.Event}{item.Highlight && '★'}</h2>
-                                                
-                                                <div className="flex flex-row gap-2 items-center pb-1">
-                                                    {formatDate(item.StartDate)} - {formatDate(item.EndDate)}
-                                                    <CalendarLink listing={item} location="" />                                              
-                                                </div>
-                                                {item.locationName.toLowerCase() === 'various' 
-                                                    ? <div>{item.locationName}</div> 
-                                                    : <a className="underline" href={'/location/' + item.Location._ref}>{item.locationName}</a>
-                                                }                                                
-                                                {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
-                                                
-                                                <button className="text-gray-500 mt-2 w-full text-left" onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
-                                                    {showDetails[index] ? 'Hide Details' : 'Details'}
-                                                </button>
-                                                {showDetails[index] && (
-                                                    <div className="border-t border-dashed border-gray-300 pt-2 mt-2">
-                                                        <div className="prose">
-                                                            {/* <div>URL: <a href={item.URL}>{item.URL}</a></div> */}
-                                                            <div>Venue: {item.locationName}</div>
-                                                            <div>Address: {item.locationAddress}</div>
-                                                            <div>Website: <a className="underline" href={item.locationUrl}>{item.locationUrl}</a></div>
-                                                            {console.log(item)}                                                    
-                                                            
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </li>
-                                    ))
-                                }
-                            </ul>
+                            <Listing listings={filteredListings} formatDate={formatDate} />
                         )}
                     </>
                 )}

@@ -21,7 +21,7 @@ export default function DisplayFilters({ type, presetRange, customRange, display
   const formatPresetRange = () => {
     switch (presetRange) {
       case 'today':
-        return 'Today';
+        return 'today';
       case 'thisweek':
         return 'this week';
       case 'thismonth':

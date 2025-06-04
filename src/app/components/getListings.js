@@ -24,7 +24,8 @@ export default async function getListings() {
       ...listing,
       locationName: locations[index][0]?.Name || 'Unknown',
       locationAddress: locations[index][0]?.Address || 'Address Not Listed',
-      locationUrl: locations[index][0]?.Url || ''
+      locationUrl: locations[index][0]?.Url || '',
+      locationHours: locations[index][0]?.Hours || '',
     }));
 
     if(data.length > 0) {

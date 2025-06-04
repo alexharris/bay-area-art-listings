@@ -77,27 +77,12 @@ export function getFilteredListings(filters, listings) {
   .filter(item => {
       const startDate = new Date(item.StartDate + 'T00:00:00');
       const endDate = new Date(item.EndDate + 'T23:59:59Z');
-      if(item.Event === 'Alex Olson, Letters') {
-        console.log('------ test');
-        console.log(item.StartDate)
-        console.log(startDate)
-      }
+
       if (filters.calendarTypeFilter === 'onview') {
-        if(item.Event === 'Alex Olson, Letters') {
-          console.log('------ onview ');
-          console.log(item.Event);
-          console.log('startDate', startDate);
-          console.log('filters', new Date(filters.calendarDateRangeFilter.from));           
-        }
+
           return (startDate <= filters.calendarDateRangeFilter.to && endDate >= filters.calendarDateRangeFilter.from);
       } else if (filters.calendarTypeFilter === 'opening') {
-        if(item.Event === 'Alex Olson, Letters') {
-          console.log('------ opening');
 
-          console.log(item.Event);
-          console.log('startDate', startDate);
-          console.log('filters', new Date(filters.calendarDateRangeFilter.from));        
-        }
           return startDate >= filters.calendarDateRangeFilter.from && startDate <= filters.calendarDateRangeFilter.to;
       } else if (filters.calendarTypeFilter === 'closing') {
           return endDate >= filters.calendarDateRangeFilter.from && endDate <= filters.calendarDateRangeFilter.to;
