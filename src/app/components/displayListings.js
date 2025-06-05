@@ -316,7 +316,7 @@ export default function displayListings() {
 
             {/* /* Sidebar */ }
             
-            <div id="sidebar" className={`${showMenu ? 'inset-0': ''} flex flex-col lg:gap-4 fixed lg:sticky lg:top-2 w-full z-40 lg:w-[430]`}>
+            <div id="sidebar" className={`${showMenu ? 'inset-0': ''} flex flex-col lg:gap-4 fixed lg:sticky lg:top-2 w-full z-40 lg:w-[430px]`}>
                 {/* Filter Menu */}
                 <div className={`${showMenu ? 'translate-x-0 inset-0 ' : '-translate-x-full hidden'}   
                 transform 
