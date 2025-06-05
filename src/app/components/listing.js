@@ -10,19 +10,19 @@ export default function Listings({ listings, formatDate }) {
       <ul id="list-view" className="w-full">
         {
           listings.map((item, index) => (
-            <li className="border-b border-dashed border-gray-400 py-4 w-full relative flex flex-col md:flex-row justify-between gap-4" key={index}>
-              <div className="w-full md:w-1/3">
+            <li className="border-b border-dashed border-gray-400 py-4 w-full relative flex flex-col lg:flex-row justify-between gap-4" key={index}>
+              <div className="w-full lg:w-1/3">
                 <h2 className="font-bold">{item.Event}{item.Highlight && '★'}</h2>
                 {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
               </div>
-              <div className="flex flex-row gap-2 pb-1 w-full md:w-1/3 text-left items-start">
+              <div className="flex flex-row gap-2 pb-1 w-full lg:w-1/3 text-left items-start">
                 <div className="">
                   {formatDate(item.StartDate)} - {formatDate(item.EndDate)}
                   <CalendarLink listing={item} location="" />                                              
                 </div>
               </div>
 
-              <div className="flex flex-col w-full md:w-1/3">
+              <div className="flex flex-col w-full lg:w-1/3">
               
               {item.locationName.toLowerCase() === 'various' 
                 ? <div className="flex flex-row">

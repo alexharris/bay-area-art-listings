@@ -82,7 +82,7 @@ export default function calendarLink(data) {
             
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-40" onClick={() => setIsModalOpen(false)}>
-                    <div className="bg-white p-4 rounded shadow-lg w-11/12 md:w-1/2 flex flex-col relative z-10" onClick={(e) => e.stopPropagation()}>
+                    <div className="bg-white p-4 rounded shadow-lg w-11/12 lg:w-1/2 flex flex-col relative z-10" onClick={(e) => e.stopPropagation()}>
                         <span className="absolute top-0 right-0 p-4 cursor-pointer" onClick={() => setIsModalOpen(false)}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="butt" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </span>

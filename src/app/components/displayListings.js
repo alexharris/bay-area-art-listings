@@ -312,42 +312,42 @@ export default function displayListings() {
     return (
    
           
-        <div className="flex flex-row w-full items-start md:gap-4">
+        <div className="flex flex-row w-full items-start lg:gap-4">
 
             {/* /* Sidebar */ }
             
-            <div className={`${showMenu ? 'inset-0': ''} flex flex-col md:gap-4 fixed md:sticky md:top-2 w-full z-40 md:w-1/2`}>
+            <div id="sidebar" className={`${showMenu ? 'inset-0': ''} flex flex-col lg:gap-4 fixed lg:sticky lg:top-2 w-full z-40 lg:w-[430]`}>
                 {/* Filter Menu */}
                 <div className={`${showMenu ? 'translate-x-0 inset-0 ' : '-translate-x-full hidden'}   
                 transform 
-                md:transform-none 
+                lg:transform-none 
                 transition-transform 
                 duration-300 
                 flex 
                 flex-col 
                 overflow-scroll 
-                md:flex 
+                lg:flex 
                 right-8 
                 left-0 
                 z-40 
                 p-2
-                md:p-0
-                md:inset-unset 
+                lg:p-0
+                lg:inset-unset 
                 gap-2 
                 bg-white
                 
                 `}>
                     {/* Logo at the top of the sidebar */}
-                    <div className="flex justify-center mb-2">
+                    <div className="flex items-start">
                         <Link href="/">
                             <img 
                                 src="/baal-handwritten-logo.png" 
                                 alt="Bay Area Art List Logo"     
-                                className="w-2/3"                       
+                                className="h-24"                       
                             />
                         </Link>
                     </div>
-                    <svg className="absolute top-2 right-2 md:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
+                    <svg className="absolute top-2 right-2 lg:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
 
 
                     {simpleDateSelectEnable &&
@@ -649,7 +649,7 @@ export default function displayListings() {
                         />
                         Sarah Hotchkiss is excited about it
                     </label>
-                    <div className="flex flex-col pb-2 md:mt-0 gap-2 items-start">
+                    <div className="flex flex-col pb-2 lg:mt-0 gap-2 items-start">
                         <label htmlFor="searchTerm" className="flex flex-row items-center gap-1">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
@@ -689,7 +689,7 @@ export default function displayListings() {
                         onClick={() => {
                             setShowMenu(false);
                         }} 
-                        className={`${showMenu ? 'block md:hidden' : 'hidden'} button`}
+                        className={`${showMenu ? 'block lg:hidden' : 'hidden'} button`}
                     >
                     View Results ({displayedResults})
                     </button>     
@@ -698,18 +698,18 @@ export default function displayListings() {
                 {/* dark mobile sidebar background */}
                 {showMenu && (
                     <div 
-                        className="fixed inset-0 bg-black opacity-50 z-30 md:hidden" 
+                        className="fixed inset-0 bg-black opacity-50 z-30 lg:hidden" 
                         onClick={() => setShowMenu(false)}
                     ></div>
                 )}            
 
-                <div className="hidden md:block">
+                <div className="hidden lg:block">
                     <AddEmailForm /> 
                 </div>
             </div>
 
             {/* Main Col */}
-            <div className="flex flex-col justify-start">
+            <div id="main-col" className="flex flex-col justify-start w-full flex-shrink">
                 {loading ? (
                     <div className="spinner animate-spin text-5xl text-center w-full">
                         🎨
@@ -719,7 +719,7 @@ export default function displayListings() {
                     <div className="flex flex-row justify-between align-bottom items-center border-b border-black pb-2 mb-2">
                    
                         <div onClick={() => setShowMenu(prev => !prev)} className="flex flex-row items-center justify-between w-full">
-                            <div className="flex flex-row gap-2 md:items-center justify-between md:justify-start w-full">
+                            <div className="flex flex-row gap-2 lg:items-center justify-between lg:justify-start w-full">
                                 <DisplayFilters                                 
                                     type={calendarTypeFilter}
                                     presetRange={calendarDateRangePreset}
@@ -729,8 +729,8 @@ export default function displayListings() {
                                 />                                    
                                 <span>{displayedResults} results</span>
                             </div>
-                            {/* <svg className="icon-link block md:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
-                            <div className="hidden md:flex flex-row gap-2">
+                            {/* <svg className="icon-link block lg:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
+                            <div className="hidden lg:flex flex-row gap-2">
                                 <svg onClick={() => setIsMapView(false)} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M5.33337 4H14" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
                                     <path d="M5.33337 8H14" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
