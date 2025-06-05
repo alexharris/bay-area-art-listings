@@ -316,7 +316,7 @@ export default function displayListings() {
 
             {/* /* Sidebar */ }
             
-            <div className={`${showMenu ? 'inset-0': ''} flex flex-col md:gap-4 fixed md:sticky md:top-2 w-full z-40 md:w-[355px]`}>
+            <div className={`${showMenu ? 'inset-0': ''} flex flex-col md:gap-4 fixed md:sticky md:top-2 w-full z-40 md:w-1/2`}>
                 {/* Filter Menu */}
                 <div className={`${showMenu ? 'translate-x-0 inset-0 ' : '-translate-x-full hidden'}   
                 transform 
@@ -649,17 +649,17 @@ export default function displayListings() {
                         />
                         Sarah Hotchkiss is excited about it
                     </label>
-                    <div className="flex flex-row pb-2 md:mt-0 gap-2 items-center">
-                        <label htmlFor="searchTerm">
+                    <div className="flex flex-col pb-2 md:mt-0 gap-2 items-start">
+                        <label htmlFor="searchTerm" className="flex flex-row items-center gap-1">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
                             <path d="M14 14L11.1 11.1" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
+                            </svg> Search
                         </label>
                         <input 
                             type="text" 
                             id="searchTerm"
-                            className="bg-gray-100"
+                            className="bg-gray-100 w-4/5"
                             value={searchTerm} 
                             onChange={(e) => setSearchTerm(e.target.value)} 
                         />
@@ -709,7 +709,7 @@ export default function displayListings() {
             </div>
 
             {/* Main Col */}
-            <div className="flex-grow flex flex-col justify-start">
+            <div className="flex flex-col justify-start">
                 {loading ? (
                     <div className="spinner animate-spin text-5xl text-center w-full">
                         🎨
