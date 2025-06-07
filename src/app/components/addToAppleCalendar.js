@@ -51,7 +51,10 @@ function downloadAppleCalendarEvent({icsEvent, selectedDate}) {
 
   export default function addToAppleCalendar({data, selectedDate}) {
     return (
-        <button onClick={() => downloadAppleCalendarEvent({icsEvent: data, selectedDate})} className="mt-4 p-2 bg-blue-500 text-white rounded">
+        <button 
+            onClick={() => downloadAppleCalendarEvent({icsEvent: data, selectedDate})} 
+            className="px-2 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+        >
             Apple Calendar
         </button>
     );

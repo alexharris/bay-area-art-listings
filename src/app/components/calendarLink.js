@@ -1,12 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import AddToAppleCalendar from './addToAppleCalendar';
-import { useEffect } from 'react';
 
 
 export default function calendarLink(data) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState('start');
-    const [icsEvent, setIcsEvent] = useState({})
+    const [icsEvent, setIcsEvent] = useState({});
+    const popupRef = useRef(null);
+    
+    // Close popup when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (popupRef.current && !popupRef.current.contains(event.target)) {
+                setIsModalOpen(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     // Set the initial state for the ICS event based on the selected date
     // For APPLE calendar
@@ -77,23 +91,45 @@ export default function calendarLink(data) {
     };
 
     return (
-        <>
-            <svg onClick={() => setIsModalOpen(true)} className="feather feather-clock w-8 lg:w-5 cursor-pointer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="butt" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <div className="relative inline-block">
+            <svg 
+                onClick={() => setIsModalOpen(!isModalOpen)} 
+                className="feather feather-calendar w-8 lg:w-5 cursor-pointer" 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="#000000" 
+                strokeWidth="1" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                title="Add to calendar"
+            >
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
             
             {isModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-40" onClick={() => setIsModalOpen(false)}>
-                    <div className="bg-white p-4 rounded shadow-lg w-11/12 lg:w-1/2 flex flex-col relative z-10" onClick={(e) => e.stopPropagation()}>
-                        <span className="absolute top-0 right-0 p-4 cursor-pointer" onClick={() => setIsModalOpen(false)}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="butt" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                        </span>
-                        <h1 className="font-bold pb-4">Add To Calendar</h1>
-                        <form 
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                            }}
-                        >
-                            <fieldset className="flex flex-col items-start space-y-2">
-                            <label>
+                <div 
+                    ref={popupRef}
+                    className="absolute z-50 top-full -right-20 lg:right-0 mt-1 p-3 bg-white shadow-lg border border-black w-80"
+                >
+                    <button 
+                        onClick={() => setIsModalOpen(!isModalOpen)} 
+                        className="absolute top-1 right-1 p-1 text-gray-500 hover:text-gray-800"
+                        aria-label="Close"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>                    
+                    <h4 className="font-semibold mb-2">Add to Calendar</h4>
+                    <div className="pb-2">{data.listing.Event}</div>
+                    <div className="text-sm">
+                        <fieldset className="flex flex-col space-y-2 mb-3">
+                            <label className="flex items-center">
                                 <input
                                     type="radio"
                                     name="date"
@@ -102,9 +138,9 @@ export default function calendarLink(data) {
                                     className="mr-2"
                                     defaultChecked
                                 />
-                                Start Date ({listing.StartDate})
+                                <span className="flex-grow">Opening: {listing.StartDate}</span>
                             </label>
-                            <label>
+                            <label className="flex items-center">
                                 <input
                                     type="radio"
                                     name="date"
@@ -112,29 +148,21 @@ export default function calendarLink(data) {
                                     onChange={handleRadioChange}
                                     className="mr-2"
                                 />
-                                End Date ({listing.EndDate})
+                                <span className="flex-grow">Closing: {listing.EndDate}</span>
                             </label>
-                            {/* <label>
-                                <input
-                                    type="radio"
-                                    name="date"
-                                    value="range"
-                                    onChange={handleRadioChange}
-                                    className="mr-2"
-                                />
-                                Full Date Range ({listing.StartDate} - {listing.EndDate})
-                            </label> */}
-                            </fieldset>
-                            <div className="flex flex-row gap-2">
-                                <button onClick={() => { handleAddToCalendar(); }} className="mt-4 p-2 bg-blue-500 text-white rounded">
-                                    Google Calendar
-                                </button>
-                                <AddToAppleCalendar data={icsEvent} selectedDate={selectedDate} />                            
-                            </div>
-                        </form>
+                        </fieldset>
+                        <div className="flex flex-row gap-2 mt-3">
+                            <button 
+                                onClick={handleAddToCalendar} 
+                                className="px-2 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+                            >
+                                Google Calendar
+                            </button>
+                            <AddToAppleCalendar data={icsEvent} selectedDate={selectedDate} />
+                        </div>
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 }

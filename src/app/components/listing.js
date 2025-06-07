@@ -1,8 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import CalendarLink from './calendarLink';
 
 export default function Listings({ listings, formatDate }) {
     const [showDetails, setShowDetails] = useState({});
+    const [showHoursPopup, setShowHoursPopup] = useState(null);
+    const popupRef = useRef(null);
+
+    // Close popup when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (popupRef.current && !popupRef.current.contains(event.target)) {
+                setShowHoursPopup(null);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     console.log(listings)
 
@@ -57,9 +73,6 @@ export default function Listings({ listings, formatDate }) {
                     <div className="flex flex-row items-center gap-1">
                       {item.locationName}                   
                     </div> 
-
-
-     
                     <div className="flex flex-row items-center gap-2">
                       <a
                         className="flex flex-row gap-1 items-center"
@@ -78,21 +91,80 @@ export default function Listings({ listings, formatDate }) {
                         {/* {item.locationUrl} */}
                         
                       </a>
-                      <span className="underline flex flex-row gap-1 items-center" 
-                        href={item.locationUrl}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-8 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
-                      </span>                       
+                      <div className="relative">
+                        <span 
+                          className="underline flex flex-row gap-1 items-center cursor-pointer" 
+                          onClick={() => {
+                            if (item.locationHours) {
+                              setShowHoursPopup(showHoursPopup === index ? null : index);
+                            } else if (item.locationUrl) {
+                              window.open(item.locationUrl, '_blank');
+                            }
+                          }}
+                          title={item.locationHours ? "View hours" : "Visit website for hours"}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className={`feather feather-clock w-8 lg:w-5 ${!item.locationHours ? 'text-gray-400' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
+                        </span>
+                        
+                        {showHoursPopup === index && (
+                          <div 
+                            ref={popupRef}
+                            className="absolute z-50 top-full -right-20 lg:right-0 mt-1 p-3 bg-white shadow-lg border border-black w-96"
+                          >
+                            <button 
+                              onClick={() => setShowHoursPopup(null)} 
+                              className="absolute top-1 right-1 p-1 text-gray-500 hover:text-gray-800"
+                              aria-label="Close"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                              </svg>
+                            </button>
+                            <h4 className="font-semibold mb-2">{item.locationName} Hours</h4>
+                            {item.locationHours ? (
+                              <ul className="text-sm space-y-1">
+                                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
+                                  const isToday = day === ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][new Date().getDay()];
+                                  const hours = item.locationHours[day]
+                                    ? item.locationHours[day].replace(`${day}: `, '').replace(`${day}:`, '')
+                                    : 'Not specified';
+                                  const isClosed = hours.toLowerCase().includes('closed');
+                                  
+                                  return (
+                                    <li key={day} className={`flex justify-between ${isToday ? 'bg-gray-200 p-1' : ''}`}>
+                                      <span className="mr-4">{day}:</span>
+                                      <span>
+                                        {hours}
+                                      </span>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            ) : (
+                              <div className="text-sm text-gray-600">
+                                <p>No hours information available.</p>
+                                {item.locationUrl && (
+                                  <p className="mt-1">
+                                    <a href={item.locationUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                                      Visit website for details
+                                    </a>
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
                     </div>                             
                   </>                  
               }                                                
               </div>              
               <div className="flex flex-col gap-2 w-full lg:w-1/4 text-left items-start justify-between">
                 
-                  {formatDate(item.StartDate)} - {formatDate(item.EndDate)}                     
-                  <span className="underline flex flex-row gap-1 items-center cusror-pointer" >                    
-                    <CalendarLink listing={item} location="" />                    
-                  </span>                                                                             
+                  <span>{formatDate(item.StartDate)} - {formatDate(item.EndDate)}</span>
+                  <CalendarLink listing={item} location="" />
                 
               </div>
 
