@@ -67,11 +67,11 @@ export default function Listings({ listings, formatDate }) {
               <div className="flex flex-col justify-between w-full lg:w-1/4">              
               {item.locationName.toLowerCase() === 'various' 
                 ? <div className="flex flex-row">
-                    {item.locationName}                   
+                    {item.locationName}
                   </div> 
                 : <>
                     <div className="flex flex-row items-center gap-1">
-                      {item.locationName}                   
+                      <a href={item.locationUrl}>{item.locationName}</a>                   
                     </div> 
                     <div className="flex flex-row items-center gap-2">
                       <a
