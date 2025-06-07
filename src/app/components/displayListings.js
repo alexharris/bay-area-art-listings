@@ -468,8 +468,7 @@ export default function displayListings() {
                             >
                                 Closing in July
                             </span>                               
-                            <br />   
-                                                    
+                            <br />                                                       
                             <span 
                                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)} 
                                 className="flex flex-row items-center"
@@ -481,7 +480,6 @@ export default function displayListings() {
                             </span>                          
                         </div>
                     } 
-
                     <div className="flex flex-col w-full">
                         <label htmlFor="filterResults" className="sr-only">Date Range</label>
                         <div id="filterResults" className="cursor-pointer">
@@ -534,9 +532,7 @@ export default function displayListings() {
                                 showOutsideDays
                             />                        
                         </div>
-                    }                    
-
-                            
+                    }                                                
                     {sidebarCalendarIsEnabled && showAdvancedFilters &&
                         <div className="p-4 mb-2 bg-gray-50">
                             
@@ -636,9 +632,7 @@ export default function displayListings() {
                             {locations.map((location, index) => (
                                 <option key={index} value={location.Name}>{location.Name}</option>
                             ))}
-                        </select> */}
-                        
-
+                        </select> */}                    
                     </div>                 
                     <label className="pb-2">
                         <input 
@@ -692,8 +686,7 @@ export default function displayListings() {
                         className={`${showMenu ? 'block lg:hidden' : 'hidden'} button`}
                     >
                     View Results ({displayedResults})
-                    </button>     
-                                                
+                    </button>                             
                 </div>
                 {/* dark mobile sidebar background */}
                 {showMenu && (
@@ -702,7 +695,6 @@ export default function displayListings() {
                         onClick={() => setShowMenu(false)}
                     ></div>
                 )}            
-
                 <div className="hidden lg:block">
                     <AddEmailForm /> 
                 </div>
@@ -719,7 +711,7 @@ export default function displayListings() {
                     <div className="flex flex-row justify-between align-bottom items-center border-b border-black pb-2 mb-2">
                    
                         <div onClick={() => setShowMenu(prev => !prev)} className="flex flex-row items-center justify-between w-full">
-                            <div className="flex flex-row gap-2 lg:items-center justify-between lg:justify-start w-full">
+                            <div className="flex flex-row gap-2 lg:items-center w-full lg:w-1/2">
                                 <DisplayFilters                                 
                                     type={calendarTypeFilter}
                                     presetRange={calendarDateRangePreset}
@@ -731,32 +723,10 @@ export default function displayListings() {
                             </div>
                             {/* <svg className="icon-link block lg:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
                             <div className="hidden lg:flex flex-row gap-2">
-                                <svg onClick={() => setIsMapView(false)} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M5.33337 4H14" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M5.33337 8H14" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M5.33337 12H14" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M2 4H2.00667" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M2 8H2.00667" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M2 12H2.00667" stroke="#000000" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
-                                <svg onClick={() => setIsMapView(true)} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"> 
-                                    <g clipPath="url(#clip0_4_48)">
-                                    <path d="M0.666626 4V14.6667L5.33329 12L10.6666 14.6667L15.3333 12V1.33334L10.6666 4L5.33329 1.33334L0.666626 4Z" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M5.33337 1.33334V12" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M10.6666 4V14.6667" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </g>
-                                    <defs>
-                                    <clipPath id="clip0_4_48">
-                                    <rect width="16" height="16" fill="white"/>
-                                    </clipPath>
-                                    </defs>
-                                </svg>
-
+                                <svg xmlns="http://www.w3.org/2000/svg" onClick={() => setIsMapView(false)} className="feather feather-clock w-8 lg:w-5 cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>                                
+                                <svg xmlns="http://www.w3.org/2000/svg" onClick={() => setIsMapView(true)} className="feather feather-clock w-8 lg:w-5 cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" ><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
                             </div>
-
-
-                        </div>
-                                             
+                        </div>                                             
                     </div>
                     {/* <div className="flex flex-row gap-4 justify-between border-b border-black pb-2 mb-2">
                         <div className="flex flex-row gap-4">
