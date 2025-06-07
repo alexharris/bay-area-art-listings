@@ -10,9 +10,9 @@ export default function Listings({ listings, formatDate }) {
       <ul id="list-view" className="w-full">
         {
           listings.map((item, index) => (
-            <li className="border-b min-h-40 border-dashed border-gray-300 py-4 w-full relative flex flex-col lg:flex-row justify-between gap-4" key={index}>
-              <div className="w-full lg:w-1/3 flex flex-col justify-between">
-                <h2 className="font-bold">{item.Event}{item.Highlight && '★'}</h2>
+            <li className="border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col lg:flex-row justify-between gap-4" key={index}>
+              <div className="w-full lg:w-1/2 flex flex-col justify-between">
+                <h2 className="text-3xl">{item.Event}{item.Highlight && '★'}</h2>
                 {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
                   <div>
                     {item.locationHours && (
@@ -48,15 +48,7 @@ export default function Listings({ listings, formatDate }) {
                     }
                   </div>                 
               </div>
-              <div className="flex flex-col gap-2 w-full lg:w-1/3 text-left items-start justify-between">
-                
-                  {formatDate(item.StartDate)} - {formatDate(item.EndDate)}                     
-                  <span className="underline flex flex-row gap-1 items-center cusror-pointer" >                    
-                    <CalendarLink listing={item} location="" />                    
-                  </span>                                                                             
-                
-              </div>
-              <div className="flex flex-col justify-between w-full lg:w-1/3">              
+              <div className="flex flex-col justify-between w-full lg:w-1/4">              
               {item.locationName.toLowerCase() === 'various' 
                 ? <div className="flex flex-row">
                     {item.locationName}                   
@@ -94,7 +86,16 @@ export default function Listings({ listings, formatDate }) {
                     </div>                             
                   </>                  
               }                                                
+              </div>              
+              <div className="flex flex-col gap-2 w-full lg:w-1/4 text-left items-start justify-between">
+                
+                  {formatDate(item.StartDate)} - {formatDate(item.EndDate)}                     
+                  <span className="underline flex flex-row gap-1 items-center cusror-pointer" >                    
+                    <CalendarLink listing={item} location="" />                    
+                  </span>                                                                             
+                
               </div>
+
               {/*               
               <button className="text-gray-500 mt-2 w-full text-left" onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
                 {showDetails[index] ? 'Hide Details' : 'Details'}

@@ -207,8 +207,9 @@ export default function displayListings() {
         
         const filteredListings = getFilteredListings(filters, listings);
         const sortedListings = sortListingsChronologically(filteredListings)
+        const sortedListingsAlphabetically = filteredListings.sort((a, b) => a.Event.localeCompare(b.Event));
         
-        setFilteredListings(sortedListings);
+        setFilteredListings(sortedListingsAlphabetically);
         setDisplayedResults(filteredListings.length);
         
         // getListingsForThisWeek(filters, listings);
@@ -711,7 +712,7 @@ export default function displayListings() {
                     <div className="flex flex-row justify-between align-bottom items-center border-b border-black pb-2 mb-2">
                    
                         <div onClick={() => setShowMenu(prev => !prev)} className="flex flex-row items-center justify-between w-full">
-                            <div className="flex flex-row gap-2 lg:items-center w-full lg:w-1/2">
+                            <div className="flex flex-row gap-2 lg:items-center w-full lg:w-2/3">
                                 <DisplayFilters                                 
                                     type={calendarTypeFilter}
                                     presetRange={calendarDateRangePreset}
