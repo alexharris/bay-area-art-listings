@@ -89,42 +89,42 @@ export default function Listings({ listings, formatDate }) {
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>                        
                         {/* {item.locationUrl} */}
-                        
-                      </a>
-                      <div className="relative">
-                        <span 
-                          className="underline flex flex-row gap-1 items-center cursor-pointer" 
-                          onClick={() => {
-                            if (item.locationHours) {
-                              setShowHoursPopup(showHoursPopup === index ? null : index);
-                            } else if (item.locationUrl) {
-                              window.open(item.locationUrl, '_blank');
-                            }
-                          }}
-                          title={item.locationHours ? "View hours" : "Visit website for hours"}
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className={`feather feather-clock w-6 lg:w-5 ${!item.locationHours ? 'text-gray-400' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
-                        </span>
-                        
-                        {showHoursPopup === index && (
-                          <div 
-                            ref={popupRef}
-                            className="absolute z-50 top-full -left-16 lg:-right-20 lg:right-0 mt-1 p-3 bg-white shadow-lg border border-black w-96"
-                          >
-                            <button 
-                              onClick={() => setShowHoursPopup(null)} 
-                              className="absolute top-1 right-1 p-1 text-gray-500 hover:text-gray-800"
-                              aria-label="Close"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                              </svg>
-                            </button>
-                            <h4 className="font-semibold mb-2">{item.locationName} Hours</h4>
-                            {item.locationHours ? (
-                              <ul className="text-sm space-y-1">
-                                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
+                                    
+                                    </a>
+                                    <div className="relative">
+                                    {item.locationHours ? (
+                                      <span 
+                                      className="underline flex flex-row gap-1 items-center cursor-pointer" 
+                                      onClick={() => setShowHoursPopup(showHoursPopup === index ? null : index)}
+                                      title="View hours"
+                                      >
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
+                                      </span>
+                                    ) : (
+                                      <span className="flex flex-row gap-1 items-center">
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
+                                      </span>
+                                    )}
+                                    
+                                    {showHoursPopup === index && (
+                                      <div 
+                                      ref={popupRef}
+                                      className="absolute z-50 top-full -left-16 lg:-right-20 lg:right-0 mt-1 p-3 bg-white shadow-lg border border-black w-96"
+                                      >
+                                      <button 
+                                        onClick={() => setShowHoursPopup(null)}   
+                                        className="absolute top-1 right-1 p-1 text-gray-500 hover:text-gray-800"
+                                        aria-label="Close"
+                                      >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                      </button>
+                                      <h4 className="font-semibold mb-2">{item.locationName} Hours</h4>
+                                      {item.locationHours ? (
+                                        <ul className="text-sm space-y-1">
+                                        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
                                   const isToday = day === ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][new Date().getDay()];
                                   const hours = item.locationHours[day]
                                     ? item.locationHours[day].replace(`${day}: `, '').replace(`${day}:`, '')
