@@ -26,9 +26,9 @@ export default function Listings({ listings, formatDate }) {
       <ul id="list-view" className="w-full">
         {
           listings.map((item, index) => (
-            <li className="border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col lg:flex-row justify-between gap-4" key={index}>
+            <li className="border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col lg:flex-row justify-between gap-2 lg:gap-4" key={index}>
               <div className="w-full lg:w-1/2 flex flex-col justify-between">
-                <h2 className="text-3xl">{item.Event}{item.Highlight && '★'}</h2>
+                <h2 className="text-2xl lg:text-3xl mb-2 lg:mb-0">{item.Event}{item.Highlight && '★'}</h2>
                 {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
                   <div>
                     {item.locationHours && (
@@ -64,13 +64,13 @@ export default function Listings({ listings, formatDate }) {
                     }
                   </div>                 
               </div>
-              <div className="flex flex-col justify-between w-full lg:w-1/4">              
+              <div className="flex flex-col items-start justify-between w-full lg:w-1/4">              
               {item.locationName.toLowerCase() === 'various' 
                 ? <div className="flex flex-row">
                     {item.locationName}
                   </div> 
                 : <>
-                    <div className="flex flex-row items-center gap-1">
+                    <div className="flex flex-row items-center gap-1 mb-1 lg:mb-0">
                       <a href={item.locationUrl}>{item.locationName}</a>                   
                     </div> 
                     <div className="flex flex-row items-center gap-2">
@@ -80,14 +80,14 @@ export default function Listings({ listings, formatDate }) {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-8 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                         {/* {item.locationAddress} */}
                       </a>
             
                       <a className="underline flex flex-row gap-1 items-center" 
                         href={item.locationUrl}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-8 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>                        
+                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>                        
                         {/* {item.locationUrl} */}
                         
                       </a>
@@ -103,13 +103,13 @@ export default function Listings({ listings, formatDate }) {
                           }}
                           title={item.locationHours ? "View hours" : "Visit website for hours"}
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className={`feather feather-clock w-8 lg:w-5 ${!item.locationHours ? 'text-gray-400' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
+                          <svg xmlns="http://www.w3.org/2000/svg" className={`feather feather-clock w-6 lg:w-5 ${!item.locationHours ? 'text-gray-400' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
                         </span>
                         
                         {showHoursPopup === index && (
                           <div 
                             ref={popupRef}
-                            className="absolute z-50 top-full -right-20 lg:right-0 mt-1 p-3 bg-white shadow-lg border border-black w-96"
+                            className="absolute z-50 top-full -left-16 lg:-right-20 lg:right-0 mt-1 p-3 bg-white shadow-lg border border-black w-96"
                           >
                             <button 
                               onClick={() => setShowHoursPopup(null)} 

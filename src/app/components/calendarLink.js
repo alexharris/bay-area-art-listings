@@ -94,7 +94,7 @@ export default function calendarLink(data) {
         <div className="relative inline-block">
             <svg 
                 onClick={() => setIsModalOpen(!isModalOpen)} 
-                className="feather feather-calendar w-8 lg:w-5 cursor-pointer" 
+                className="feather feather-calendar w-6 lg:w-5 cursor-pointer" 
                 xmlns="http://www.w3.org/2000/svg" 
                 viewBox="0 0 24 24" 
                 fill="none" 
@@ -113,7 +113,7 @@ export default function calendarLink(data) {
             {isModalOpen && (
                 <div 
                     ref={popupRef}
-                    className="absolute z-50 top-full -right-20 lg:right-0 mt-1 p-3 bg-white shadow-lg border border-black w-80"
+                    className="absolute z-50 top-full lg:-right-20 lg:right-0 mt-1 p-3 bg-white shadow-lg border border-black w-80"
                 >
                     <button 
                         onClick={() => setIsModalOpen(!isModalOpen)} 
