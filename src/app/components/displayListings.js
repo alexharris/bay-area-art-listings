@@ -91,7 +91,6 @@ export default function displayListings() {
             
             // Handle selectedLocation parameter
             if (params.has('selectedLocation')) {
-                console.log('Selected Location:', params.get('selectedLocation'));
                 setSelectedLocation(params.get('selectedLocation'));
             }
             
@@ -129,7 +128,6 @@ export default function displayListings() {
                     const to = new Date(params.get('dateTo'));                    
                     
                     if (!isNaN(from.getTime()) && !isNaN(to.getTime())) {
-                        console.log('Date parameters:', params.get('dateFrom'), params.get('dateTo'));
                         updateCalendarDateRangeFilter({
                             from: params.get('dateFrom'),
                             to: params.get('dateTo')
@@ -255,7 +253,6 @@ export default function displayListings() {
                 calendarDateRangeFilter.from.getTime() === startOfCurrentMonth.getTime() && 
                 calendarDateRangeFilter.to.getTime() === endOfCurrentMonth.getTime();
             
-            console.log(calendarDateRangeFilter.from.getTime(), startOfCurrentMonth.getTime(), calendarDateRangeFilter.to.getTime(), endOfCurrentMonth.getTime(), isDefaultMonthRange);
 
             if (!isDefaultMonthRange) {
                 params.set('dateFrom', format(new Date(calendarDateRangeFilter.from), 'yyyy-MM-dd'));
@@ -263,7 +260,7 @@ export default function displayListings() {
             }
         }
 
-        // if (isMapView) params.set('view', 'map');
+        if (isMapView) params.set('view', 'map');
 
         // // Only update URL if we have params, otherwise clear the search params
         const newUrl = params.toString() 
@@ -293,6 +290,26 @@ export default function displayListings() {
         setOpenHoursOnly(!openHoursOnly);
     }
 
+    // Toggle map view
+    function toggleMapView() {
+        const newMapView = !isMapView;
+        setIsMapView(newMapView);
+        
+        // Update URL parameter if needed
+        const params = new URLSearchParams(window.location.search);
+        if (newMapView) {
+            // Switching to map view
+            params.set('view', 'map');
+        } else {
+            // Switching to list view
+            params.delete('view');
+        }
+        
+        const newUrl = params.toString() 
+            ? `${window.location.pathname}?${params.toString()}`
+            : window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+    }
 
     function updateCalendarDateRangeFilter(dateRange){
         // Handle dates properly to avoid timezone issues
@@ -745,12 +762,54 @@ export default function displayListings() {
                                     displayedResults={displayedResults}
                                     selectedCounty={selectedCounty}
                                 />                                    
-                                <span>{displayedResults} results</span>
+                                <span className="hidden lg:block">{displayedResults} results</span>
                             </div>
                             {/* <svg className="icon-link block lg:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
-                            <div className="hidden lg:flex flex-row gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" onClick={() => setIsMapView(false)} className="feather feather-clock w-8 lg:w-5 cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>                                
-                                <svg xmlns="http://www.w3.org/2000/svg" onClick={() => setIsMapView(true)} className="feather feather-clock w-8 lg:w-5 cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+                            <div className="hidden lg:flex flex-row gap-2 items-center">
+                                <div className="flex items-center">
+                                    <svg 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        className="w-5 h-5 mr-2 cursor-pointer" 
+                                        viewBox="0 0 24 24" 
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        strokeWidth="1.5" 
+                                        strokeLinecap="round" 
+                                        strokeLinejoin="round"
+                                        onClick={() => isMapView && toggleMapView()}
+                                    >
+                                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                                    </svg>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input 
+                                            type="checkbox" 
+                                            className="sr-only peer" 
+                                            checked={isMapView} 
+                                            onChange={toggleMapView} 
+                                        />
+                                        <div className="w-10 h-5 bg-gray-100 border border-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-gray-700 after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-100"></div>
+                                    </label>
+                                    <svg 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        className="w-5 h-5 ml-2 cursor-pointer" 
+                                        viewBox="0 0 24 24" 
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        strokeWidth="1.5" 
+                                        strokeLinecap="round" 
+                                        strokeLinejoin="round"
+                                        onClick={() => !isMapView && toggleMapView()}
+                                    >
+                                        <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                                        <line x1="8" y1="2" x2="8" y2="18"></line>
+                                        <line x1="16" y1="6" x2="16" y2="22"></line>
+                                    </svg>
+                                </div>
                             </div>
                         </div>                                             
                     </div>
@@ -778,11 +837,10 @@ export default function displayListings() {
                             <p className="pb-4">No Results</p>
                             <p className="pb-4">¯\_(ツ)_/¯</p>
                             <p>Try changing your filters.</p>
-                        
+                        </div>
+                    }            
 
-                        </div>}            
-
-                        {isMapView && L ? (
+                        {displayedResults > 0 && isMapView && L ? (
                             <div id="map-view" className="w-full">
                                 <div className="h-[70vh] border w-full">
                                 <MapContainer center={[37.7749, -122.4194]} zoom={9} scrollWheelZoom={true} className="h-[70vh] border w-full z-0">
@@ -806,7 +864,7 @@ export default function displayListings() {
                                                     position={[location.Geolocation.lat, location.Geolocation.lng]} 
                                                     icon={L.icon({
                                                         iconUrl: item.Highlight 
-                                                            ? "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cg clipPath='url(%23clip0_1_2)'%3E%3Cpath d='M21 1.16667L22.8025 4.81833L26.8333 5.4075L23.9167 8.24833L24.605 12.2617L21 10.3658L17.395 12.2617L18.0833 8.24833L15.1667 5.4075L19.1975 4.81833L21 1.16667Z' fill='%23FFF700' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_1_2'%3E%3Crect width='14' height='14' fill='white' transform='translate(14)'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A"
+                                                            ? "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cg clipPath='url(%23clip0_1_2)'%3E%3Cpath d='M21 1.16667L22.8025 4.81833L26.8333 5.4075L23.9167 8.24833L24.605 12.2617L21 10.3658L17.395 12.2617L18.0833 8.24833L15.1667 5.4075L19.1975 4.81833L21 1.16667Z' fill='%23FFF700' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_1_2'%3E%3Crect width='14' height='14' fill='white' transform='translate(14)'/%3E%3C/clipPath%3E%3C/defs%3E%3Csvg%3E%0A"
                                                             : "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A",
                                                     })}
                                                 >
@@ -832,9 +890,6 @@ export default function displayListings() {
                 toggleMenu={() => setShowMenu(prev => !prev)} 
                 isMapView={isMapView}
                 displayedResults={displayedResults}
-                toggleMapView={() => setIsMapView(true)}
-                toggleListView={() => setIsMapView(false)}
-
             />
         </div>
     
