@@ -55,13 +55,30 @@ const endOfWeek = nextWeek.toISOString().split('T')[0];
 const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);    
+const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0); 
+
+
+// Function to determine if a venue is open today
+function determineOpenHoursFilter(item) {
+    // Get current day name
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const today = new Date();
+    const dayOfWeek = daysOfWeek[today.getDay()];
+
+    // Only return true if locationHours is not defined or if the location is open today
+    if (!item.locationHours) {
+      return true;
+    } else {
+      return !item.locationHours[dayOfWeek].toLowerCase().includes('closed');
+    }
+}
 
 export function getFilteredListings(filters, listings) {
-
+  
   // Set default filter values
   filters = {
     highlightsOnly: filters.highlightsOnly || false,
+    openHoursOnly: filters.openHoursOnly || false,
     searchTerm: filters.searchTerm || '',
     selectedLocation: filters.selectedLocation || '',
     selectedCounty: filters.selectedCounty || [],
@@ -71,6 +88,7 @@ export function getFilteredListings(filters, listings) {
 
   let filteredListings = listings
   .filter(item => filters.highlightsOnly ? item.Highlight : true) //Highlights Only
+  .filter(item =>filters.openHoursOnly ? determineOpenHoursFilter(item) : true)
   .filter(item => filters.selectedLocation ? item.locationName === filters.selectedLocation : true) // Selected Location
   .filter(item => item.Event.toLowerCase().includes(filters.searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(filters.searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(filters.searchTerm.toLowerCase())) // Search Term
   .filter(item => filters.selectedCounty[0] ? filters.selectedCounty[0].zipcodes.some(zipcode => item.locationAddress.includes(zipcode)) : true) // Selected County

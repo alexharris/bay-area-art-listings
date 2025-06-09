@@ -20,7 +20,7 @@ export default function Listings({ listings, formatDate }) {
         };
     }, []);
 
-    console.log(listings)
+    
 
     return (
       <ul id="list-view" className="w-full">

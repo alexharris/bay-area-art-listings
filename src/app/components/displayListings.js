@@ -58,6 +58,7 @@ export default function displayListings() {
     const [calendarDateRangeFilter, setCalendarDateRangeFilter] = useState([]); // actual date range to filter on    
     const [filteredListings, setFilteredListings] = useState([]);
     const [highlightsOnly, setHighlightsOnly] = useState(false);
+    const [openHoursOnly, setOpenHoursOnly] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [selectedCounty, setSelectedCounty] = useState({});
@@ -73,6 +74,8 @@ export default function displayListings() {
     const [showMenu, setShowMenu] = useState(false);
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
+
+
 
     // Add this new effect to handle URL parameters
     useEffect(() => {
@@ -101,6 +104,11 @@ export default function displayListings() {
             // Handle highlightsOnly parameter
             if (params.has('highlightsOnly')) {
                 setHighlightsOnly(params.get('highlightsOnly') === 'true');
+            }
+
+            // Handle openHoursOnly parameter
+            if (params.has('openHoursOnly')) {
+                setOpenHoursOnly(params.get('openHoursOnly') === 'true');
             }
             
             // Handle calendarTypeFilter parameter
@@ -180,6 +188,7 @@ export default function displayListings() {
         // Create an object of all of the filter variables
         const filters = {
             highlightsOnly: highlightsOnly,
+            openHoursOnly: openHoursOnly,
             searchTerm: searchTerm,
             selectedLocation: selectedLocation,
             selectedCounty: selectedCounty,
@@ -227,6 +236,8 @@ export default function displayListings() {
         }
         if (highlightsOnly) params.set('highlightsOnly', 'true');
 
+        if (openHoursOnly) params.set('openHoursOnly', 'true');
+
         if (calendarTypeFilter && calendarTypeFilter !== 'opening') {
             params.set('calendarTypeFilter', calendarTypeFilter);
         }
@@ -261,7 +272,7 @@ export default function displayListings() {
         window.history.replaceState({}, '', newUrl);
 
 
-    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, searchTerm, listings, selectedLocation, selectedCounty]);
+    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, openHoursOnly, searchTerm, listings, selectedLocation, selectedCounty]);
 
     // Toggle map view
     useEffect(() => {
@@ -277,6 +288,11 @@ export default function displayListings() {
     function toggleHighlights() {
         setHighlightsOnly(!highlightsOnly);
     }
+
+    function toggleOpenHoursOnly() {
+        setOpenHoursOnly(!openHoursOnly);
+    }
+
 
     function updateCalendarDateRangeFilter(dateRange){
         // Handle dates properly to avoid timezone issues
@@ -634,7 +650,16 @@ export default function displayListings() {
                                 <option key={index} value={location.Name}>{location.Name}</option>
                             ))}
                         </select> */}                    
-                    </div>                 
+                    </div>   
+                    <label className="pb-2">
+                        <input 
+                            type="checkbox" 
+                            className="mr-2"
+                            checked={openHoursOnly} 
+                            onChange={toggleOpenHoursOnly} 
+                        />
+                        Hide closed
+                    </label>                                  
                     <label className="pb-2">
                         <input 
                             type="checkbox" 
@@ -724,8 +749,8 @@ export default function displayListings() {
                             </div>
                             {/* <svg className="icon-link block lg:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
                             <div className="hidden lg:flex flex-row gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" onClick={() => setIsMapView(false)} className="feather feather-clock w-8 lg:w-5 cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>                                
-                                <svg xmlns="http://www.w3.org/2000/svg" onClick={() => setIsMapView(true)} className="feather feather-clock w-8 lg:w-5 cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" ><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" onClick={() => setIsMapView(false)} className="feather feather-clock w-8 lg:w-5 cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>                                
+                                <svg xmlns="http://www.w3.org/2000/svg" onClick={() => setIsMapView(true)} className="feather feather-clock w-8 lg:w-5 cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
                             </div>
                         </div>                                             
                     </div>
@@ -768,6 +793,7 @@ export default function displayListings() {
                                     { 
                                     filteredListings
                                         .filter(item => highlightsOnly ? item.Highlight : true)
+                                        .filter(item => openHoursOnly ? determineOpenHoursFilter(item) : true)
                                         .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
                                         .filter(item => item.locationName.toLowerCase() !== 'various')
                                         .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
