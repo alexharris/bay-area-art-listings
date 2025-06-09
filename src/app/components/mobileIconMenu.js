@@ -1,6 +1,38 @@
-export default function header({ toggleMenu, isMapView, displayedResults }) {
+export default function header({ toggleMenu, isMapView, displayedResults, toggleMapView }) {
   // Get the displayedResults value from props
   const resultsCount = displayedResults;
+  
+  // Function to update URL without page reload
+  const updateUrlWithoutReload = (isMap) => {
+    // Update URL to reflect the change without reloading the page
+    const params = new URLSearchParams(window.location.search);
+    
+    if (isMap) {
+      params.set('view', 'map');
+    } else {
+      params.delete('view');
+    }
+    
+    const newUrl = params.toString() 
+      ? `${window.location.pathname}?${params.toString()}`
+      : window.location.pathname;
+    
+    // Use pushState to update the URL without reloading
+    window.history.pushState({}, '', newUrl);
+    
+    // Add event listener for popstate if not already added
+    if (typeof window !== 'undefined' && !window._popstateListenerAdded) {
+      window.addEventListener('popstate', () => {
+        // When the user navigates with browser buttons, update the UI accordingly
+        const params = new URLSearchParams(window.location.search);
+        const isMapFromUrl = params.get('view') === 'map';
+        if (isMapFromUrl !== isMapView) {
+          toggleMapView();
+        }
+      });
+      window._popstateListenerAdded = true;
+    }
+  };
 
   return (
     <div className="lg:hidden bg-gray-100 h-12 w-full fixed bottom-0 left-0 p-2 flex flex-row justify-between items-center">
@@ -23,13 +55,9 @@ export default function header({ toggleMenu, isMapView, displayedResults }) {
             strokeLinejoin="round"
             onClick={() => {
               if (isMapView) {
-                // Switch to list view
-                const params = new URLSearchParams(window.location.search);
-                params.delete('view');
-                const newUrl = params.toString() 
-                  ? `${window.location.pathname}?${params.toString()}`
-                  : window.location.pathname;
-                window.location.href = newUrl;
+                // Toggle to list view without reload
+                toggleMapView();
+                updateUrlWithoutReload(false);
               }
             }}
           >
@@ -46,18 +74,10 @@ export default function header({ toggleMenu, isMapView, displayedResults }) {
               className="sr-only peer" 
               checked={isMapView} 
               onChange={() => {
-                // Update URL to reflect the change
-                const params = new URLSearchParams(window.location.search);
-                if (!isMapView) {
-                  params.set('view', 'map');
-                } else {
-                  params.delete('view');
-                }
-                
-                const newUrl = params.toString() 
-                  ? `${window.location.pathname}?${params.toString()}`
-                  : window.location.pathname;
-                window.location.href = newUrl;
+                // Toggle the map view state
+                const newMapState = !isMapView;
+                toggleMapView();
+                updateUrlWithoutReload(newMapState);
               }}
             />
             <div className="w-10 h-5 bg-gray-100 border border-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-gray-700 after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-100"></div>
@@ -73,13 +93,9 @@ export default function header({ toggleMenu, isMapView, displayedResults }) {
             strokeLinejoin="round"
             onClick={() => {
               if (!isMapView) {
-                // Switch to map view
-                const params = new URLSearchParams(window.location.search);
-                params.set('view', 'map');
-                const newUrl = params.toString() 
-                  ? `${window.location.pathname}?${params.toString()}`
-                  : window.location.pathname;
-                window.location.href = newUrl;
+                // Toggle to map view without reload
+                toggleMapView();
+                updateUrlWithoutReload(true);
               }
             }}
           >

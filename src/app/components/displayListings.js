@@ -266,7 +266,7 @@ export default function displayListings() {
         const newUrl = params.toString() 
             ? `${window.location.pathname}?${params.toString()}`
             : window.location.pathname;
-        window.history.replaceState({}, '', newUrl);
+        window.history.pushState({}, '', newUrl);
 
 
     }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, openHoursOnly, searchTerm, listings, selectedLocation, selectedCounty]);
@@ -295,20 +295,31 @@ export default function displayListings() {
         const newMapView = !isMapView;
         setIsMapView(newMapView);
         
-        // Update URL parameter if needed
+        // Update URL without reloading
         const params = new URLSearchParams(window.location.search);
         if (newMapView) {
-            // Switching to map view
             params.set('view', 'map');
         } else {
-            // Switching to list view
             params.delete('view');
         }
         
         const newUrl = params.toString() 
             ? `${window.location.pathname}?${params.toString()}`
             : window.location.pathname;
-        window.history.replaceState({}, '', newUrl);
+        window.history.pushState({}, '', newUrl);
+        
+        // Add event listener for popstate if not already added (for browser back/forward button support)
+        if (typeof window !== 'undefined' && !window._popstateListenerAdded) {
+            window.addEventListener('popstate', () => {
+                // When the user navigates with browser buttons, update the UI accordingly
+                const params = new URLSearchParams(window.location.search);
+                const isMapFromUrl = params.get('view') === 'map';
+                if (isMapFromUrl !== isMapView) {
+                    setIsMapView(isMapFromUrl);
+                }
+            });
+            window._popstateListenerAdded = true;
+        }
     }
 
     function updateCalendarDateRangeFilter(dateRange){
@@ -850,8 +861,7 @@ export default function displayListings() {
                                     />
                                     { 
                                     filteredListings
-                                        .filter(item => highlightsOnly ? item.Highlight : true)
-                                        
+                                        .filter(item => highlightsOnly ? item.Highlight : true)                                        
                                         .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
                                         .filter(item => item.locationName.toLowerCase() !== 'various')
                                         .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -864,7 +874,7 @@ export default function displayListings() {
                                                     position={[location.Geolocation.lat, location.Geolocation.lng]} 
                                                     icon={L.icon({
                                                         iconUrl: item.Highlight 
-                                                            ? "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cg clipPath='url(%23clip0_1_2)'%3E%3Cpath d='M21 1.16667L22.8025 4.81833L26.8333 5.4075L23.9167 8.24833L24.605 12.2617L21 10.3658L17.395 12.2617L18.0833 8.24833L15.1667 5.4075L19.1975 4.81833L21 1.16667Z' fill='%23FFF700' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_1_2'%3E%3Crect width='14' height='14' fill='white' transform='translate(14)'/%3E%3C/clipPath%3E%3C/defs%3E%3Csvg%3E%0A"
+                                                            ? "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cg clipPath='url(%23clip0_1_2)'%3E%3Cpath d='M21 1.16667L22.8025 4.81833L26.8333 5.4075L23.9167 8.24833L24.605 12.2617L21 10.3658L17.395 12.2617L18.0833 8.24833L15.1667 5.4075L19.1975 4.81833L21 1.16667Z' fill='%23FFF700' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_1_2'%3E%3Crect width='14' height='14' fill='white' transform='translate(14)'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A"
                                                             : "data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14 25.3167C20.1833 19.8333 23.3333 15.1667 23.3333 11.6667C23.3333 9.19131 22.35 6.81734 20.5997 5.067C18.8493 3.31666 16.4754 2.33333 14 2.33333C11.5246 2.33333 9.15068 3.31666 7.40034 5.067C5.65 6.81734 4.66667 9.19131 4.66667 11.6667C4.66667 15.1667 7.81667 19.7167 14 25.3167Z' fill='%23D9D9D9' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M14 15.1667C15.933 15.1667 17.5 13.5997 17.5 11.6667C17.5 9.73367 15.933 8.16667 14 8.16667C12.067 8.16667 10.5 9.73367 10.5 11.6667C10.5 13.5997 12.067 15.1667 14 15.1667Z' stroke='black' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A",
                                                     })}
                                                 >
@@ -890,6 +900,7 @@ export default function displayListings() {
                 toggleMenu={() => setShowMenu(prev => !prev)} 
                 isMapView={isMapView}
                 displayedResults={displayedResults}
+                toggleMapView={toggleMapView}
             />
         </div>
     
