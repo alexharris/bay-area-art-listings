@@ -793,7 +793,7 @@ export default function displayListings() {
                                     { 
                                     filteredListings
                                         .filter(item => highlightsOnly ? item.Highlight : true)
-                                        .filter(item => openHoursOnly ? determineOpenHoursFilter(item) : true)
+                                        
                                         .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
                                         .filter(item => item.locationName.toLowerCase() !== 'various')
                                         .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))

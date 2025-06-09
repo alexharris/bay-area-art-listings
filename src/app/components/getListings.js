@@ -16,6 +16,7 @@ export default async function getListings() {
     // get the locations reference by the listing
     const locations = await Promise.all(data.map(async listing => {
       const location = await client.fetch(`*[_type == "location" && _id == "${listing.Location._ref}"]`);
+      console.log(location);
       return location
     }));
 
