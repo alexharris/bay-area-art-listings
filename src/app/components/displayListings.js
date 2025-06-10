@@ -688,7 +688,7 @@ export default function displayListings() {
                         />
                         Hide closed
                     </label>                                  
-                    <label className="pb-2">
+                    {/* <label className="pb-2">
                         <input 
                             type="checkbox" 
                             className="mr-2"
@@ -696,7 +696,7 @@ export default function displayListings() {
                             onChange={toggleHighlights} 
                         />
                         Sarah Hotchkiss is excited about it
-                    </label>
+                    </label> */}
                     <div className="flex flex-col pb-2 lg:mt-0 gap-2 items-start">
                         <label htmlFor="searchTerm" className="flex flex-row items-center gap-1">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
