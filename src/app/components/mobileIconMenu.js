@@ -1,4 +1,4 @@
-export default function header({ toggleMenu, isMapView, displayedResults, toggleMapView }) {
+export default function MobileIconMenu({ toggleBottomSheet, isMapView, displayedResults, toggleMapView, isBottomSheetOpen }) {
   // Get the displayedResults value from props
   const resultsCount = displayedResults;
   
@@ -36,13 +36,22 @@ export default function header({ toggleMenu, isMapView, displayedResults, toggle
 
   return (
     <div className="lg:hidden bg-gray-100 h-12 w-full fixed bottom-0 left-0 p-2 flex flex-row justify-between items-center">
-      <div onClick={toggleMenu} className="w-24 flex flex-row gap-1 items-center">
-        <svg className="feather feather-filter w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" ><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>         
-        <span className="font-medium text-md">{resultsCount}</span>
+      <div onClick={toggleBottomSheet} className={`w-24 flex flex-row gap-1 items-center ${isBottomSheetOpen ? 'font-bold' : ''}`}>
+        <svg 
+          className={`feather feather-filter w-8 h-8 ${isBottomSheetOpen ? 'text-black stroke-2' : 'text-gray-800'}`} 
+          xmlns="http://www.w3.org/2000/svg" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="1.5" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+        >
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>         
+        <span className={`font-medium text-md ${isBottomSheetOpen ? 'text-black' : 'text-gray-800'}`}>{resultsCount}</span>
       </div>
-      <div className="w-16">
-        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>        
-      </div>      
+    
       <div className="flex justify-center">
         <div className="flex items-center">
           <svg 

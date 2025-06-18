@@ -15,8 +15,10 @@ import AddEmailForm from './addEmailForm';
 import { getFilteredListings } from '../../utils/filters';
 import { sortListingsChronologically } from '../../utils/sort'; 
 import MobileIconMenu from './mobileIconMenu';
+import MobileFilterBottomSheet from './mobileFilterBottomSheet';
 import Link from "next/link";
 import Listing from './listing';
+import FilterPresets from './filterPresets';
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
@@ -49,7 +51,16 @@ function formatDate(dateString) {
     return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
 
-export default function displayListings() {
+export default function DisplayListings() {
+    const today = new Date();
+    const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+    const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6));
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);   
+
+
     // Initial data
     const [listings, setListings] = useState([]);
     const [locations, setLocations] = useState([]);    
@@ -72,6 +83,7 @@ export default function displayListings() {
     const [L, setL] = useState(null);
     const [displayedResults, setDisplayedResults] = useState(0); // number of results
     const [showMenu, setShowMenu] = useState(false);
+    const [showBottomSheet, setShowBottomSheet] = useState(false);
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
 
@@ -145,15 +157,6 @@ export default function displayListings() {
         }
     }, []);
 
-
-    // Date Variables
-    const today = new Date();
-    const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-    const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6));
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-    const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);    
 
     // Load initial data
     useEffect(() => {
@@ -356,15 +359,34 @@ export default function displayListings() {
 
     return (
    
-        //   big wrapper
+          
         <div className="flex flex-row w-full items-start lg:gap-4">
 
             {/* /* Sidebar */ }
-            <div id="sidebar" className="hidden lg:flex">
+            
+            <div id="sidebar" className={`${showMenu ? 'inset-0': ''} flex flex-col lg:gap-4 fixed lg:sticky lg:top-2 w-full z-40 lg:w-[430px]`}>
                 {/* Filter Menu */}
-                <div className="flex flex-col gap-4">
+                <div className={`${showMenu ? 'translate-x-0 inset-0 ' : '-translate-x-full hidden'}   
+                transform 
+                lg:transform-none 
+                transition-transform 
+                duration-300 
+                flex 
+                flex-col 
+                overflow-scroll 
+                lg:flex 
+                right-8 
+                left-0 
+                z-40 
+                p-2
+                lg:p-0
+                lg:inset-unset 
+                gap-2 
+                bg-white
+                
+                `}>
                     {/* Logo at the top of the sidebar */}
-                    <div className="flex items-start 1">
+                    <div className="flex items-start">
                         <Link href="/">
                             <img 
                                 src="/baal-handwritten-logo.png" 
@@ -373,6 +395,7 @@ export default function displayListings() {
                             />
                         </Link>
                     </div>
+                    <svg className="absolute top-2 right-2 lg:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
 
 
                     {simpleDateSelectEnable &&
@@ -507,44 +530,20 @@ export default function displayListings() {
                     } 
                     <div className="flex flex-col w-full">
                         <label htmlFor="filterResults" className="sr-only">Date Range</label>
-                        <div id="filterResults" className="cursor-pointer">
-                            <div onClick={() => { 
-                                setShowCustomCalendar(false); 
-                                const todayFrom = new Date();
-                                todayFrom.setHours(0, 0, 0, 0);
-                                const todayTo = new Date();
-                                todayTo.setHours(23, 59, 59, 999);
-                                setCalendarDateRangeFilter({ from: todayFrom, to: todayTo }); 
-                                setCalendarDateRangePreset('today'); 
-                            }} className={calendarDateRangePreset === 'today' ? 'font-bold' : ''}>Today</div>
-                            <div onClick={() => { 
-                                setShowCustomCalendar(false); 
-                                const weekFrom = new Date(startOfWeek);
-                                weekFrom.setHours(0, 0, 0, 0);
-                                const weekTo = new Date(endOfWeek);
-                                weekTo.setHours(23, 59, 59, 999);
-                                setCalendarDateRangeFilter({ from: weekFrom, to: weekTo }); 
-                                setCalendarDateRangePreset('thisweek'); 
-                            }} className={calendarDateRangePreset === 'thisweek' ? 'font-bold' : ''}>This Week</div>
-                            <div onClick={() => { 
-                                setShowCustomCalendar(false); 
-                                const monthFrom = new Date(startOfMonth);
-                                monthFrom.setHours(0, 0, 0, 0);
-                                const monthTo = new Date(endOfMonth);
-                                monthTo.setHours(23, 59, 59, 999);
-                                setCalendarDateRangeFilter({ from: monthFrom, to: monthTo }); 
-                                setCalendarDateRangePreset('thismonth'); 
-                            }} className={calendarDateRangePreset === 'thismonth' ? 'font-bold' : ''}>This Month</div>
-                            <div onClick={() => { 
-                                setShowCustomCalendar(false); 
-                                const nextMonthFrom = new Date(startOfNextMonth);
-                                nextMonthFrom.setHours(0, 0, 0, 0);
-                                const nextMonthTo = new Date(endOfNextMonth);
-                                nextMonthTo.setHours(23, 59, 59, 999);
-                                setCalendarDateRangeFilter({ from: nextMonthFrom, to: nextMonthTo }); 
-                                setCalendarDateRangePreset('nextmonth'); 
-                            }} className={calendarDateRangePreset === 'nextmonth' ? 'font-bold' : ''}>Next Month</div>                                
-                            <div onClick={() => {setShowCustomCalendar(true); setCalendarDateRangePreset('custom')}} className={calendarDateRangePreset === 'custom' ? 'font-bold' : ''}>Custom</div>
+                        <div id="filterResults">
+                            <FilterPresets 
+                                className="hidden lg:block"
+                                setShowCustomCalendar={setShowCustomCalendar}
+                                calendarDateRangePreset={calendarDateRangePreset}
+                                setCalendarDateRangeFilter={setCalendarDateRangeFilter}
+                                setCalendarDateRangePreset={setCalendarDateRangePreset}
+                                startOfWeek={startOfWeek}
+                                endOfWeek={endOfWeek}
+                                startOfMonth={startOfMonth}
+                                endOfMonth={endOfMonth}
+                                startOfNextMonth={startOfNextMonth}
+                                endOfNextMonth={endOfNextMonth}
+                            />
                         </div>
                     </div>   
                     {showCustomCalendar &&
@@ -558,106 +557,9 @@ export default function displayListings() {
                             />                        
                         </div>
                     }                                                
-                    {sidebarCalendarIsEnabled && showAdvancedFilters &&
-                        <div className="p-4 mb-2 bg-gray-50">
-                            
-
-                            <div className="flex flex-row gap-2 mb-2">
-                                <div className="flex flex-col w-1/2">
-                                    <label htmlFor="calendarTypeFilter">Type</label>
-                                    {/* <select size="3" id="calendarTypeFilter" className="p-1 border border-gray-300 cur</div>sor-pointer">
-                                        <option value="onview" onClick={() => setCalendarTypeFilter('onview')}>On View</option>
-                                        <option value="opening" onClick={() => setCalendarTypeFilter('opening')}>Opening</option>
-                                        <option value="closing" onClick={() => setCalendarTypeFilter('closing')}>Closing</option>
-                                    </select> */}
-                                    <select 
-                                        id="calendarTypeFilter" 
-                                        className="p-1 border border-gray-300 cursor-pointer" 
-                                        size="3"
-                                        value={calendarTypeFilter}
-                                        onChange={(e) => setCalendarTypeFilter(e.target.value)}
-                                    >
-                                        <option value="onview">On View</option>
-                                        <option value="opening">Opening Date</option>
-                                        <option value="closing">Closing Date</option>
-                                    </select>                                
-                                    {/* <div id="calendarTypeFilter" className="p-1 border border-gray-300 cursor-pointer">
-                                        <div onClick={() => setCalendarTypeFilter('onview')} className={calendarTypeFilter === 'onview' ? 'bg-gray-200' : ''}>On View</div>
-                                        <div onClick={() => setCalendarTypeFilter('opening')} className={calendarTypeFilter === 'opening' ? 'bg-gray-200' : ''}>Opening</div>
-                                        <div onClick={() => setCalendarTypeFilter('closing')} className={calendarTypeFilter === 'closing' ? 'bg-gray-200' : ''}>Closing</div>
-                                    </div> */}
-                                </div>
-                                <div className="flex flex-col w-1/2">
-                                    <label htmlFor="filterResults">Date Range</label>
-                                    <div id="filterResults" className="p-1 border border-gray-300 cursor-pointer">
-                                        <div onClick={() => { 
-                                            setShowCustomCalendar(false); 
-                                            const todayFrom = new Date();
-                                            todayFrom.setHours(0, 0, 0, 0);
-                                            const todayTo = new Date();
-                                            todayTo.setHours(23, 59, 59, 999);
-                                            setCalendarDateRangeFilter({ from: todayFrom, to: todayTo }); 
-                                            setCalendarDateRangePreset('today'); 
-                                        }} className={calendarDateRangePreset === 'today' ? 'bg-gray-200' : ''}>Today</div>
-                                        <div onClick={() => { 
-                                            setShowCustomCalendar(false); 
-                                            const weekFrom = new Date(startOfWeek);
-                                            weekFrom.setHours(0, 0, 0, 0);
-                                            const weekTo = new Date(endOfWeek);
-                                            weekTo.setHours(23, 59, 59, 999);
-                                            setCalendarDateRangeFilter({ from: weekFrom, to: weekTo }); 
-                                            setCalendarDateRangePreset('thisweek'); 
-                                        }} className={calendarDateRangePreset === 'thisweek' ? 'bg-gray-200' : ''}>This Week</div>
-                                        <div onClick={() => { 
-                                            setShowCustomCalendar(false); 
-                                            const monthFrom = new Date(startOfMonth);
-                                            monthFrom.setHours(0, 0, 0, 0);
-                                            const monthTo = new Date(endOfMonth);
-                                            monthTo.setHours(23, 59, 59, 999);
-                                            setCalendarDateRangeFilter({ from: monthFrom, to: monthTo }); 
-                                            setCalendarDateRangePreset('thismonth'); 
-                                        }} className={calendarDateRangePreset === 'thismonth' ? 'bg-gray-200' : ''}>This Month</div>
-                                        <div onClick={() => { 
-                                            setShowCustomCalendar(false); 
-                                            const nextMonthFrom = new Date(startOfNextMonth);
-                                            nextMonthFrom.setHours(0, 0, 0, 0);
-                                            const nextMonthTo = new Date(endOfNextMonth);
-                                            nextMonthTo.setHours(23, 59, 59, 999);
-                                            setCalendarDateRangeFilter({ from: nextMonthFrom, to: nextMonthTo }); 
-                                            setCalendarDateRangePreset('nextmonth'); 
-                                        }} className={calendarDateRangePreset === 'nextmonth' ? 'bg-gray-200' : ''}>Next Month</div>                                
-                                        <div onClick={() => {setShowCustomCalendar(true); setCalendarDateRangePreset('custom')}} className={calendarDateRangePreset === 'custom' ? 'bg-gray-200' : ''}>Custom</div>
-                                    </div>
-                                </div>                       
-                            </div>
-                            {showCustomCalendar &&
-                                <div className='border border-gray-300 px-1'>
-                                    <DayPicker
-                                        mode="range"
-                                        onSelect={(dateRange) => updateCalendarDateRangeFilter(dateRange)}
-                                        selected={calendarDateRangeFilter}
-                                        required
-                                        showOutsideDays
-                                    />                        
-                                </div>
-                            }
-                        </div>
-                    }                    
+               
                     <div className="flex flex-col">
-                        {/* <div className="text-sm uppercase pb-2">Location</div> */}
-                        <CountySelector onCountyChange={setSelectedCounty} />                    
-                        {/* <label htmlFor="locationFilter">Venue</label>
-                        <select 
-                            id="locationFilter" 
-                            onChange={(e) => setSelectedLocation(e.target.value)} 
-                            value={selectedLocation}
-                            className="p-1 bg-white border border-gray-300"
-                        >
-                            <option value="">All Locations</option>
-                            {locations.map((location, index) => (
-                                <option key={index} value={location.Name}>{location.Name}</option>
-                            ))}
-                        </select> */}                    
+                        <CountySelector onCountyChange={setSelectedCounty} />                                       
                     </div>   
                     <label className="pb-2">
                         <input 
@@ -668,15 +570,6 @@ export default function displayListings() {
                         />
                         Hide closed
                     </label>                                  
-                    <label className="pb-2">
-                        <input 
-                            type="checkbox" 
-                            className="mr-2"
-                            checked={highlightsOnly} 
-                            onChange={toggleHighlights} 
-                        />
-                        Sarah Hotchkiss is excited about it
-                    </label>
                     <div className="flex flex-col pb-2 lg:mt-0 gap-2 items-start">
                         <label htmlFor="searchTerm" className="flex flex-row items-center gap-1">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -877,10 +770,37 @@ export default function displayListings() {
                 
             </div>
             <MobileIconMenu 
-                toggleMenu={() => setShowMenu(prev => !prev)} 
+                toggleBottomSheet={() => setShowBottomSheet(true)} 
                 isMapView={isMapView}
                 displayedResults={displayedResults}
                 toggleMapView={toggleMapView}
+                isBottomSheetOpen={showBottomSheet}
+            />
+            
+            {/* Mobile Filter Bottom Sheet */}
+            <MobileFilterBottomSheet
+                isOpen={showBottomSheet}
+                onClose={() => setShowBottomSheet(false)}
+                calendarTypeFilter={calendarTypeFilter}
+                setCalendarTypeFilter={setCalendarTypeFilter}
+                calendarDateRangeFilter={calendarDateRangeFilter}
+                setCalendarDateRangeFilter={setCalendarDateRangeFilter}
+                calendarDateRangePreset={calendarDateRangePreset}
+                setCalendarDateRangePreset={setCalendarDateRangePreset}
+                highlightsOnly={highlightsOnly}
+                setHighlightsOnly={setHighlightsOnly}
+                openHoursOnly={openHoursOnly}
+                setOpenHoursOnly={setOpenHoursOnly}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                showAdvancedFilters={showAdvancedFilters}
+                setShowAdvancedFilters={setShowAdvancedFilters}
+                showCustomCalendar={showCustomCalendar}
+                setShowCustomCalendar={setShowCustomCalendar}
+                selectedCounty={selectedCounty}
+                setSelectedCounty={setSelectedCounty}
+                displayedResults={displayedResults}
+                setShowMenu={setShowMenu}
             />
         </div>
     

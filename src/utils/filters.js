@@ -85,13 +85,14 @@ export function getFilteredListings(filters, listings) {
     calendarTypeFilter: filters.calendarTypeFilter || '',
     calendarDateRangeFilter: filters.calendarDateRangeFilter || { from: startOfWeek, to: endOfWeek },
   };
+  console.log('Filters:', filters);
 
   let filteredListings = listings
   .filter(item => filters.highlightsOnly ? item.Highlight : true) //Highlights Only
   .filter(item =>filters.openHoursOnly ? determineOpenHoursFilter(item) : true)
   .filter(item => filters.selectedLocation ? item.locationName === filters.selectedLocation : true) // Selected Location
   .filter(item => item.Event.toLowerCase().includes(filters.searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(filters.searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(filters.searchTerm.toLowerCase())) // Search Term
-  .filter(item => filters.selectedCounty[0] ? filters.selectedCounty[0].zipcodes.some(zipcode => item.locationAddress.includes(zipcode)) : true) // Selected County
+  .filter(item => filters.selectedCounty[0] ? filters.selectedCounty[0].zipcodes.some(zipcode => item.locationAddress.includes(zipcode)) : true) // Selected County 
   .filter(item => {
       const startDate = new Date(item.StartDate + 'T00:00:00');
       const endDate = new Date(item.EndDate + 'T23:59:59Z');

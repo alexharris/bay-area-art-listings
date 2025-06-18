@@ -35,7 +35,7 @@ const CountySelector = ({ onCountyChange }) => {
   
   return (
     <div className="flex flex-row items-center pb-1 relative">
-      <svg width="8" height="10" viewBox="0 0 8 10" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute z-10 pointer-events-none">
+      <svg className="absolute z-10 pointer-events-none hidden lg:block" width="8" height="10" viewBox="0 0 8 10" fill="none" xmlns="http://www.w3.org/2000/svg" >
         <path d="M0.330059 9.33014L0.330059 0.669885L7.83006 5.00001L0.330059 9.33014Z" fill="black"/>
       </svg>
 
