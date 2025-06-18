@@ -630,7 +630,7 @@ export default function DisplayListings() {
             {/* Main Col */}
             <div id="main-col" className="flex flex-col justify-start w-full flex-shrink">
                 {loading ? (
-                    <div className="spinner animate-spin text-5xl text-center w-full">
+                    <div className="animate-pulse text-5xl flex items-center justify-center w-full h-[70vh]">
                         🎨
                     </div>
                 ) : (
