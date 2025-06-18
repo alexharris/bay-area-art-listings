@@ -110,49 +110,27 @@ export default function MobileFilterBottomSheet({
           }}
           aria-modal="true"
           role="dialog"
-          // Touch event handlers for drag-to-close
-          onTouchStart={e => {
-            // Store initial Y position
-            bottomSheetRef.current._dragStartY = e.touches[0].clientY;
-          }}
-          onTouchMove={e => {
-            if (bottomSheetRef.current._dragStartY !== undefined) {
-          const deltaY = e.touches[0].clientY - bottomSheetRef.current._dragStartY;
-          if (deltaY > 40) { // threshold for drag down
-            onClose();
-            bottomSheetRef.current._dragStartY = undefined;
-          }
-            }
-          }}
-          onTouchEnd={() => {
-            bottomSheetRef.current._dragStartY = undefined;
-          }}
         >
-          {/* Handle/Drag indicator */}
-          <div
-            className="flex justify-center pt-3 pb-1 cursor-pointer"
-            onClick={onClose}
-            tabIndex={0}
-            role="button"
-            aria-label="Close filter panel"
-            onKeyDown={e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            onClose();
-          }
-            }}
-          >
-            <div className="w-12 h-1.5 bg-gray-300 rounded-full shadow-sm"></div>
-          </div>
-
           {/* Header */}
         <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200">
-          <h2 className="text-lg font-semibold">Filter</h2>
-          <button 
-            onClick={clearAllFilters}
-            className="text-blue-600"
-          >
-            Clear All
-          </button>
+          <h2 className="text-lg font-semibold flex flex-row items-center gap-2"><span>Filter</span> <span className="text-gray-400 text-sm mt-.5">{displayedResults}</span></h2>
+          <div className="flex items-center space-x-6">
+            <button 
+              onClick={clearAllFilters}
+              className="text-blue-600"
+            >
+              Clear All
+            </button>
+            <button 
+              onClick={onClose}
+              className="text-gray-700 p-1"
+              aria-label="Close filter panel"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
         
         {/* Content */}
