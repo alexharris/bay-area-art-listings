@@ -772,33 +772,33 @@ export default function DisplayListings() {
                                                     position={group.position}
                                                     icon={L.icon({
                                                         iconUrl: totalItems > 1 
-                                                            ? "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjZmY0NTAwIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCI+PC9jaXJjbGU+PC9zdmc+"
-                                                            : "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJva2xjaCg0NC42JSAuMDMgMjU2LjgwMikiIHN0cm9rZT0iIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9ImZlYXRoZXIgZmVhdGhlci1jaXJjbGUiPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48L3N2Zz4="
+                                                            ? "data:image/svg+xml,%3Csvg width='20' height='16' viewBox='0 0 20 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8.00001 14.6667C11.6819 14.6667 14.6667 11.6819 14.6667 8C14.6667 4.3181 11.6819 1.33333 8.00001 1.33333C4.31811 1.33333 1.33334 4.3181 1.33334 8C1.33334 11.6819 4.31811 14.6667 8.00001 14.6667Z' fill='%239ACD32' stroke='black' stroke-width='0.666667' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M10 14.6667C13.6819 14.6667 16.6667 11.6819 16.6667 8C16.6667 4.3181 13.6819 1.33333 10 1.33333C6.31811 1.33333 3.33334 4.3181 3.33334 8C3.33334 11.6819 6.31811 14.6667 10 14.6667Z' fill='%239ACD32' stroke='black' stroke-width='0.666667' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12 14.6667C15.6819 14.6667 18.6667 11.6819 18.6667 8C18.6667 4.3181 15.6819 1.33333 12 1.33333C8.31811 1.33333 5.33334 4.3181 5.33334 8C5.33334 11.6819 8.31811 14.6667 12 14.6667Z' fill='%239ACD32' stroke='black' stroke-width='0.666667' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A"
+                                                            : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='yellowgreen' fill-opacity='1' stroke='currentColor' stroke-width='1' stroke-linecap='round' stroke-linejoin='round' class='feather feather-circle'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3C/svg%3E"
                                                     })}
                                                 >
                                                     <Popup>
-                                                        <div className="popup-content">
+                                                        <div className="popup-content flex flex-col gap-2">
                                                             <h2 className="text-xl">{currentItem.Event}</h2>
-                                                            <a href={'/location/' + currentItem.Location._ref}>{currentItem.locationName}</a><br />
-                                                            {currentItem.locationAddress}
+                                                            <a href={currentItem.locationUrl} target="_blank">{currentItem.locationName}</a>
+                                                            <span>{currentItem.locationAddress}</span>
                                                             <TodaysHoursStatus locationHours={currentItem.locationHours} locationUrl={currentItem.locationUrl} />
                                                             
                                                             {totalItems > 1 && (
                                                                 <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
                                                                     <button 
                                                                         onClick={handlePrevious}
-                                                                        className="text-sm px-2 hover:bg-gray-100"
+                                                                        className="text-sm px-2 hover:bg-gray-100 flex flex-row gap-1 items-center"
                                                                     >
-                                                                        ← Prev
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Prev
                                                                     </button>
                                                                     <span className="text-xs text-gray-500">
                                                                         {currentPage + 1} of {totalItems}
                                                                     </span>
                                                                     <button 
                                                                         onClick={handleNext}
-                                                                        className="text-sm px-2 hover:bg-gray-100"
+                                                                        className="text-sm px-2 hover:bg-gray-100 flex flex-row gap-1 items-center"
                                                                     >
-                                                                        Next →
+                                                                        Next <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                                                                     </button>
                                                                 </div>
                                                             )}
