@@ -74,6 +74,8 @@ export default function DisplayListings() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [selectedCounty, setSelectedCounty] = useState({});
+    // Map popup pagination state
+    const [popupPages, setPopupPages] = useState({});
     //  Sorting
     const [sortDate, setSortDate] = useState([]);
     // Display
@@ -363,7 +365,7 @@ export default function DisplayListings() {
           
         <div className="flex flex-row w-full items-start lg:gap-4">
 
-            {/* /* Sidebar */ }
+            {/* Sidebar */ }
             
             <div id="sidebar" className={`${showMenu ? 'inset-0': ''} flex flex-col lg:gap-4 fixed lg:sticky lg:top-2 w-full z-40 lg:w-[430px]`}>
                 {/* Filter Menu */}
@@ -636,94 +638,75 @@ export default function DisplayListings() {
                     </div>
                 ) : (
                     <>  
-                    <div className="flex flex-row justify-between align-bottom items-center border-b border-black pb-2 mb-2">
-                   
-                        <div className="flex flex-row items-center justify-between w-full">
-                            <div className="flex flex-row gap-2 lg:items-center w-full lg:w-2/3">
-                                <DisplayFilters                                 
-                                    type={calendarTypeFilter}
-                                    presetRange={calendarDateRangePreset}
-                                    customRange={calendarDateRangeFilter}
-                                    displayedResults={displayedResults}
-                                    selectedCounty={selectedCounty}
-                                />                                    
-                                <span className="hidden lg:block">{displayedResults} results</span>
-                            </div>
-                            {/* <svg className="icon-link block lg:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
-                            <div className="hidden lg:flex flex-row gap-2 items-center">
-                                <div className="flex items-center">
-                                    <svg 
-                                        xmlns="http://www.w3.org/2000/svg" 
-                                        className="w-5 h-5 mr-2 cursor-pointer" 
-                                        viewBox="0 0 24 24" 
-                                        fill="none" 
-                                        stroke="currentColor" 
-                                        strokeWidth="1.5" 
-                                        strokeLinecap="round" 
-                                        strokeLinejoin="round"
-                                        onClick={() => isMapView && toggleMapView()}
-                                    >
-                                        <line x1="8" y1="6" x2="21" y2="6"></line>
-                                        <line x1="8" y1="12" x2="21" y2="12"></line>
-                                        <line x1="8" y1="18" x2="21" y2="18"></line>
-                                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                                    </svg>
-                                    <label className="relative inline-flex items-center cursor-pointer">
-                                        <input 
-                                            type="checkbox" 
-                                            className="sr-only peer" 
-                                            checked={isMapView} 
-                                            onChange={toggleMapView} 
-                                        />
-                                        <div className="w-10 h-5 bg-gray-100 border border-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-gray-700 after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-100"></div>
-                                    </label>
-                                    <svg 
-                                        xmlns="http://www.w3.org/2000/svg" 
-                                        className="w-5 h-5 ml-2 cursor-pointer" 
-                                        viewBox="0 0 24 24" 
-                                        fill="none" 
-                                        stroke="currentColor" 
-                                        strokeWidth="1.5" 
-                                        strokeLinecap="round" 
-                                        strokeLinejoin="round"
-                                        onClick={() => !isMapView && toggleMapView()}
-                                    >
-                                        <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-                                        <line x1="8" y1="2" x2="8" y2="18"></line>
-                                        <line x1="16" y1="6" x2="16" y2="22"></line>
-                                    </svg>
+                        <div className="flex flex-row justify-between align-bottom items-center border-b border-black pb-2 mb-2">
+                    
+                            <div className="flex flex-row items-center justify-between w-full">
+                                <div className="flex flex-row gap-2 lg:items-center w-full lg:w-2/3">
+                                    <DisplayFilters                                 
+                                        type={calendarTypeFilter}
+                                        presetRange={calendarDateRangePreset}
+                                        customRange={calendarDateRangeFilter}
+                                        displayedResults={displayedResults}
+                                        selectedCounty={selectedCounty}
+                                    />                                    
+                                    <span className="hidden lg:block">{displayedResults} results</span>
                                 </div>
+                                {/* <svg className="icon-link block lg:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
+                                <div className="hidden lg:flex flex-row gap-2 items-center">
+                                    <div className="flex items-center">
+                                        <svg 
+                                            xmlns="http://www.w3.org/2000/svg" 
+                                            className="w-5 h-5 mr-2 cursor-pointer" 
+                                            viewBox="0 0 24 24" 
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            strokeWidth="1.5" 
+                                            strokeLinecap="round" 
+                                            strokeLinejoin="round"
+                                            onClick={() => isMapView && toggleMapView()}
+                                        >
+                                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                                        </svg>
+                                        <label className="relative inline-flex items-center cursor-pointer">
+                                            <input 
+                                                type="checkbox" 
+                                                className="sr-only peer" 
+                                                checked={isMapView} 
+                                                onChange={toggleMapView} 
+                                            />
+                                            <div className="w-10 h-5 bg-gray-100 border border-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-gray-700 after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-100"></div>
+                                        </label>
+                                        <svg 
+                                            xmlns="http://www.w3.org/2000/svg" 
+                                            className="w-5 h-5 ml-2 cursor-pointer" 
+                                            viewBox="0 0 24 24" 
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            strokeWidth="1.5" 
+                                            strokeLinecap="round" 
+                                            strokeLinejoin="round"
+                                            onClick={() => !isMapView && toggleMapView()}
+                                        >
+                                            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                                            <line x1="8" y1="2" x2="8" y2="18"></line>
+                                            <line x1="16" y1="6" x2="16" y2="22"></line>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>                                             
+                        </div>
+                        {displayedResults === 0 && 
+                            <div className="text-center flex-grow flex flex-col justify-center text-2xl py-36">
+                                <p className="pb-4">No Results</p>
+                                <p className="pb-4">¯\_(ツ)_/¯</p>
+                                <p>Try changing your filters.</p>
                             </div>
-                        </div>                                             
-                    </div>
-                    {/* <div className="flex flex-row gap-4 justify-between border-b border-black pb-2 mb-2">
-                        <div className="flex flex-row gap-4">
-                            <span 
-                                className={isMapView ? '' : 'font-bold'} 
-                                onClick={() => setIsMapView(false)}
-                            >
-                                List
-                            </span>
-                            <span 
-                                className={isMapView ? 'font-bold' : ''} 
-                                onClick={() => setIsMapView(true)}
-                            >
-                                Map
-                            </span>
-                        </div>
-                        <div>
-                            {displayedResults} results
-                        </div>
-                    </div>          */}
-                    {displayedResults === 0 && 
-                        <div className="text-center flex-grow flex flex-col justify-center text-2xl py-36">
-                            <p className="pb-4">No Results</p>
-                            <p className="pb-4">¯\_(ツ)_/¯</p>
-                            <p>Try changing your filters.</p>
-                        </div>
-                    }            
+                        }            
 
                         {displayedResults > 0 && isMapView && L ? (
                             <div id="map-view" className="w-full">
@@ -734,37 +717,100 @@ export default function DisplayListings() {
                                     url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                                     />
                                     { 
-                                    filteredListings
-                                        .filter(item => highlightsOnly ? item.Highlight : true)                                        
-                                        .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
-                                        .filter(item => item.locationName.toLowerCase() !== 'various')
-                                        .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
-                                        .map((item, index) => {
+                                    (() => {
+                                        // Filter listings
+                                        const filteredItems = filteredListings
+                                            .filter(item => highlightsOnly ? item.Highlight : true)                                        
+                                            .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
+                                            .filter(item => item.locationName.toLowerCase() !== 'various')
+                                            .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                                    item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                                    item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()));
+                                        
+                                        // Group listings by location coordinates
+                                        const locationGroups = {};
+                                        
+                                        filteredItems.forEach(item => {
                                             const location = locations.find(loc => loc.Name === item.locationName);
+                                            if (location && location.Geolocation) {
+                                                const key = `${location.Geolocation.lat},${location.Geolocation.lng}`;
+                                                if (!locationGroups[key]) {
+                                                    locationGroups[key] = {
+                                                        position: [location.Geolocation.lat, location.Geolocation.lng],
+                                                        locationName: item.locationName,
+                                                        locationAddress: item.locationAddress,
+                                                        items: []
+                                                    };
+                                                }
+                                                locationGroups[key].items.push(item);
+                                            }
+                                        });
+                                        
+                                        return Object.entries(locationGroups).map(([key, group], groupIndex) => {
+                                            // Get current page for this group or set to 0 if not yet defined
+                                            const currentPage = popupPages[key] || 0;
+                                            const totalItems = group.items.length;
+                                            const currentItem = group.items[currentPage];
                                             
-                                            return location && location.Geolocation ? (
+                                            const handlePrevious = () => {
+                                                setPopupPages({
+                                                    ...popupPages,
+                                                    [key]: (currentPage - 1 + totalItems) % totalItems
+                                                });
+                                            };
+                                            
+                                            const handleNext = () => {
+                                                setPopupPages({
+                                                    ...popupPages,
+                                                    [key]: (currentPage + 1) % totalItems
+                                                });
+                                            };
+                                            
+                                            return (
                                                 <Marker 
-                                                    key={index} 
-                                                    position={[location.Geolocation.lat, location.Geolocation.lng]} 
+                                                    key={key} 
+                                                    position={group.position}
                                                     icon={L.icon({
-                                                        iconUrl: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJva2xjaCg0NC42JSAuMDMgMjU2LjgwMikiIHN0cm9rZT0iIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9ImZlYXRoZXIgZmVhdGhlci1jaXJjbGUiPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48L3N2Zz4=",
+                                                        iconUrl: totalItems > 1 
+                                                            ? "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjZmY0NTAwIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCI+PC9jaXJjbGU+PC9zdmc+"
+                                                            : "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJva2xjaCg0NC42JSAuMDMgMjU2LjgwMikiIHN0cm9rZT0iIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9ImZlYXRoZXIgZmVhdGhlci1jaXJjbGUiPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIj48L2NpcmNsZT48L3N2Zz4="
                                                     })}
-
                                                 >
                                                     <Popup>
-                                                        <div>
-                                                            <a href={'/listing/' + item._id}><b>{item.Event}</b></a><br />
-                                                            <a href={'/location/' + item.Location._ref}>{item.locationName}</a><br />
-                                                            {item.locationAddress}</div>
-                                                            <TodaysHoursStatus locationHours={item.locationHours} locationUrl={item.locationUrl} />                                                            
+                                                        <div className="popup-content">
+                                                            <h2 className="text-xl">{currentItem.Event}</h2>
+                                                            <a href={'/location/' + currentItem.Location._ref}>{currentItem.locationName}</a><br />
+                                                            {currentItem.locationAddress}
+                                                            <TodaysHoursStatus locationHours={currentItem.locationHours} locationUrl={currentItem.locationUrl} />
+                                                            
+                                                            {totalItems > 1 && (
+                                                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
+                                                                    <button 
+                                                                        onClick={handlePrevious}
+                                                                        className="text-sm px-2 hover:bg-gray-100"
+                                                                    >
+                                                                        ← Prev
+                                                                    </button>
+                                                                    <span className="text-xs text-gray-500">
+                                                                        {currentPage + 1} of {totalItems}
+                                                                    </span>
+                                                                    <button 
+                                                                        onClick={handleNext}
+                                                                        className="text-sm px-2 hover:bg-gray-100"
+                                                                    >
+                                                                        Next →
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </Popup>
                                                 </Marker>
-                                            ) : null;
-                                        })
+                                            );
+                                        });
+                                    })()
                                     }
                                 </MapContainer>
                                 </div>
-
                             </div>
                         ) : (
                             <Listing listings={filteredListings} formatDate={formatDate} />
@@ -772,43 +818,44 @@ export default function DisplayListings() {
                     </>
                 )}
                 
-            </div>
-            <MobileIconMenu 
-                toggleBottomSheet={() => setShowBottomSheet(true)} 
-                isMapView={isMapView}
-                displayedResults={displayedResults}
-                toggleMapView={toggleMapView}
-                isBottomSheetOpen={showBottomSheet}
-            />
+          
+                <MobileIconMenu 
+                    toggleBottomSheet={() => setShowBottomSheet(true)} 
+                    isMapView={isMapView}
+                    displayedResults={displayedResults}
+                    toggleMapView={toggleMapView}
+                    isBottomSheetOpen={showBottomSheet}
+                />
+                
+                {/* Mobile Filter Bottom Sheet */}
+                <MobileFilterBottomSheet
+                    isOpen={showBottomSheet}
+                    onClose={() => setShowBottomSheet(false)}
+                    calendarTypeFilter={calendarTypeFilter}
+                    setCalendarTypeFilter={setCalendarTypeFilter}
+                    calendarDateRangeFilter={calendarDateRangeFilter}
+                    setCalendarDateRangeFilter={setCalendarDateRangeFilter}
+                    calendarDateRangePreset={calendarDateRangePreset}
+                    setCalendarDateRangePreset={setCalendarDateRangePreset}
+                    highlightsOnly={highlightsOnly}
+                    setHighlightsOnly={setHighlightsOnly}
+                    openHoursOnly={openHoursOnly}
+                    setOpenHoursOnly={setOpenHoursOnly}
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    showAdvancedFilters={showAdvancedFilters}
+                    setShowAdvancedFilters={setShowAdvancedFilters}
+                    showCustomCalendar={showCustomCalendar}
+                    setShowCustomCalendar={setShowCustomCalendar}
+                    selectedCounty={selectedCounty}
+                    setSelectedCounty={setSelectedCounty}
+                    displayedResults={displayedResults}
+                    setShowMenu={setShowMenu}
+                />
             
-            {/* Mobile Filter Bottom Sheet */}
-            <MobileFilterBottomSheet
-                isOpen={showBottomSheet}
-                onClose={() => setShowBottomSheet(false)}
-                calendarTypeFilter={calendarTypeFilter}
-                setCalendarTypeFilter={setCalendarTypeFilter}
-                calendarDateRangeFilter={calendarDateRangeFilter}
-                setCalendarDateRangeFilter={setCalendarDateRangeFilter}
-                calendarDateRangePreset={calendarDateRangePreset}
-                setCalendarDateRangePreset={setCalendarDateRangePreset}
-                highlightsOnly={highlightsOnly}
-                setHighlightsOnly={setHighlightsOnly}
-                openHoursOnly={openHoursOnly}
-                setOpenHoursOnly={setOpenHoursOnly}
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                showAdvancedFilters={showAdvancedFilters}
-                setShowAdvancedFilters={setShowAdvancedFilters}
-                showCustomCalendar={showCustomCalendar}
-                setShowCustomCalendar={setShowCustomCalendar}
-                selectedCounty={selectedCounty}
-                setSelectedCounty={setSelectedCounty}
-                displayedResults={displayedResults}
-                setShowMenu={setShowMenu}
-            />
+            </div>
         </div>
+    );
     
-    )
 }
-
 
