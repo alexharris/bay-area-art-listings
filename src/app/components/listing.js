@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import CalendarLink from './calendarLink';
+import TodaysHoursStatus from './TodaysHoursStatus';
 
 export default function Listings({ listings, formatDate }) {
     const [showDetails, setShowDetails] = useState({});
@@ -27,44 +28,18 @@ export default function Listings({ listings, formatDate }) {
         {
           listings.map((item, index) => (
             <li className="border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col lg:flex-row justify-between gap-2 lg:gap-4" key={index}>
+              {/* Left Column - Event and Today's Hours */}
               <div className="w-full lg:w-1/2 flex flex-col justify-between">
                 <h2 className="text-2xl lg:text-3xl mb-2 lg:mb-0">{item.Event}{item.Highlight && '★'}</h2>
                 {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
-                  <div>
-                    {item.locationHours && (
-                      <div className="leading-tight">
-                        {(() => {
-                          const today = new Date();
-                          const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                          const todayName = days[today.getDay()];
-                          const openHours = item.locationHours[todayName];
-                          // Check if the item has open hours for today
-                          const displayOpenHours = openHours 
-                            ? openHours.replace(`${todayName}: `, '').replace(`${todayName}:`, '') 
-                            : null;
-                          
-                          if (!openHours || openHours.toLowerCase().includes('closed')) {
-                            return <span className="flex flex-row items-center gap-1">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="w-3 feather feather-circle fill-red-600" viewBox="0 0 24 24" stroke="none" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/></svg>
-                              Closed today
-                            </span>;
-                          }
-                          return <span className="flex flex-row items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 fill-green-600 feather feather-circle" viewBox="0 0 24 24" stroke="none" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/></svg>
-                            Today: {displayOpenHours}
-                            </span>;
-                        })()}
-                        </div>
-                      )} 
-                      {!item.locationHours && 
-                        <a className="flex flex-row items-center gap-1 underline" href={item.locationUrl}>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-3 feather feather-circle fill-gray-600" viewBox="0 0 24 24" stroke="smoke" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/></svg>
-                        Check site for hours
-                        </a>
-                      }
-                      </div>                 
-                    </div>
-                    <div className="flex flex-col items-start justify-between w-full lg:w-1/4">              
+                <div>
+                  <div className="leading-tight">
+                    <TodaysHoursStatus locationHours={item.locationHours} locationUrl={item.locationUrl} />
+                  </div>
+                </div>                 
+              </div>
+              {/* Middle Column - Location Info */}
+              <div className="flex flex-col items-start justify-between w-full lg:w-1/4">              
                     {item.locationName.toLowerCase() === 'various' 
                     ? <div className="flex flex-row">
                       {item.locationName}
@@ -159,12 +134,11 @@ export default function Listings({ listings, formatDate }) {
                     </div>                             
                   </>                  
               }                                                
-              </div>              
-              <div className="flex flex-col gap-2 w-full lg:w-1/4 text-left items-start justify-between">
-                
+              </div>       
+              {/* Right Column - Date Info  */}
+              <div className="flex flex-col gap-2 w-full lg:w-1/4 text-left items-start justify-between">                
                   <span>{formatDate(item.StartDate)} - {formatDate(item.EndDate)}</span>
-                  <CalendarLink listing={item} location="" />
-                
+                  <CalendarLink listing={item} location="" />                
               </div>
 
               {/*               
