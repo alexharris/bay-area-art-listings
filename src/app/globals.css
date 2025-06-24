@@ -47,3 +47,15 @@ body {
   box-shadow: none;
 }
 
+/* Add this to your globals.css file */
+.leaflet-container {
+  font-family: var(--font-geist-sans);
+}
+
+/* Target specific Leaflet elements if needed */
+.leaflet-control, 
+.leaflet-popup-content,
+.leaflet-tooltip {
+  font-family: var(--font-geist-sans) !important;
+}
+
