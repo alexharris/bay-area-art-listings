@@ -778,7 +778,20 @@ export default function DisplayListings() {
                                                 >
                                                     <Popup>
                                                         <div className="popup-content flex flex-col gap-2">
-                                                            <h2 className="text-xl">{currentItem.Event}</h2>
+                                                            {currentItem.EventUrl
+                                                                ? <a 
+                                                                    href={currentItem.EventUrl}
+                                                                    target="_blank"
+                                                                    className="text-xl lg:text-xl mb-2 lg:mb-0"
+                                                                    >
+                                                                    <h2>{currentItem.Event}</h2>
+                                                                    </a>
+                                                                : <span
+                                                                    className="text-2xl lg:text-3xl mb-2 lg:mb-0"
+                                                                    >
+                                                                    <h2>{currentItem.Event}</h2>
+                                                                    </span>
+                                                            }  
                                                             <a
                                                                 className="flex flex-row gap-1 items-center text-black"
                                                                 href={currentItem.locationUrl} 

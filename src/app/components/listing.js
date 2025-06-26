@@ -29,8 +29,21 @@ export default function Listings({ listings, formatDate }) {
           listings.map((item, index) => (
             <li className="border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col lg:flex-row justify-between gap-2 lg:gap-4" key={index}>
               {/* Left Column - Event and Today's Hours */}
-              <div className="w-full lg:w-1/2 flex flex-col justify-between">
-                <h2 className="text-2xl lg:text-3xl mb-2 lg:mb-0">{item.Event}{item.Highlight && '★'}</h2>
+              <div className="w-full lg:w-1/2 flex flex-col justify-between">                
+                {item.EventUrl
+                  ? <a 
+                      href={item.EventUrl}
+                      target="_blank"
+                      className="text-2xl lg:text-3xl mb-2 lg:mb-0"
+                    >
+                      <h2>{item.Event}</h2>
+                    </a>
+                  : <span
+                      className="text-2xl lg:text-3xl mb-2 lg:mb-0"
+                    >
+                      <h2>{item.Event}</h2>
+                    </span>
+                }                   
                 {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
                 <div>
                   <div className="leading-tight">
@@ -42,7 +55,15 @@ export default function Listings({ listings, formatDate }) {
               <div className="flex flex-col items-start justify-between w-full lg:w-1/4">              
                     {item.locationName.toLowerCase() === 'various' 
                     ? <div className="flex flex-row">
-                        {item.locationName}
+                      {item.eventUrl
+                        ? <a 
+                            href={item.eventUrl}
+                            target="_blank"
+                          >
+                            {item.locationName}
+                          </a>
+                        : <span>{item.locationName}</span>
+                      }                     
                       </div> 
                     : <>
                       <div className="flex flex-row items-center gap-1 mb-1 lg:mb-0">

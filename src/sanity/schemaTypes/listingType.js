@@ -10,6 +10,10 @@ export const listingType = defineType({
       type: 'string',
     }),
     defineField({
+      name: 'EventUrl',
+      type: 'url'
+    }),      
+    defineField({
       name: 'StartDate',
       type: 'date',
       options: {
