@@ -42,30 +42,37 @@ export default function Listings({ listings, formatDate }) {
               <div className="flex flex-col items-start justify-between w-full lg:w-1/4">              
                     {item.locationName.toLowerCase() === 'various' 
                     ? <div className="flex flex-row">
-                      {item.locationName}
+                        {item.locationName}
                       </div> 
                     : <>
                       <div className="flex flex-row items-center gap-1 mb-1 lg:mb-0">
-                        <a href={item.locationUrl}>{item.locationName}</a>                   
+                        <a 
+                          href={item.locationUrl}
+                          target="_blank"
+                        >
+                          {item.locationName}
+                        </a>                   
                       </div> 
                       <div className="flex flex-row items-center gap-2">
                         <a
-                        className="flex flex-row gap-1 items-center"
-                        href={item.googlePlaceId 
-                          ? `https://www.google.com/maps/place/?q=place_id:${item.googlePlaceId}` 
-                          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.locationName + ' ' + item.locationAddress)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                          className="flex flex-row gap-1 items-center"
+                          href={item.googlePlaceId 
+                            ? `https://www.google.com/maps/place/?q=place_id:${item.googlePlaceId}` 
+                            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.locationName + ' ' + item.locationAddress)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                         >
                         
                         <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                         {/* {item.locationAddress} */}
                       </a>
             
-                      <a className="underline flex flex-row gap-1 items-center" 
+                      <a 
+                        className="underline flex flex-row gap-1 items-center" 
                         href={item.locationUrl}
+                        target="_blank"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>                        
+                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-globe w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>                        
                       </a>
                       <div className="relative">
                         {item.locationHours ? (
@@ -84,7 +91,7 @@ export default function Listings({ listings, formatDate }) {
                         {showHoursPopup === index && (
                           <div 
                             ref={popupRef}
-                            className="absolute z-50 top-full -left-16 lg:-right-20 lg:right-0 mt-1 p-3 bg-white shadow-lg border border-black w-96"
+                            className="absolute z-50 top-full -left-16 lg:-left-80 lg:right-0 mt-1 p-3 bg-white shadow-lg border border-black w-80 lg:w-96"
                           >
                             <button 
                               onClick={() => setShowHoursPopup(null)}   
@@ -98,7 +105,7 @@ export default function Listings({ listings, formatDate }) {
                             </button>
                             <h4 className="font-semibold mb-2">{item.locationName} Hours</h4>
                             {item.locationHours ? (
-                              <ul className="text-sm space-y-1">
+                              <ul className="text-xs lg:text-sm space-y-1">
                                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
                                   const isToday = day === ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][new Date().getDay()];
                                   const hours = item.locationHours[day]

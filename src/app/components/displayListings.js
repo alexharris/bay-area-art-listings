@@ -779,8 +779,22 @@ export default function DisplayListings() {
                                                     <Popup>
                                                         <div className="popup-content flex flex-col gap-2">
                                                             <h2 className="text-xl">{currentItem.Event}</h2>
-                                                            <a href={currentItem.locationUrl} target="_blank">{currentItem.locationName}</a>
-                                                            <span>{currentItem.locationAddress}</span>
+                                                            <a
+                                                                className="flex flex-row gap-1 items-center text-black"
+                                                                href={currentItem.locationUrl} 
+                                                                target="_blank"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-globe w-4" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>                        
+                                                                {currentItem.locationName}
+                                                            </a>
+                                                            <a
+                                                                className="flex flex-row gap-1 items-center text-black"
+                                                                target='_blank'
+                                                                href={currentItem.locationUrl}
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-4" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                                                {currentItem.locationAddress}
+                                                            </a>
                                                             <TodaysHoursStatus locationHours={currentItem.locationHours} locationUrl={currentItem.locationUrl} />
                                                             
                                                             {totalItems > 1 && (
