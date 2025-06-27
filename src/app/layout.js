@@ -11,54 +11,53 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "Bay Area Art List",
-  description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
-  metadataBase: new URL("https://bayareaartlist.com"),
-  openGraph: {
-    title: "Bay Area Art List",
-    description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
-    url: "https://bayareaartlist.com",
-    siteName: "Bay Area Art List",
-    images: [
-      {
-        url: "/favicon/opengraph-image.png",
-        width: 1200,
-        height: 630,
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Bay Area Art List",
-    description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
-    images: ["/favicon/opengraph-image.png"],
-  },
-  icons: {
-    icon: [
-      { url: "/favicon/favicon.ico" },
-      { url: "/favicon/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" },
-    ],
-    apple: [
-      { url: "/favicon/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
-  },
-  manifest: "/favicon/site.webmanifest",
-  appleWebApp: {
-    title: "Bay Area Art List",
-  },
-};
+// export const metadata = {
+//   title: "Bay Area Art List",
+//   description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
+//   metadataBase: new URL("https://bayareaartlist.com"),
+//   openGraph: {
+//     title: "Bay Area Art List",
+//     description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
+//     url: "https://bayareaartlist.com",
+//     siteName: "Bay Area Art List",
+//     images: [
+//       {
+//         url: "/favicon/opengraph-image.png",
+//         width: 1200,
+//         height: 630,
+//       },
+//     ],
+//     locale: "en_US",
+//     type: "website",
+//   },
+//   twitter: {
+//     card: "summary_large_image",
+//     title: "Bay Area Art List",
+//     description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
+//     images: ["/favicon/opengraph-image.png"],
+//   },
+//   icons: {
+//     icon: [
+//       { url: "/favicon/favicon.ico" },
+//       { url: "/favicon/favicon.svg", type: "image/svg+xml" },
+//       { url: "/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+//     ],
+//     apple: [
+//       { url: "/favicon/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+//     ],
+//   },
+//   manifest: "/favicon/site.webmanifest",
+//   appleWebApp: {
+//     title: "Bay Area Art List",
+//   },
+// };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-    <meta itemprop="name" content="Bay Area Art List"></meta>    
-    <meta itemprop="description" content="A directory of visual arts exhibitions in the San Francisco Bay Area."></meta>    
-    <meta itemprop="image" content="https://bayareaartlist.com/favicon/opengraph-image.png"></meta>        
+        <meta property="og:image" content="https://bayareaartlist.com//favicon/opengraph-image.png" />
+      
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
