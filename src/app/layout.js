@@ -16,6 +16,12 @@ export const metadata = {
   title: "Bay Area Art List",
   description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
   metadataBase: new URL("https://bayareaartlist.com"),
+  other: {
+    "image": "/favicon/opengraph-image.png",
+    "itemprop:image": "/favicon/opengraph-image.png",
+    "itemprop:name": "Bay Area Art List",
+    "itemprop:description": "A directory of visual arts exhibitions in the San Francisco Bay Area.",
+  },
   openGraph: {
     title: "Bay Area Art List",
     description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
