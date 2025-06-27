@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Bay Area Art List",
   description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
-  metadataBase: new URL("https://bayareaartlist.com"),
+  metadataBase: new URL("http://bayareaartlist.com"),
   other: {
     "image": "/favicon/opengraph-image.png",
     "itemprop:image": "/favicon/opengraph-image.png",
@@ -25,7 +25,7 @@ export const metadata = {
   openGraph: {
     title: "Bay Area Art List",
     description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
-    url: "https://bayareaartlist.com",
+    url: "http://bayareaartlist.com",
     siteName: "Bay Area Art List",
     images: [
       {
