@@ -32,6 +32,8 @@ export default function RootLayout({ children }) {
         <meta property="og:title" content="Bay Area Art List" />
         <meta property="og:description" content="A directory of visual arts exhibitions in the San Francisco Bay Area" />
         <meta property="og:image" content="https://bayareaartlist.com/favicon/open-graph-image.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
 
         {/* <!-- Twitter Meta Tags --> */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -39,7 +41,7 @@ export default function RootLayout({ children }) {
         <meta property="twitter:url" content="https://bayareaartlist.com" />
         <meta name="twitter:title" content="Bay Area Art List"  />
         <meta name="twitter:description" content="A directory of visual arts exhibitions in the San Francisco Bay Area" />
-        <meta name="twitter:image" content="/favicon/open-graph-image.png" />
+        <meta name="twitter:image" content="https://bayareaartlist.com/favicon/open-graph-image.png" />
 
         {/* <!-- Meta Tags --> */}
         <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
