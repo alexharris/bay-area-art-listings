@@ -12,10 +12,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "Art Listings",
-  description: "A list of art shows",
-};
+// export const metadata = {
+//   title: "Bay Area Art List",
+//   description: "A list of art shows",
+// };
 
 export default function RootLayout({ children }) {
 
@@ -39,7 +39,7 @@ export default function RootLayout({ children }) {
         <meta property="twitter:url" content="https://bayareaartlist.com" />
         <meta name="twitter:title" content="Bay Area Art List"  />
         <meta name="twitter:description" content="A directory of visual arts exhibitions in the San Francisco Bay Area" />
-        <meta name="twitter:image" content="/favicon/open-graph-image.png " />
+        <meta name="twitter:image" content="/favicon/open-graph-image.png" />
 
         {/* <!-- Meta Tags --> */}
         <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
