@@ -1,6 +1,6 @@
-export const metadata = {
-  title: 'Listing',
-  openGraph: {
-    title: 'Blog',
-  },
-}
+// export const metadata = {
+//   title: 'Listing',
+//   openGraph: {
+//     title: 'Blog',
+//   },
+// }
