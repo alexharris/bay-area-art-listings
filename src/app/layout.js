@@ -12,45 +12,52 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// export const metadata = {
-//   title: "Bay Area Art List",
-//   description: "A list of art shows",
-// };
+export const metadata = {
+  title: "Bay Area Art List",
+  description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
+  metadataBase: new URL("https://bayareaartlist.com"),
+  openGraph: {
+    title: "Bay Area Art List",
+    description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
+    url: "https://bayareaartlist.com",
+    siteName: "Bay Area Art List",
+    images: [
+      {
+        url: "/favicon/opengraph-image.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bay Area Art List",
+    description: "A directory of visual arts exhibitions in the San Francisco Bay Area",
+    images: ["/favicon/opengraph-image.png"],
+  },
+  icons: {
+    icon: [
+      { url: "/favicon/favicon.ico" },
+      { url: "/favicon/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: [
+      { url: "/favicon/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  manifest: "/favicon/site.webmanifest",
+  appleWebApp: {
+    title: "Bay Area Art List",
+  },
+};
 
 export default function RootLayout({ children }) {
 
 
   return (
     <html lang="en">
-      <head>
-        <title>Bay Area Art List</title>
-        <meta name="description" content="A directory of visual arts exhibitions in the San Francisco Bay Area" />
-
-        {/* <!-- Facebook Meta Tags --> */}
-        <meta property="og:url" content="https://bayareaartlist.com" />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Bay Area Art List" />
-        <meta property="og:description" content="A directory of visual arts exhibitions in the San Francisco Bay Area" />
-        <meta property="og:image" content="https://bayareaartlist.com/favicon/open-graph-image.png" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-
-        {/* <!-- Twitter Meta Tags --> */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta property="twitter:domain" content="bayareaartlist.com" />
-        <meta property="twitter:url" content="https://bayareaartlist.com" />
-        <meta name="twitter:title" content="Bay Area Art List"  />
-        <meta name="twitter:description" content="A directory of visual arts exhibitions in the San Francisco Bay Area" />
-        <meta name="twitter:image" content="https://bayareaartlist.com/favicon/open-graph-image.png" />
-
-        {/* <!-- Meta Tags --> */}
-        <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
-        <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
-        <link rel="shortcut icon" href="/favicon/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
-        <meta name="apple-mobile-web-app-title" content="Bay Area Art List" />
-        <link rel="manifest" href="/favicon/site.webmanifest" />        
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
