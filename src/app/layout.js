@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Bay Area Art List" />
         <meta property="og:description" content="A directory of visual arts exhibitions in the San Francisco Bay Area" />
-        <meta property="og:image" content="/favicon/open-graph-image.png" />
+        <meta property="og:image" content="https://bayareaartlist.com/favicon/open-graph-image.png" />
 
         {/* <!-- Twitter Meta Tags --> */}
         <meta name="twitter:card" content="summary_large_image" />
