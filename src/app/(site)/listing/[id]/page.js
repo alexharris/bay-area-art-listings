@@ -39,19 +39,19 @@ export default async function Location({ params }) {
   );
 }
 
-export async function generateMetadata({ params }) {
-  const id = (await params).id;
-  const listing = await fetchListingData(id);
+// export async function generateMetadata({ params }) {
+//   const id = (await params).id;
+//   const listing = await fetchListingData(id);
 
-  const location = await getLocationFromRef(listing.Location._ref);
+//   const location = await getLocationFromRef(listing.Location._ref);
 
-  return {
-    title: `${listing.Event} @ ${location[0].Name} ${formatDate(listing.StartDate)} to ${formatDate(listing.EndDate)}`,
-    description: `${listing.Event} @ ${location[0].Name} ${formatDate(listing.StartDate)} to ${formatDate(listing.EndDate)}`,
-    openGraph: {
-      title: `${listing.Event} @ ${location[0].Name} ${formatDate(listing.StartDate)} to ${formatDate(listing.EndDate)}`,
-      description: `${listing.Event} @ ${location[0].Name} ${formatDate(listing.StartDate)} to ${formatDate(listing.EndDate)}`,
-    },
-  };
-}
+//   return {
+//     title: `${listing.Event} @ ${location[0].Name} ${formatDate(listing.StartDate)} to ${formatDate(listing.EndDate)}`,
+//     description: `${listing.Event} @ ${location[0].Name} ${formatDate(listing.StartDate)} to ${formatDate(listing.EndDate)}`,
+//     openGraph: {
+//       title: `${listing.Event} @ ${location[0].Name} ${formatDate(listing.StartDate)} to ${formatDate(listing.EndDate)}`,
+//       description: `${listing.Event} @ ${location[0].Name} ${formatDate(listing.StartDate)} to ${formatDate(listing.EndDate)}`,
+//     },
+//   };
+// }
 
