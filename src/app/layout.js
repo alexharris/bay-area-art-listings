@@ -1,7 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -15,17 +14,11 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Bay Area Art List",
   description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
-  metadataBase: new URL("http://bayareaartlist.com"),
-  other: {
-    "image": "/favicon/opengraph-image.png",
-    "itemprop:image": "/favicon/opengraph-image.png",
-    "itemprop:name": "Bay Area Art List",
-    "itemprop:description": "A directory of visual arts exhibitions in the San Francisco Bay Area.",
-  },
+  metadataBase: new URL("https://bayareaartlist.com"),
   openGraph: {
     title: "Bay Area Art List",
     description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
-    url: "http://bayareaartlist.com",
+    url: "https://bayareaartlist.com",
     siteName: "Bay Area Art List",
     images: [
       {
@@ -40,7 +33,7 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Bay Area Art List",
-    description: "A directory of visual arts exhibitions in the San Francisco Bay Area",
+    description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
     images: ["/favicon/opengraph-image.png"],
   },
   icons: {
@@ -60,10 +53,13 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-
-
   return (
     <html lang="en">
+      <head>
+    <meta itemprop="name" content="Bay Area Art List"></meta>    
+    <meta itemprop="description" content="A directory of visual arts exhibitions in the San Francisco Bay Area."></meta>    
+    <meta itemprop="image" content="https://bayareaartlist.com/favicon/opengraph-image.png"></meta>        
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
