@@ -35,7 +35,7 @@ export default function MobileIconMenu({ toggleBottomSheet, isMapView, displayed
   };
 
   return (
-    <div className="lg:hidden bg-gray-100 h-12 w-full fixed bottom-0 left-0 p-2 flex flex-row justify-between items-center">
+    <div className="lg:hidden bg-gray-100 w-full fixed bottom-0 left-0 p-4 flex flex-row justify-between items-center">
       <div onClick={toggleBottomSheet} className={`w-24 flex flex-row gap-1 items-center ${isBottomSheetOpen ? 'font-bold' : ''}`}>
         <svg 
           className={`feather feather-filter w-8 h-8 ${isBottomSheetOpen ? 'text-black stroke-2' : 'text-gray-800'}`} 
