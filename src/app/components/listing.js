@@ -36,7 +36,7 @@ export default function Listings({ listings, formatDate }) {
                       target="_blank"
                       className="text-2xl lg:text-3xl mb-2 lg:mb-0"
                     >
-                      <h2 className="">{item.Event}<svg className="inline-block float-left feather feather-arrow-up-right mb-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></h2>
+                      <h2 className=""><span className="inline-block float-left">{item.Event}</span><svg className="inline-block feather feather-arrow-up-right mb-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></h2>
                     </a>
                   : <span
                       className="text-2xl lg:text-3xl mb-2 lg:mb-0"
