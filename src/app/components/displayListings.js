@@ -638,7 +638,7 @@ export default function DisplayListings() {
                     </div>
                 ) : (
                     <>  
-                        <div className="flex flex-row justify-between align-bottom items-center border-b border-black pb-2 mb-2">
+                        <div className="flex flex-row justify-between align-bottom items-center border-b border-dashed border-black pb-2 mb-2">
                     
                             <div className="flex flex-row items-center justify-between w-full">
                                 <div className="flex flex-row gap-2 lg:items-center w-full lg:w-2/3">

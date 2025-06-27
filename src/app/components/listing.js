@@ -27,7 +27,7 @@ export default function Listings({ listings, formatDate }) {
       <ul id="list-view" className="w-full">
         {
           listings.map((item, index) => (
-            <li className="border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col lg:flex-row justify-between gap-2 lg:gap-4" key={index}>
+            <li className="border-b min-h-40 border-dashed border-gray-400 pt-5 pb-6 w-full relative flex flex-col lg:flex-row justify-between gap-2 lg:gap-4" key={index}>
               {/* Left Column - Event and Today's Hours */}
               <div className="w-full lg:w-1/2 flex flex-col justify-between">                
                 {item.EventUrl
@@ -36,7 +36,7 @@ export default function Listings({ listings, formatDate }) {
                       target="_blank"
                       className="text-2xl lg:text-3xl mb-2 lg:mb-0"
                     >
-                      <h2>{item.Event}</h2>
+                      <h2 className="flex flex-row items-center">{item.Event} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up-right"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></h2>
                     </a>
                   : <span
                       className="text-2xl lg:text-3xl mb-2 lg:mb-0"
