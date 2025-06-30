@@ -367,26 +367,30 @@ export default function DisplayListings() {
 
             {/* Sidebar */ }
             
-            <div id="sidebar" className={`${showMenu ? 'inset-0': ''} flex flex-col lg:gap-4 fixed lg:sticky lg:top-2 w-full z-40 lg:w-[430px]`}>
+            <div id="sidebar" className={`${showMenu ? 'inset-0': ''} flex flex-col lg:gap-4 fixed lg:sticky lg:top-4 w-full z-40 lg:w-[430px]`}>
                 {/* Filter Menu */}
                 <div className={`${showMenu ? 'translate-x-0 inset-0 ' : '-translate-x-full hidden'}   
-                transform 
-                lg:transform-none 
-                transition-transform 
-                duration-300 
-                flex 
-                flex-col 
-                overflow-scroll 
-                lg:flex 
-                right-8 
-                left-0 
+                transform
+                lg:transform-none
+                transition-transform
+                duration-300
+                flex
+                flex-col
+                overflow-scroll
+                lg:flex
+                right-8
+                left-0
                 z-40 
                 p-2
                 lg:p-0
-                lg:inset-unset 
-                gap-2 
+                mr-0
+                lg:mr-8
+                lg:inset-unset
+                gap-2
                 bg-white
-                
+                border-b
+                border-gray-200
+                border-dashed
                 `}>
                     {/* Logo at the top of the sidebar */}
                     <div className="flex items-start">
@@ -576,17 +580,17 @@ export default function DisplayListings() {
                         />
                         Hide closed
                     </label>                                  
-                    <div className="flex flex-col pb-2 lg:mt-0 gap-2 items-start">
+                    <div className="flex flex-row pb-2 lg:mt-0 gap-2 items-center">
                         <label htmlFor="searchTerm" className="flex flex-row items-center gap-1">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
                             <path d="M14 14L11.1 11.1" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg> Search
+                            </svg> <span className="sr-only">Search</span>
                         </label>
                         <input 
                             type="text" 
                             id="searchTerm"
-                            className="bg-gray-100 w-4/5"
+                            className="border-b border-gray-600"
                             value={searchTerm} 
                             onChange={(e) => setSearchTerm(e.target.value)} 
                         />
@@ -613,7 +617,7 @@ export default function DisplayListings() {
                             // Clear URL parameters
                             window.history.pushState({}, '', window.location.pathname);
                         }} 
-                        className="underline cursor-pointer mb-4 inline-block"
+                        className="underline cursor-pointer mb-4 inline-block text-gray-800 text-sm"
                     >
                         Clear All
                     </span>
@@ -634,9 +638,10 @@ export default function DisplayListings() {
                         onClick={() => setShowMenu(false)}
                     ></div>
                 )}            
-                <div className="hidden lg:block">
+                <a className="hidden lg:block" href="/about" >About</a>
+                {/* <div className="hidden lg:block">
                     <AddEmailForm /> 
-                </div>
+                </div> */}
             </div>
 
             {/* Main Col */}

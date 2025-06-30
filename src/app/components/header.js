@@ -1,11 +1,11 @@
 import Link from "next/link";
 
-export default async function header() {
+export default function header() {
  return (
-  <header className="p-4 flex flex-row justify-start">
+  <header className="flex flex-row justify-start mb-8">
     <Link href="/">
       <img 
-        className="h-24 lg:hidden"
+        className="h-24"
         src="/baal-handwritten-logo.png" 
         alt="Bay Area Art List Logo"                            
       />    

@@ -6,6 +6,8 @@ import urlBuilder from '@sanity/image-url'
 import {getImageDimensions} from '@sanity/asset-utils'
 import { useState, useEffect } from "react";
 import getContent from './getContent';
+import Header from "../../components/header";
+
 
 const builder = urlBuilder({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
@@ -57,8 +59,8 @@ export default function About() {
   }, []);
 
   return (
-    <div className="flex flex-col mt-8 px-4 sm:px-4 font-[family-name:var(--font-geist-sans)]">
-      
+    <div className="flex flex-col px-4 sm:px-4 font-[family-name:var(--font-geist-sans)]">
+      <Header />
       {content.map((item, index) => (
         <div className="prose" key={index}>
           <h1>{item.Header}</h1>
