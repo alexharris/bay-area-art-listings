@@ -60,6 +60,7 @@ const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
 
 // Function to determine if a venue is open today
 function determineOpenHoursFilter(item) {
+  console.log('ehllo')
     // Get current day name
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const today = new Date();
@@ -69,7 +70,7 @@ function determineOpenHoursFilter(item) {
     if (!item.locationHours) {
       return true;
     } else {
-      return !item.locationHours[dayOfWeek].toLowerCase().includes('closed');
+      return item.locationHours[dayOfWeek] && !item.locationHours[dayOfWeek].toLowerCase().includes('closed');
     }
 }
 

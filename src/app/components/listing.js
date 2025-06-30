@@ -32,7 +32,7 @@ export default function Listings({ listings, formatDate }) {
                              
                 {item.EventUrl
                   ? <div className="flex flex-col justify-between mb-2 lg:mb-0 w-full lg:w-1/2">
-                      <div>
+                      <div className="flex flex-col">
                         <a 
                           href={item.EventUrl}
                           target="_blank"
@@ -40,18 +40,18 @@ export default function Listings({ listings, formatDate }) {
                         >
                           <h2 className=""><span className="inline-block float-left">{item.Event}</span></h2>
                         </a>
-                        {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
+                        {item.Notes && <div className="my-2">{item.Notes}</div>}
                       </div>
                       <a href={item.EventUrl} target="_blank">
                         <svg class="feather feather-external-link w-6 lg:w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>                      
                       </a>                      
                     </div>
-                  : <span className="text-2xl lg:text-3xl mb-2 lg:mb-0 w-full lg:w-1/2">
+                  : <span className="flex flex-col text-2xl lg:text-3xl mb-2 lg:mb-0 w-full lg:w-1/2">
                       <h2>{item.Event}</h2>
-                      {item.Notes && <div className="mt-2">Notes: {item.Notes}</div>}
+                      {item.Notes && <div className="my-2">{item.Notes}</div>}
                     </span>
                 }                   
-              {/* Right Column - Date Info  */}
+              {/* Middle Column - Date Info  */}
               <div className="flex flex-col gap-2 w-full lg:w-1/4 text-left items-start justify-between">                
                   <span className="font-semibold">{formatDate(item.StartDate)} - {formatDate(item.EndDate)}</span>
                   <CalendarLink listing={item} location="" />                
@@ -59,10 +59,10 @@ export default function Listings({ listings, formatDate }) {
                 
                
         
-              {/* Middle Column - Location Info */}
+              {/* Right Column - Location Info */}
               <div className="flex flex-col items-start justify-between w-full lg:w-1/4">              
                     {item.locationName.toLowerCase() === 'various' 
-                    ? <div className="flex flex-row">
+                    ? <div className="flex flex-row font-semibold">
                       {item.eventUrl
                         ? <a 
                             href={item.eventUrl}
@@ -100,7 +100,6 @@ export default function Listings({ listings, formatDate }) {
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                        
                         <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                         {/* {item.locationAddress} */}
                       </a>
