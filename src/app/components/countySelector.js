@@ -7,9 +7,16 @@ function getZipcodesByCounty(county) {
   return zipcodes;
 }
 
-const CountySelector = ({ onCountyChange }) => {
+const CountySelector = ({ onCountyChange, selectedCountyProp }) => {
 
   const [selectedCounty, setSelectedCounty] = useState('');
+  
+  useEffect(() => {
+    // Reset local state when parent component passes an empty array
+    if (selectedCountyProp && Array.isArray(selectedCountyProp) && selectedCountyProp.length === 0) {
+      setSelectedCounty('');
+    }
+  }, [selectedCountyProp]);
   
   useEffect(() => {
     // Only run in the browser

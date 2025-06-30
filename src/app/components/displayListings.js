@@ -562,7 +562,10 @@ export default function DisplayListings() {
                     }                                                
                
                     <div className="flex flex-col">
-                        <CountySelector onCountyChange={setSelectedCounty} />                                       
+                        <CountySelector 
+                            onCountyChange={setSelectedCounty} 
+                            selectedCountyProp={selectedCounty} 
+                        />                                       
                     </div>   
                     <label className="pb-2">
                         <input 
@@ -588,11 +591,14 @@ export default function DisplayListings() {
                             onChange={(e) => setSearchTerm(e.target.value)} 
                         />
                     </div>                       
-                    {/* <span 
+                    <span 
                         onClick={() => {
                             setHighlightsOnly(false);
                             setSearchTerm('');
                             setSelectedLocation('');
+                            // Reset county filter - this will also trigger the useEffect in CountySelector
+                            setSelectedCounty([]);
+                            setOpenHoursOnly(false);
                             setCalendarTypeFilter('onview');
                             
                             // Create proper Date objects for startOfWeek and endOfWeek
@@ -602,12 +608,15 @@ export default function DisplayListings() {
                             weekTo.setHours(23, 59, 59, 999);
                             
                             setCalendarDateRangeFilter({ from: weekFrom, to: weekTo });
-                            setSortDate({from: new Date(), to: new Date()});
+                            setCalendarDateRangePreset('thisWeek');
+                            
+                            // Clear URL parameters
+                            window.history.pushState({}, '', window.location.pathname);
                         }} 
-                        className="underline cursor-pointer"
+                        className="underline cursor-pointer mb-4 inline-block"
                     >
-                        Clear All Filters
-                    </span>  */}
+                        Clear All
+                    </span>
                                 
                     <button 
                         onClick={() => {
