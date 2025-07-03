@@ -806,6 +806,7 @@ export default function DisplayListings() {
                                                                     <h2>{currentItem.Event}</h2>
                                                                     </span>
                                                             }  
+                                                            <span className="font-semibold">{formatDate(currentItem.StartDate)} - {formatDate(currentItem.EndDate)}</span>
                                                             <a
                                                                 className="flex flex-row gap-1 items-center text-black"
                                                                 href={currentItem.locationUrl} 
@@ -814,6 +815,7 @@ export default function DisplayListings() {
                                                                 <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-globe w-4" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>                        
                                                                 {currentItem.locationName}
                                                             </a>
+                                                            
                                                             <a
                                                                 className="flex flex-row gap-1 items-center text-black"
                                                                 target='_blank'
@@ -830,7 +832,7 @@ export default function DisplayListings() {
                                                                         onClick={handlePrevious}
                                                                         className="text-sm px-2 hover:bg-gray-100 flex flex-row gap-1 items-center"
                                                                     >
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Prev
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Prev
                                                                     </button>
                                                                     <span className="text-xs text-gray-500">
                                                                         {currentPage + 1} of {totalItems}
@@ -839,7 +841,7 @@ export default function DisplayListings() {
                                                                         onClick={handleNext}
                                                                         className="text-sm px-2 hover:bg-gray-100 flex flex-row gap-1 items-center"
                                                                     >
-                                                                        Next <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                                                        Next <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                                                                     </button>
                                                                 </div>
                                                             )}
