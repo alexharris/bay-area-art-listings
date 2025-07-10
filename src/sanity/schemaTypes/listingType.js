@@ -39,7 +39,15 @@ export const listingType = defineType({
     }),
     defineField({
       name: 'Notes',
-      type: 'text',
-    }),
+      type: 'array', 
+      of: [
+        {
+          type: 'block'
+        },
+        {
+          type: 'image'
+        }        
+      ]      
+    })
   ],
 })

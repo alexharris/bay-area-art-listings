@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import CalendarLink from './calendarLink';
 import TodaysHoursStatus from './TodaysHoursStatus';
+import NotesRenderer from './NotesRenderer';
 
 export default function Listings({ listings, formatDate }) {
     const [showDetails, setShowDetails] = useState({});
@@ -21,8 +22,6 @@ export default function Listings({ listings, formatDate }) {
         };
     }, []);
 
-    
-
     return (
       <ul id="list-view" className="w-full">
         {
@@ -40,7 +39,8 @@ export default function Listings({ listings, formatDate }) {
                         >
                           <h2 className=""><span className="inline-block float-left">{item.Event}</span></h2>
                         </a>
-                        {item.Notes && <div className="my-2">{item.Notes}</div>}
+
+                        <NotesRenderer notes={item.Notes} itemIndex={index} />
                       </div>
                       <a href={item.EventUrl} target="_blank">
                         <svg className="feather feather-external-link w-6 lg:w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>                      
@@ -48,7 +48,7 @@ export default function Listings({ listings, formatDate }) {
                     </div>
                   : <span className="flex flex-col text-2xl lg:text-3xl mb-2 lg:mb-0 w-full lg:w-1/2">
                       <h2>{item.Event}</h2>
-                      {item.Notes && <div className="my-2">{item.Notes}</div>}
+                      <NotesRenderer notes={item.Notes} itemIndex={index} />
                     </span>
                 }                   
               {/* Middle Column - Date Info  */}
