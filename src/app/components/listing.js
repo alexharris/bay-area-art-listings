@@ -52,8 +52,11 @@ export default function Listings({ listings, formatDate }) {
                     </span>
                 }                   
               {/* Middle Column - Date Info  */}
-              <div className="flex flex-col gap-2 w-full lg:w-1/4 text-left items-start justify-between">                
-                  <span className="font-semibold">{formatDate(item.StartDate)} - {formatDate(item.EndDate)}</span>
+              <div className="flex flex-col gap-2 w-full lg:w-1/4 text-left items-start justify-between">      
+                  
+                  <span className="font-semibold">
+                    {item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`}
+                  </span>
                   <CalendarLink listing={item} location="" />                
               </div>
                 

@@ -806,7 +806,9 @@ export default function DisplayListings() {
                                                                     <h2>{currentItem.Event}</h2>
                                                                     </span>
                                                             }  
-                                                            <span className="font-semibold">{formatDate(currentItem.StartDate)} - {formatDate(currentItem.EndDate)}</span>
+                                                            <span className="font-semibold">
+                                                                {currentItem.DateOverride || `${formatDate(currentItem.StartDate)} - ${formatDate(currentItem.EndDate)}`}
+                                                            </span>                                                            
                                                             <a
                                                                 className="flex flex-row gap-1 items-center text-black"
                                                                 href={currentItem.locationUrl} 

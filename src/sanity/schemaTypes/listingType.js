@@ -26,7 +26,12 @@ export const listingType = defineType({
       options: {
         dateFormat: 'MMMM D, YYYY'
       }
-    }),    
+    }),   
+    defineField({
+      name: 'DateOverride',
+      type: 'string',
+      description: 'If filled, this will display instead of the date fields'
+    }),     
     defineField({
       name: 'Highlight',
       type: 'boolean',
@@ -40,6 +45,7 @@ export const listingType = defineType({
     defineField({
       name: 'Notes',
       type: 'array', 
+      description: 'Notes about the listing. Use +++ to separate preview and expanded text.',
       of: [
         {
           type: 'block'
