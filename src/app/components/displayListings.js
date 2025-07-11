@@ -221,8 +221,16 @@ export default function DisplayListings() {
         const filteredListings = getFilteredListings(filters, listings);
         const sortedListings = sortListingsChronologically(filteredListings)
         const sortedListingsAlphabetically = filteredListings.sort((a, b) => a.Event.localeCompare(b.Event));
+        // Sort listings by end date (soonest first)
+        const sortedListingsBySoonestEndDate = filteredListings.sort((a, b) => {
+            // Convert end dates to Date objects for comparison
+            const endDateA = new Date(a.EndDate);
+            const endDateB = new Date(b.EndDate);
+            // Sort by ascending order (soonest first)
+            return endDateA - endDateB;
+        });
         
-        setFilteredListings(sortedListingsAlphabetically);
+        setFilteredListings(sortedListingsBySoonestEndDate);
         setDisplayedResults(filteredListings.length);
         
         // getListingsForThisWeek(filters, listings);
