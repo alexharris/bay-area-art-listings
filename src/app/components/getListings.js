@@ -13,6 +13,8 @@ export default async function getListings() {
     let today = new Date().toISOString().split('T')[0];
     let data = await client.fetch('*[_type == "listing" && EndDate > $today]', {today});    
 
+    console.log(data)
+
     // get the locations reference by the listing
     const locations = await Promise.all(data.map(async listing => {
       const location = await client.fetch(`*[_type == "location" && _id == "${listing.Location._ref}"]`);      

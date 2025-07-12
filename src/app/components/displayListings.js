@@ -14,6 +14,7 @@ import "react-day-picker/style.css";
 import AddEmailForm from './addEmailForm';
 import { getFilteredListings } from '../../utils/filters';
 import { sortListingsChronologically } from '../../utils/sort'; 
+import { extractPortableTextContent } from '../../utils/helpers';
 import MobileIconMenu from './mobileIconMenu';
 import MobileFilterBottomSheet from './mobileFilterBottomSheet';
 import Link from "next/link";
@@ -745,9 +746,15 @@ export default function DisplayListings() {
                                             .filter(item => highlightsOnly ? item.Highlight : true)                                        
                                             .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
                                             .filter(item => item.locationName.toLowerCase() !== 'various')
-                                            .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                                                    item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                                                    item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()));
+                                            .filter(item => {
+                                                const searchLower = searchTerm.toLowerCase();
+                                                
+                                                return item.Event.toLowerCase().includes(searchLower) || 
+                                                       item.locationName.toLowerCase().includes(searchLower) || 
+                                                       item.locationAddress.toLowerCase().includes(searchLower) ||
+                                                       extractPortableTextContent(item.Notes).toLowerCase().includes(searchLower) ||
+                                                       item.locationUrl.toLowerCase().includes(searchLower);
+                                            });
                                         
                                         // Group listings by location coordinates
                                         const locationGroups = {};
@@ -866,7 +873,7 @@ export default function DisplayListings() {
                                 </div>
                             </div>
                         ) : (
-                            <Listing listings={filteredListings} formatDate={formatDate} />
+                            <Listing listings={filteredListings} formatDate={formatDate} />                            
                         )}
                     </>
                 )}
