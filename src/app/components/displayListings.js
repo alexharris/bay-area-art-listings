@@ -661,10 +661,10 @@ export default function DisplayListings() {
                     </div>
                 ) : (
                     <>  
-                        <div className="flex flex-row justify-between align-bottom items-center border-b border-dashed border-black pb-2 mb-2">
-                    
-                            <div className="flex flex-row items-center justify-between w-full">
-                                <div className="flex flex-row gap-2 lg:items-center w-full lg:w-2/3">
+                        {/* Top bar */}
+                        <div className="flex flex-col justify-between align-bottom items-center  sticky top-0 z-30 bg-white">                    
+                            <div className="flex flex-row items-center justify-between w-full border-b border-dashed border-black py-2">
+                                <div className="flex flex-row gap-1 lg:items-start w-full lg:w-2/3">
                                     <DisplayFilters                                 
                                         type={calendarTypeFilter}
                                         presetRange={calendarDateRangePreset}
@@ -672,7 +672,7 @@ export default function DisplayListings() {
                                         displayedResults={displayedResults}
                                         selectedCounty={selectedCounty}
                                     />                                    
-                                    <span className="hidden lg:block">{displayedResults} results</span>
+                                    <span className="hidden lg:block text-xs">({displayedResults})</span>
                                 </div>
                                 {/* <svg className="icon-link block lg:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
                                 <div className="hidden lg:flex flex-row gap-2 items-center">
@@ -721,8 +721,9 @@ export default function DisplayListings() {
                                         </svg>
                                     </div>
                                 </div>
-                            </div>                                             
+                            </div>                                                                    
                         </div>
+
                         {displayedResults === 0 && 
                             <div className="text-center flex-grow flex flex-col justify-center text-2xl py-36">
                                 <p className="pb-4">No Results</p>
