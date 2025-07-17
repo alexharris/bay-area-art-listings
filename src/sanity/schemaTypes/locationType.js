@@ -29,10 +29,18 @@ export const locationType = defineType({
     defineField({
       name: 'Geolocation',
       type: 'geopoint',
+      options: {
+        collapsible: true, // Makes the whole fieldset collapsible
+        collapsed: true, // Defines if the fieldset should be collapsed by default or not
+      },      
     }),
     defineField({
       name: 'Hours',
       type: 'object',
+      options: {
+        collapsible: true, // Makes the whole fieldset collapsible
+        collapsed: true, // Defines if the fieldset should be collapsed by default or not
+      },      
       fields: [
         {
           name: 'Monday',
@@ -63,6 +71,11 @@ export const locationType = defineType({
           type: 'string',
         },
       ]
-    })    
+    }),
+    defineField({
+      name: 'InternalNotes',
+      type: 'string',
+      description: 'Notes just for internal use, not displayed on the site.',
+    }),         
   ],
 })

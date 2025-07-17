@@ -54,6 +54,11 @@ export const listingType = defineType({
           type: 'image'
         }        
       ]      
-    })
+    }),
+    defineField({
+      name: 'InternalNotes',
+      type: 'string',
+      description: 'Notes just for internal use, not displayed on the site.',
+    }),    
   ],
 })
