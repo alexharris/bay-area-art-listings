@@ -28,6 +28,7 @@ export default async function getListings() {
       locationAddress: locations[index][0]?.Address || 'Address Not Listed',
       locationUrl: locations[index][0]?.Url || '',
       locationHours: locations[index][0]?.Hours || '',
+      locationInstagram: locations[index][0]?.Instagram || '',
     }));
 
     if(data.length > 0) {

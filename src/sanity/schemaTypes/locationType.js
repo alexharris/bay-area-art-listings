@@ -27,6 +27,11 @@ export const locationType = defineType({
       type: 'url'
     }),    
     defineField({
+      title: 'Instagram',
+      name: 'Instagram',
+      type: 'string'
+    }),      
+    defineField({
       name: 'Geolocation',
       type: 'geopoint',
       options: {

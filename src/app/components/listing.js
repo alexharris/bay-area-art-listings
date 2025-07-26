@@ -197,6 +197,21 @@ export default function Listings({ listings, formatDate }) {
                           </div>
                         )}
                       </div>
+                      {console.log(item)}
+                      {item.locationInstagram && (
+                        <a
+                          className="underline flex flex-row gap-1 items-center"
+                          href={`https://instagram.com/${item.locationInstagram.replace(/^@/, '')}`}
+                          target="_blank"
+                          title="Instagram"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-instagram w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+                          </svg>
+                        </a>
+                      )}
                     </div>                             
                   </>                  
               }                                                
