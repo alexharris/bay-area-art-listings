@@ -197,7 +197,6 @@ export default function Listings({ listings, formatDate }) {
                           </div>
                         )}
                       </div>
-                      {console.log(item)}
                       {item.locationInstagram && (
                         <a
                           className="underline flex flex-row gap-1 items-center"
