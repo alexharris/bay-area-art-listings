@@ -54,14 +54,28 @@ function formatDate(dateString) {
 }
 
 export default function DisplayListings() {
-    const today = new Date();
-    const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-    const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6));
+    // Get today's date in US West Coast (Pacific Time)
+    const today = new Date(
+        new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
+    );
+    // Always use a fresh copy of today's date for calculations to avoid mutation issues
+    console.log('Today\'s date:', today);
+
+    // Calculate start and end of week using a new Date instance
+    const startOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+    const endOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 6);
+
+    // Calculate start and end of month
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-    const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);   
 
+    // Calculate start and end of next month
+    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+
+    console.log('today:', today);
+    console.log('startOfMonth:', startOfMonth);
+    console.log('endOfMonth:', endOfMonth);
 
     // Initial data
     const [listings, setListings] = useState([]);
@@ -263,11 +277,10 @@ export default function DisplayListings() {
             
             startOfCurrentMonth.setHours(0, 0, 0, 0);
             endOfCurrentMonth.setHours(0,0,0,0);
-            
+
             const isDefaultMonthRange = 
                 calendarDateRangeFilter.from.getTime() === startOfCurrentMonth.getTime() && 
                 calendarDateRangeFilter.to.getTime() === endOfCurrentMonth.getTime();
-            
 
             if (!isDefaultMonthRange) {
                 params.set('dateFrom', format(new Date(calendarDateRangeFilter.from), 'yyyy-MM-dd'));
@@ -563,7 +576,7 @@ export default function DisplayListings() {
                         </div>
                     </div>   
                     {showCustomCalendar &&
-                        <div >
+                        <div>
                             <DayPicker
                                 mode="range"
                                 onSelect={(dateRange) => updateCalendarDateRangeFilter(dateRange)}

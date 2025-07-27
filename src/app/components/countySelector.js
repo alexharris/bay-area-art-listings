@@ -10,7 +10,7 @@ function getZipcodesByCounty(county) {
 const CountySelector = ({ onCountyChange, selectedCountyProp }) => {
 
   const [selectedCounty, setSelectedCounty] = useState('');
-  console.log('CountySelector rendered with selectedCounty:', selectedCounty);
+
   useEffect(() => {
     // Reset local state when parent component passes an empty array
     if (selectedCountyProp && Array.isArray(selectedCountyProp) && selectedCountyProp.length === 0) {
