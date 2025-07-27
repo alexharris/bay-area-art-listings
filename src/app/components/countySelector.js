@@ -10,11 +10,11 @@ function getZipcodesByCounty(county) {
 const CountySelector = ({ onCountyChange, selectedCountyProp }) => {
 
   const [selectedCounty, setSelectedCounty] = useState('');
-  
+  console.log('CountySelector rendered with selectedCounty:', selectedCounty);
   useEffect(() => {
     // Reset local state when parent component passes an empty array
     if (selectedCountyProp && Array.isArray(selectedCountyProp) && selectedCountyProp.length === 0) {
-      setSelectedCounty('');
+      setSelectedCounty('All');
     }
   }, [selectedCountyProp]);
   
@@ -57,7 +57,7 @@ const CountySelector = ({ onCountyChange, selectedCountyProp }) => {
           MozAppearance: 'none' 
         }}
       >
-        <option value="">Select a county</option>
+        <option value="All">Select a county</option>
         <option value="Alameda">Alameda</option>
         <option value="Contra Costa">Contra Costa</option>
         <option value="Marin">Marin</option>
