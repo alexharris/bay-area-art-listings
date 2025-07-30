@@ -21,6 +21,7 @@ import Link from "next/link";
 import Listing from './listing';
 import FilterPresets from './filterPresets';
 import TodaysHoursStatus from './TodaysHoursStatus';
+import SortSelector from './sortSelector';
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
@@ -59,7 +60,6 @@ export default function DisplayListings() {
         new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
     );
     // Always use a fresh copy of today's date for calculations to avoid mutation issues
-    console.log('Today\'s date:', today);
 
     // Calculate start and end of week using a new Date instance
     const startOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
@@ -73,9 +73,6 @@ export default function DisplayListings() {
     const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
     const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
 
-    console.log('today:', today);
-    console.log('startOfMonth:', startOfMonth);
-    console.log('endOfMonth:', endOfMonth);
 
     // Initial data
     const [listings, setListings] = useState([]);
@@ -104,6 +101,7 @@ export default function DisplayListings() {
     const [showBottomSheet, setShowBottomSheet] = useState(false);
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
+    const [sortMethod, setSortMethod] = useState('closingSoon');
 
 
 
@@ -234,18 +232,9 @@ export default function DisplayListings() {
         //     });
         
         const filteredListings = getFilteredListings(filters, listings);
-        const sortedListings = sortListingsChronologically(filteredListings)
-        const sortedListingsAlphabetically = filteredListings.sort((a, b) => a.Event.localeCompare(b.Event));
-        // Sort listings by end date (soonest first)
-        const sortedListingsBySoonestEndDate = filteredListings.sort((a, b) => {
-            // Convert end dates to Date objects for comparison
-            const endDateA = new Date(a.EndDate);
-            const endDateB = new Date(b.EndDate);
-            // Sort by ascending order (soonest first)
-            return endDateA - endDateB;
-        });
+        const sortedListings = applySorting(filteredListings, sortMethod);
         
-        setFilteredListings(sortedListingsBySoonestEndDate);
+        setFilteredListings(sortedListings);
         setDisplayedResults(filteredListings.length);
         
         // getListingsForThisWeek(filters, listings);
@@ -297,7 +286,7 @@ export default function DisplayListings() {
         window.history.pushState({}, '', newUrl);
 
 
-    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, openHoursOnly, searchTerm, listings, selectedLocation, selectedCounty]);
+    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, openHoursOnly, searchTerm, listings, selectedLocation, selectedCounty, sortMethod]);
 
     // Toggle map view
     useEffect(() => {
@@ -379,6 +368,28 @@ export default function DisplayListings() {
         
         setCalendarDateRangeFilter(adjustedFilter);
         setCalendarDateRangePreset('custom');
+    }
+
+    function applySorting(listings, method) {
+        switch (method) {
+            case 'alphabetical':
+                return [...listings].sort((a, b) => a.Event.localeCompare(b.Event));
+            case 'chronological':
+                return sortListingsChronologically([...listings]);
+            case 'openingSoon':
+                return [...listings].sort((a, b) => {
+                    const startDateA = new Date(a.StartDate);
+                    const startDateB = new Date(b.StartDate);
+                    return startDateA - startDateB;
+                });
+            case 'closingSoon':
+            default:
+                return [...listings].sort((a, b) => {
+                    const endDateA = new Date(a.EndDate);
+                    const endDateB = new Date(b.EndDate);
+                    return endDateA - endDateB;
+                });
+        }
     }
 
 
@@ -601,7 +612,7 @@ export default function DisplayListings() {
                             onChange={toggleOpenHoursOnly} 
                         />
                         Hide closed
-                    </label>                                  
+                    </label>      
                     <div className="flex flex-row pb-2 lg:mt-0 gap-2 items-center">
                         <label htmlFor="searchTerm" className="flex flex-row items-center gap-1">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -677,7 +688,7 @@ export default function DisplayListings() {
                         {/* Top bar */}
                         <div className="flex flex-col justify-between align-bottom items-center  sticky top-0 z-30 bg-white">                    
                             <div className="flex flex-row items-center justify-between w-full border-b border-dashed border-black py-2">
-                                <div className="flex flex-row gap-1 lg:items-start w-full lg:w-2/3">
+                                <div className="flex flex-row gap-1 lg:items-start">
                                     <DisplayFilters                                 
                                         type={calendarTypeFilter}
                                         presetRange={calendarDateRangePreset}
@@ -687,6 +698,10 @@ export default function DisplayListings() {
                                     />                                    
                                     <span className="hidden lg:block text-xs">({displayedResults})</span>
                                 </div>
+                                <SortSelector 
+                                    onSortChange={setSortMethod}
+                                    currentSort={sortMethod}
+                                />
                                 {/* <svg className="icon-link block lg:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
                                 <div className="hidden lg:flex flex-row gap-2 items-center">
                                     <div className="flex items-center">
