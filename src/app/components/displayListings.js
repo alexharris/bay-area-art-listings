@@ -101,7 +101,7 @@ export default function DisplayListings() {
     const [showBottomSheet, setShowBottomSheet] = useState(false);
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
-    const [sortMethod, setSortMethod] = useState('closingSoon');
+    const [sortMethod, setSortMethod] = useState('openingSoon');
 
 
 
@@ -146,7 +146,7 @@ export default function DisplayListings() {
                 }
             } else {
                 // Default to 'onview' if no type is specified
-                setCalendarTypeFilter('onview');    
+                setCalendarTypeFilter('opening');  
             }
 
             // Handle date range parameters
@@ -202,6 +202,7 @@ export default function DisplayListings() {
 
     // Update filtered listings when filters change
     useEffect(() => {
+
         // Create an object of all of the filter variables
         const filters = {
             highlightsOnly: highlightsOnly,
@@ -212,6 +213,7 @@ export default function DisplayListings() {
             calendarTypeFilter: calendarTypeFilter,
             calendarDateRangeFilter: calendarDateRangeFilter,
         };
+
 
         // const filteredListings = listings
         //     .filter(item => highlightsOnly ? item.Highlight : true)
@@ -254,9 +256,9 @@ export default function DisplayListings() {
 
         if (openHoursOnly) params.set('openHoursOnly', 'true');
 
-        if (calendarTypeFilter && calendarTypeFilter !== 'opening') {
+        // if (calendarTypeFilter && calendarTypeFilter !== 'opening') {
             params.set('calendarTypeFilter', calendarTypeFilter);
-        }
+        // }
 
         // only need to display the date range in the URL if it's not the default month range
         if (calendarDateRangeFilter.from && calendarDateRangeFilter.to) {
@@ -611,8 +613,24 @@ export default function DisplayListings() {
                             checked={openHoursOnly} 
                             onChange={toggleOpenHoursOnly} 
                         />
-                        Hide closed
-                    </label>      
+                        Only show venues open today
+                    </label>
+
+                    <div className="pb-2">
+                        <label htmlFor="calendarTypeDropdown" className="mr-2">Shows that are </label>
+                        <select
+                            id="calendarTypeDropdown"
+                            value={calendarTypeFilter}
+                            onChange={e => setCalendarTypeFilter(e.target.value)}
+                            className="border border-gray-300 rounded px-2 py-1"
+                        >
+                            <option value="onview">On View</option>
+                            <option value="opening">Opening</option>
+                            <option value="closing">Closing</option>
+                            
+                        </select>
+                    </div>
+                    
                     <div className="flex flex-row pb-2 lg:mt-0 gap-2 items-center">
                         <label htmlFor="searchTerm" className="flex flex-row items-center gap-1">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -25,7 +25,7 @@ export default function calendarLink(data) {
     // Set the initial state for the ICS event based on the selected date
     // For APPLE calendar
     useEffect(() => {
-        console.log(selectedDate)
+        
         if (selectedDate === 'start') {
             setIcsEvent({
                 title: data.listing.Event,
