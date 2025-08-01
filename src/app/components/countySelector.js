@@ -51,7 +51,7 @@ const CountySelector = ({ onCountyChange, selectedCountyProp }) => {
         id="countyFilter" 
         value={selectedCounty}
         onChange={handleCountyChange}
-        className="border border-gray-300 rounded px-2 py-1"
+        className="border border-gray-300 bg-white rounded px-2 py-1"
 
       >
         <option value="All">Select a county</option>

@@ -605,7 +605,7 @@ export default function DisplayListings() {
                             id="calendarTypeDropdown"
                             value={calendarTypeFilter}
                             onChange={e => setCalendarTypeFilter(e.target.value)}
-                            className="border border-gray-300 rounded px-2 py-1"                           
+                            className="border border-gray-300 bg-white rounded px-2 py-1"                           
                         >
                             <option value="onview">Show everything</option>
                             <option value="opening">Openings</option>
@@ -633,15 +633,16 @@ export default function DisplayListings() {
                     
                     <div className="flex flex-row pb-2 lg:mt-0 gap-2 items-center">
                         <label htmlFor="searchTerm" className="flex flex-row items-center gap-1">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            {/* <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
                             <path d="M14 14L11.1 11.1" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg> <span className="sr-only">Search</span>
+                            </svg>  */}
+                            <span className="">Search</span>
                         </label>
                         <input 
                             type="text" 
                             id="searchTerm"
-                            className="border-b border-gray-600"
+                            className="border border-gray-300 rounded px-2 mr-2 py-1"
                             value={searchTerm} 
                             onChange={(e) => setSearchTerm(e.target.value)} 
                         />
