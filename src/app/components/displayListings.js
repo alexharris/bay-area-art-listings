@@ -599,7 +599,20 @@ export default function DisplayListings() {
                             />                        
                         </div>
                     }                                                
-               
+                    <div className="pb-0">
+                        <label htmlFor="calendarTypeDropdown" className="mr-2">Event Type</label>
+                        <select
+                            id="calendarTypeDropdown"
+                            value={calendarTypeFilter}
+                            onChange={e => setCalendarTypeFilter(e.target.value)}
+                            className="border border-gray-300 rounded px-2 py-1"                           
+                        >
+                            <option value="onview">Show everything</option>
+                            <option value="opening">Openings</option>
+                            <option value="closing">Closings</option>
+                            
+                        </select>
+                    </div>               
                     <div className="flex flex-col">
                         <CountySelector 
                             onCountyChange={setSelectedCounty} 
@@ -616,20 +629,7 @@ export default function DisplayListings() {
                         Only show venues open today
                     </label>
 
-                    <div className="pb-2">
-                        <label htmlFor="calendarTypeDropdown" className="mr-2">Shows that are </label>
-                        <select
-                            id="calendarTypeDropdown"
-                            value={calendarTypeFilter}
-                            onChange={e => setCalendarTypeFilter(e.target.value)}
-                            className="border border-gray-300 rounded px-2 py-1"
-                        >
-                            <option value="onview">On View</option>
-                            <option value="opening">Opening</option>
-                            <option value="closing">Closing</option>
-                            
-                        </select>
-                    </div>
+
                     
                     <div className="flex flex-row pb-2 lg:mt-0 gap-2 items-center">
                         <label htmlFor="searchTerm" className="flex flex-row items-center gap-1">
