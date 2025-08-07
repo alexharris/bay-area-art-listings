@@ -13,7 +13,7 @@ import CountySelector from './countySelector';
 import "react-day-picker/style.css";
 import AddEmailForm from './addEmailForm';
 import { getFilteredListings } from '../../utils/filters';
-import { sortListingsChronologically } from '../../utils/sort'; 
+import { sortListingsChronologically, applySorting } from '../../utils/sort'; 
 import { extractPortableTextContent } from '../../utils/helpers';
 import MobileIconMenu from './mobileIconMenu';
 import MobileFilterBottomSheet from './mobileFilterBottomSheet';
@@ -370,28 +370,6 @@ export default function DisplayListings() {
         
         setCalendarDateRangeFilter(adjustedFilter);
         setCalendarDateRangePreset('custom');
-    }
-
-    function applySorting(listings, method) {
-        switch (method) {
-            case 'alphabetical':
-                return [...listings].sort((a, b) => a.Event.localeCompare(b.Event));
-            case 'chronological':
-                return sortListingsChronologically([...listings]);
-            case 'openingSoon':
-                return [...listings].sort((a, b) => {
-                    const startDateA = new Date(a.StartDate);
-                    const startDateB = new Date(b.StartDate);
-                    return startDateA - startDateB;
-                });
-            case 'closingSoon':
-            default:
-                return [...listings].sort((a, b) => {
-                    const endDateA = new Date(a.EndDate);
-                    const endDateB = new Date(b.EndDate);
-                    return endDateA - endDateB;
-                });
-        }
     }
 
 

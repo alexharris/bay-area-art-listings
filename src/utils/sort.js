@@ -20,9 +20,12 @@ export function sortListingsChronologically(listings, direction = 'asc') {
     }
     
     // Sort by the date
-    return direction === 'desc' 
+    const dateCompare = direction === 'desc' 
       ? dateB.getTime() - dateA.getTime() 
       : dateA.getTime() - dateB.getTime();
+    
+    // If dates are the same, sort by venue name alphabetically
+    return dateCompare !== 0 ? dateCompare : a.locationName.localeCompare(b.locationName);
   });
 
   return sortedListings;
@@ -64,4 +67,36 @@ export function sortListingsByUpcoming(listings) {
   
   // Return upcoming events first, followed by past events
   return [...upcoming, ...past];
+}
+
+/**
+ * Applies different sorting methods to an array of listings
+ * @param {Array} listings - Array of listing objects
+ * @param {string} method - Sorting method: 'alphabetical', 'chronological', 'openingSoon', 'closingSoon'
+ * @returns {Array} - Sorted array of listings
+ */
+export function applySorting(listings, method) {
+  switch (method) {
+    case 'alphabetical':
+      return [...listings].sort((a, b) => a.Event.localeCompare(b.Event));
+    case 'chronological':
+      return sortListingsChronologically([...listings]);
+    case 'openingSoon':
+      return [...listings].sort((a, b) => {
+        const startDateA = new Date(a.StartDate);
+        const startDateB = new Date(b.StartDate);
+        const dateCompare = startDateA - startDateB;
+        // If dates are the same, sort by venue name alphabetically
+        return dateCompare !== 0 ? dateCompare : a.locationName.localeCompare(b.locationName);
+      });
+    case 'closingSoon':
+    default:
+      return [...listings].sort((a, b) => {
+        const endDateA = new Date(a.EndDate);
+        const endDateB = new Date(b.EndDate);
+        const dateCompare = endDateA - endDateB;
+        // If dates are the same, sort by venue name alphabetically
+        return dateCompare !== 0 ? dateCompare : a.locationName.localeCompare(b.locationName);
+      });
+  }
 }

@@ -9,7 +9,6 @@ export default function SortSelector({ onSortChange, currentSort }) {
         { value: 'openingSoon', label: 'Opening Date' },
         { value: 'closingSoon', label: 'Closing Date' },
         { value: 'alphabetical', label: 'Alphabetical' },
-        { value: 'chronological', label: 'Chronological' }
     ];
 
     const handleSortSelect = (sortValue) => {
