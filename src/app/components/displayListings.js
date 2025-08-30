@@ -190,7 +190,7 @@ export default function DisplayListings() {
         setOpenHoursOnly(false);
         setSearchTerm('');
         setSelectedLocation('');
-        setSelectedCounty({});
+        setSelectedCounty([]);
         setSortMethod('openingSoon');
         
         // Reset calendar date range to initial state (10 years from start of month)
