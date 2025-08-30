@@ -346,7 +346,7 @@ export default function DisplayListings() {
             </div>
 
             {/* Main Col */}
-            <div id="main-col" className="flex flex-col justify-start w-full flex-shrink">
+            <div id="main-col" className="flex flex-col justify-start w-full flex-shrink min-h-screen">
                 {loading ? (
                     <div className="animate-pulse text-5xl flex items-center justify-center w-full h-[70vh]">
                         🎨
