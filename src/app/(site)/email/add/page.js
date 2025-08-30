@@ -1,4 +1,4 @@
-import AddEmailForm from '../../../components/addEmailForm'
+import AddEmailForm from '../../../components/old/addEmailForm'
 // import { createClient } from '@supabase/supabase-js'
 
 // const supabase = createClient(

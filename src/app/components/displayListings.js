@@ -11,7 +11,7 @@ import { DayPicker, Select } from "react-day-picker";
 import DisplayFilters from './displayFilters';
 import CountySelector from './countySelector';
 import "react-day-picker/style.css";
-import AddEmailForm from './addEmailForm';
+import AddEmailForm from './old/addEmailForm';
 import { getFilteredListings } from '../../utils/filters';
 import { sortListingsChronologically } from '../../utils/sort'; 
 import { extractPortableTextContent } from '../../utils/helpers';

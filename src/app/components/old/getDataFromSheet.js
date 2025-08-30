@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Papa from 'papaparse';
-import uploadSheetData from '../components/uploadSheetData';
+import uploadSheetData from './uploadSheetData';
 
 function GetDataFromSheet(){
   const [file, setFile] = useState(null);

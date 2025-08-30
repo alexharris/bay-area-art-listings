@@ -1,5 +1,5 @@
 import { createClient } from '@sanity/client';
-import CsvExportButton from '../../components/CsvExportButton';
+import CsvExportButton from '../../components/old/CsvExportButton';
 
 const client = createClient({
     projectId: 'ride9vgj',
