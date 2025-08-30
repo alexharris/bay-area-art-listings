@@ -28,6 +28,8 @@ export default function DisplayFilters({ type, presetRange, customRange, display
         return 'this month';
       case 'nextmonth':
         return 'next month';
+      case 'anytime':
+        return 'anytime';
       default:
         return 'Custom Range';
     }

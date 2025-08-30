@@ -46,15 +46,15 @@ const CountySelector = ({ onCountyChange, selectedCountyProp }) => {
         <path d="M0.330059 9.33014L0.330059 0.669885L7.83006 5.00001L0.330059 9.33014Z" fill="black"/>
       </svg> */}
 
-      <label htmlFor="countyFilter" className="pr-2">Location </label>
+      <label htmlFor="countyFilter" className="pr-2 w-24">County</label>
       <select 
         id="countyFilter" 
         value={selectedCounty}
         onChange={handleCountyChange}
-        className="border border-gray-300 bg-white rounded px-2 py-1"
+        className="border border-gray-300 bg-white rounded px-2 py-1 flex-grow"
 
       >
-        <option value="All">Select a county</option>
+        <option value="All">Anywhere</option>
         <option value="Alameda">Alameda</option>
         <option value="Contra Costa">Contra Costa</option>
         <option value="Marin">Marin</option>

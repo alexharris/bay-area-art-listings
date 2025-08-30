@@ -31,7 +31,6 @@ const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ss
 
 // Feature flags
 const sidebarCalendarIsEnabled = true; // Set to false to disable calendar features
-const simpleDateSelectEnable = false; // Set to true to enable simple date select
 
 
 
@@ -104,76 +103,6 @@ export default function DisplayListings() {
     const [sortMethod, setSortMethod] = useState('openingSoon');
 
 
-
-    // Add this new effect to handle URL parameters
-    useEffect(() => {
-        console.log('Checking URL parameters and setting initial state...');
-        // Only run in the browser
-        if (typeof window !== 'undefined') {
-            const params = new URLSearchParams(window.location.search);
-            
-            // Handle searchTerm parameter
-            if (params.has('searchTerm')) {
-                setSearchTerm(params.get('searchTerm'));
-            }
-            
-            // Handle selectedLocation parameter
-            if (params.has('selectedLocation')) {
-                setSelectedLocation(params.get('selectedLocation'));
-            }
-            
-            // Handle selectedCounty parameter
-            // if (params.has('selectedCounty')) {
-            //     console.log('Selected County:', params.get('selectedCounty'));
-            //     setSelectedCounty(params.get('selectedCounty'));
-            // }
-            
-            // Handle highlightsOnly parameter
-            if (params.has('highlightsOnly')) {
-                setHighlightsOnly(params.get('highlightsOnly') === 'true');
-            }
-
-            // Handle openHoursOnly parameter
-            if (params.has('openHoursOnly')) {
-                setOpenHoursOnly(params.get('openHoursOnly') === 'true');
-            }
-            
-            // Handle calendarTypeFilter parameter
-            if (params.has('calendarTypeFilter')) {
-                const type = params.get('calendarTypeFilter');
-                if (['onview', 'opening', 'closing'].includes(type)) {
-                    setCalendarTypeFilter(type);
-                }
-            } else {
-                // Default to 'onview' if no type is specified
-                setCalendarTypeFilter('opening');  
-            }
-
-            // Handle date range parameters
-            if (params.has('dateFrom') && params.has('dateTo')) {
-                try {
-                    const from = new Date(params.get('dateFrom'));
-                    const to = new Date(params.get('dateTo'));                    
-                    
-                    if (!isNaN(from.getTime()) && !isNaN(to.getTime())) {
-                        updateCalendarDateRangeFilter({
-                            from: params.get('dateFrom'),
-                            to: params.get('dateTo')
-                        });                        
-                    }
-                } catch (e) {
-                    console.error('Invalid date format in URL parameters:', e);
-                }
-            }
-            
-            // Handle view mode parameter
-            if (params.has('view')) {
-                setIsMapView(params.get('view') === 'map');
-            }
-        }
-    }, []);
-
-
     // Load initial data
     useEffect(() => {
         async function fetchData() {
@@ -188,8 +117,11 @@ export default function DisplayListings() {
                 
                 // Only set calendar filters if the feature flag is enabled
                 // if (sidebarCalendarIsEnabled) {
-                setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
-                setCalendarDateRangePreset('thismonth');
+                // Set calendar date range to cover the next ten years
+                const tenYearsFromNow = new Date(startOfMonth);
+                tenYearsFromNow.setFullYear(tenYearsFromNow.getFullYear() + 10);
+                setCalendarDateRangeFilter({ from: startOfMonth, to: tenYearsFromNow });
+                setCalendarDateRangePreset('everything');
                 // }
             } catch (error) {
                 console.error('Data retrieval failed:', error);
@@ -214,80 +146,12 @@ export default function DisplayListings() {
             calendarDateRangeFilter: calendarDateRangeFilter,
         };
 
-
-        // const filteredListings = listings
-        //     .filter(item => highlightsOnly ? item.Highlight : true)
-        //     .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
-        //     .filter(item => item.Event.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationName.toLowerCase().includes(searchTerm.toLowerCase()) || item.locationAddress.toLowerCase().includes(searchTerm.toLowerCase()))
-        //     .filter(item => selectedCounty[0] ? selectedCounty[0].zipcodes.some(zipcode => item.locationAddress.includes(zipcode)) : true)
-        //     .filter(item => {
-        //         const startDate = new Date(item.StartDate);
-        //         const endDate = new Date(item.EndDate);
-        //         if (calendarTypeFilter === 'onview') {
-        //             return (startDate <= calendarDateRangeFilter.to && endDate >= calendarDateRangeFilter.from);
-        //         } else if (calendarTypeFilter === 'opening') {
-        //             return startDate >= calendarDateRangeFilter.from && startDate <= calendarDateRangeFilter.to;
-        //         } else if (calendarTypeFilter === 'closing') {
-        //             return endDate >= calendarDateRangeFilter.from && endDate <= calendarDateRangeFilter.to;
-        //         }
-        //         return true;
-        //     });
-        
         const filteredListings = getFilteredListings(filters, listings);
         const sortedListings = applySorting(filteredListings, sortMethod);
         
         setFilteredListings(sortedListings);
         setDisplayedResults(filteredListings.length);
         
-        // getListingsForThisWeek(filters, listings);
-
-        console.log('updating url params when filters change')
-
-        // Update URL parameters based on filters
-        const params = new URLSearchParams();
-
-        // // Only add non-default values to URL params
-        if (searchTerm) params.set('searchTerm', searchTerm);
-        if (selectedLocation) params.set('selectedLocation', selectedLocation);
-        if (selectedCounty && selectedCounty[0] && selectedCounty[0].county) {
-            params.set('selectedCounty', selectedCounty[0].county);
-        }
-        if (highlightsOnly) params.set('highlightsOnly', 'true');
-
-        if (openHoursOnly) params.set('openHoursOnly', 'true');
-
-        // if (calendarTypeFilter && calendarTypeFilter !== 'opening') {
-            params.set('calendarTypeFilter', calendarTypeFilter);
-        // }
-
-        // only need to display the date range in the URL if it's not the default month range
-        if (calendarDateRangeFilter.from && calendarDateRangeFilter.to) {
-            const today = new Date();
-            const startOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            const endOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-            
-            startOfCurrentMonth.setHours(0, 0, 0, 0);
-            endOfCurrentMonth.setHours(0,0,0,0);
-
-            const isDefaultMonthRange = 
-                calendarDateRangeFilter.from.getTime() === startOfCurrentMonth.getTime() && 
-                calendarDateRangeFilter.to.getTime() === endOfCurrentMonth.getTime();
-
-            if (!isDefaultMonthRange) {
-                params.set('dateFrom', format(new Date(calendarDateRangeFilter.from), 'yyyy-MM-dd'));
-                params.set('dateTo', format(new Date(calendarDateRangeFilter.to), 'yyyy-MM-dd'));
-            }
-        }
-
-        if (isMapView) params.set('view', 'map');
-
-        // // Only update URL if we have params, otherwise clear the search params
-        const newUrl = params.toString() 
-            ? `${window.location.pathname}?${params.toString()}`
-            : window.location.pathname;
-        window.history.pushState({}, '', newUrl);
-
-
     }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, openHoursOnly, searchTerm, listings, selectedLocation, selectedCounty, sortMethod]);
 
     // Toggle map view
@@ -300,11 +164,6 @@ export default function DisplayListings() {
         }
     }, [isMapView]);
 
-    // Toggle highlights filter
-    function toggleHighlights() {
-        setHighlightsOnly(!highlightsOnly);
-    }
-
     function toggleOpenHoursOnly() {
         setOpenHoursOnly(!openHoursOnly);
     }
@@ -313,32 +172,6 @@ export default function DisplayListings() {
     function toggleMapView() {
         const newMapView = !isMapView;
         setIsMapView(newMapView);
-        
-        // Update URL without reloading
-        const params = new URLSearchParams(window.location.search);
-        if (newMapView) {
-            params.set('view', 'map');
-        } else {
-            params.delete('view');
-        }
-        
-        const newUrl = params.toString() 
-            ? `${window.location.pathname}?${params.toString()}`
-            : window.location.pathname;
-        window.history.pushState({}, '', newUrl);
-        
-        // Add event listener for popstate if not already added (for browser back/forward button support)
-        if (typeof window !== 'undefined' && !window._popstateListenerAdded) {
-            window.addEventListener('popstate', () => {
-                // When the user navigates with browser buttons, update the UI accordingly
-                const params = new URLSearchParams(window.location.search);
-                const isMapFromUrl = params.get('view') === 'map';
-                if (isMapFromUrl !== isMapView) {
-                    setIsMapView(isMapFromUrl);
-                }
-            });
-            window._popstateListenerAdded = true;
-        }
     }
 
     function updateCalendarDateRangeFilter(dateRange){
@@ -437,141 +270,10 @@ export default function DisplayListings() {
                             />
                         </Link>
                     </div>
-                    <svg className="absolute top-2 right-2 lg:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                                    
+                    <svg className="absolute top-2 right-2 lg:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ff0000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                             
 
-
-                    {simpleDateSelectEnable &&
-                        <div className="pb-1">
-                            <span 
-                                onClick={() => {
-                                    setCalendarTypeFilter('onview');
-                                    const todayFrom = new Date();
-                                    todayFrom.setHours(0, 0, 0, 0);
-                                    const todayTo = new Date();
-                                    todayTo.setHours(23, 59, 59, 999);
-                                    setCalendarDateRangeFilter({ from: todayFrom, to: todayTo }); 
-                                    setCalendarDateRangePreset('today');
-                                    setShowAdvancedFilters(false);
-                                }}
-                                className={`cursor-pointer hover:underline ${
-                                    calendarTypeFilter === 'onview' && 
-                                    calendarDateRangeFilter.from && 
-                                    calendarDateRangeFilter.from.toDateString() === new Date().toDateString() ? 
-                                    'font-bold' : ''
-                                }`}                                
-                            >
-                                On view today
-                            </span>                               
-                            <br />                             
-                            <span 
-                                onClick={() => {
-                                    setCalendarTypeFilter('opening');
-                                    const june = new Date();
-                                    june.setMonth(5); // June is month 5 (0-indexed)
-                                    const startOfMonth = new Date(june.getFullYear(), 5, 1);
-                                    startOfMonth.setHours(0, 0, 0, 0);
-                                    const endOfMonth = new Date(june.getFullYear(), 5 + 1, 0);
-                                    endOfMonth.setHours(23, 59, 59, 999);
-                                    setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
-                                    setCalendarDateRangePreset('custom')
-                                    setShowAdvancedFilters(false);
-                                }}
-                                className={`cursor-pointer hover:underline ${
-                                    calendarTypeFilter === 'opening' && 
-                                    calendarDateRangeFilter.from && 
-                                    calendarDateRangeFilter.from.getMonth() === 5 && 
-                                    calendarDateRangeFilter.from.getDate() === 1 ? 
-                                    'font-bold' : ''
-                                }`}                                
-                            >
-                                Opening in June
-                            </span>   
-                            <br />
-                            <span 
-                                onClick={() => {
-                                    setCalendarTypeFilter('closing');
-                                    const june = new Date();
-                                    june.setMonth(5); // June is month 5 (0-indexed)
-                                    const startOfMonth = new Date(june.getFullYear(), 5, 1);
-                                    startOfMonth.setHours(0, 0, 0, 0);
-                                    const endOfMonth = new Date(june.getFullYear(), 5 + 1, 0);
-                                    endOfMonth.setHours(23, 59, 59, 999);
-                                    setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
-                                    setCalendarDateRangePreset('custom');
-                                    setShowAdvancedFilters(false);
-                                }}
-                                className={`cursor-pointer hover:underline ${
-                                    calendarTypeFilter === 'closing' && 
-                                    calendarDateRangeFilter.from && 
-                                    calendarDateRangeFilter.from.getMonth() === 5 && 
-                                    calendarDateRangeFilter.from.getDate() === 1 ? 
-                                    'font-bold' : ''
-                                }`}                                
-                            >
-                                Closing in June
-                            </span>   
-                            <br />
-                            <span 
-                                onClick={() => {
-                                    setCalendarTypeFilter('opening');
-                                    const date = new Date();
-                                    date.setMonth(6); 
-                                    const startOfMonth = new Date(date.getFullYear(), 6, 1);
-                                    startOfMonth.setHours(0, 0, 0, 0);
-                                    const endOfMonth = new Date(date.getFullYear(), 6 + 1, 0);
-                                    endOfMonth.setHours(23, 59, 59, 999);
-                                    setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
-                                    setCalendarDateRangePreset('custom');
-                                    setShowAdvancedFilters(false);
-                                }}
-                                className={`cursor-pointer hover:underline ${
-                                    calendarTypeFilter === 'opening' && 
-                                    calendarDateRangeFilter.from && 
-                                    calendarDateRangeFilter.from.getMonth() === 6 && 
-                                    calendarDateRangeFilter.from.getDate() === 1 ? 
-                                    'font-bold' : ''
-                                }`}                                
-                            >
-                                Opening in July
-                            </span>                               
-                            <br />
-                            <span 
-                                onClick={() => {
-                                    setCalendarTypeFilter('closing');
-                                    const date = new Date();
-                                    date.setMonth(6); 
-                                    const startOfMonth = new Date(date.getFullYear(), 6, 1);
-                                    startOfMonth.setHours(0, 0, 0, 0);
-                                    const endOfMonth = new Date(date.getFullYear(), 6 + 1, 0);
-                                    endOfMonth.setHours(23, 59, 59, 999);
-                                    setCalendarDateRangeFilter({ from: startOfMonth, to: endOfMonth });
-                                    setCalendarDateRangePreset('custom');
-                                    setShowAdvancedFilters(false);
-                                }}
-                                className={`cursor-pointer hover:underline ${
-                                    calendarTypeFilter === 'closing' && 
-                                    calendarDateRangeFilter.from && 
-                                    calendarDateRangeFilter.from.getMonth() === 6 && 
-                                    calendarDateRangeFilter.from.getDate() === 1 ? 
-                                    'font-bold' : ''
-                                }`}                                
-                            >
-                                Closing in July
-                            </span>                               
-                            <br />                                                       
-                            <span 
-                                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)} 
-                                className="flex flex-row items-center"
-                            >   
-                                <svg className={`${showAdvancedFilters ? 'translate rotate-90' : ''} `} width="8" height="10" viewBox="0 0 8 10" fill="none" xmlns="http://www.w3.org/2000/svg" >
-                                    <path d="M0.330059 9.33014L0.330059 0.669885L7.83006 5.00001L0.330059 9.33014Z" fill="black"/>
-                                </svg>
-                                <span className="pl-1">Advanced Filters</span>
-                            </span>                          
-                        </div>
-                    } 
                     <div className="flex flex-col w-full">
-                        <label htmlFor="filterResults" className="sr-only">Date Range</label>
+                        <label htmlFor="filterResults" className="sr-only pr-2 w-24">Date Range</label>
                         <div id="filterResults">
                             <FilterPresets 
                                 className="hidden lg:block"
@@ -599,15 +301,15 @@ export default function DisplayListings() {
                             />                        
                         </div>
                     }                                                
-                    <div className="pb-0">
-                        <label htmlFor="calendarTypeDropdown" className="mr-2">Event Type</label>
+                    <div className="pb-0 flex flex-row items-center">
+                        <label htmlFor="calendarTypeDropdown" className="pr-2 w-24">Event Type</label>
                         <select
                             id="calendarTypeDropdown"
                             value={calendarTypeFilter}
                             onChange={e => setCalendarTypeFilter(e.target.value)}
-                            className="border border-gray-300 bg-white rounded px-2 py-1"                           
+                            className="border border-gray-300 bg-white rounded px-2 py-1 flex-grow"                           
                         >
-                            <option value="onview">Show everything</option>
+                            <option value="onview">Anything</option>
                             <option value="opening">Openings</option>
                             <option value="closing">Closings</option>
                             
@@ -631,18 +333,14 @@ export default function DisplayListings() {
 
 
                     
-                    <div className="flex flex-row pb-2 lg:mt-0 gap-2 items-center">
-                        <label htmlFor="searchTerm" className="flex flex-row items-center gap-1">
-                            {/* <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M14 14L11.1 11.1" stroke="black" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>  */}
-                            <span className="">Search</span>
+                    <div className="flex flex-row pb-2 lg:mt-0 items-center">
+                        <label htmlFor="searchTerm" className="w-24 pr-2">
+                            Search
                         </label>
                         <input 
                             type="text" 
                             id="searchTerm"
-                            className="border border-gray-300 rounded px-2 mr-2 py-1"
+                            className="border border-gray-300 rounded px-2 py-1"
                             value={searchTerm} 
                             onChange={(e) => setSearchTerm(e.target.value)} 
                         />
