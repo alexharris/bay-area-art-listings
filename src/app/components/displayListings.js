@@ -206,6 +206,26 @@ export default function DisplayListings() {
         }
     }
 
+    function clearAllFilters() {
+        // Reset all filters to their initial values
+        setCalendarTypeFilter('onview');
+        setHighlightsOnly(false);
+        setOpenHoursOnly(false);
+        setSearchTerm('');
+        setSelectedLocation('');
+        setSelectedCounty({});
+        setSortMethod('openingSoon');
+        
+        // Reset calendar date range to initial state (10 years from start of month)
+        const tenYearsFromNow = new Date(startOfMonth);
+        tenYearsFromNow.setFullYear(tenYearsFromNow.getFullYear() + 10);
+        setCalendarDateRangeFilter({ from: startOfMonth, to: tenYearsFromNow });
+        setCalendarDateRangePreset('everything');
+        
+        // Close custom calendar if open
+        setShowCustomCalendar(false);
+    }
+
 
     return (
    
@@ -249,8 +269,32 @@ export default function DisplayListings() {
                             />
                         </Link>
                     </div>
-                    <svg className="absolute top-2 right-2 lg:hidden icon-link" onClick={() => setShowMenu(prev => !prev)} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ff0000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>                             
-
+                    <div className="flex flex-row py-8 lg:mt-0 items-center">
+                        <label htmlFor="searchTerm" className="w-24 pr-2">
+                            Search
+                        </label>
+                        <input 
+                            type="text" 
+                            id="searchTerm"
+                            className="border border-gray-300 rounded px-2 py-1"
+                            value={searchTerm} 
+                            onChange={(e) => setSearchTerm(e.target.value)} 
+                        />
+                    </div>    
+                    <div className="pb-0 flex flex-row items-center">
+                        <label htmlFor="calendarTypeDropdown" className="pr-2 w-24">Event Type</label>
+                        <select
+                            id="calendarTypeDropdown"
+                            value={calendarTypeFilter}
+                            onChange={e => setCalendarTypeFilter(e.target.value)}
+                            className="border border-gray-300 bg-white rounded px-2 py-1 flex-grow"                           
+                        >
+                            <option value="onview">Anything</option>
+                            <option value="opening">Openings</option>
+                            <option value="closing">Closings</option>
+                            
+                        </select>
+                    </div>
                     <div className="flex flex-col w-full">
                         <label htmlFor="filterResults" className="sr-only pr-2 w-24">Date Range</label>
                         <div id="filterResults">
@@ -280,20 +324,7 @@ export default function DisplayListings() {
                             />                        
                         </div>
                     }                                                
-                    <div className="pb-0 flex flex-row items-center">
-                        <label htmlFor="calendarTypeDropdown" className="pr-2 w-24">Event Type</label>
-                        <select
-                            id="calendarTypeDropdown"
-                            value={calendarTypeFilter}
-                            onChange={e => setCalendarTypeFilter(e.target.value)}
-                            className="border border-gray-300 bg-white rounded px-2 py-1 flex-grow"                           
-                        >
-                            <option value="onview">Anything</option>
-                            <option value="opening">Openings</option>
-                            <option value="closing">Closings</option>
-                            
-                        </select>
-                    </div>               
+              
                     <div className="flex flex-col">
                         <CountySelector 
                             onCountyChange={setSelectedCounty} 
@@ -309,47 +340,14 @@ export default function DisplayListings() {
                         />
                         Only show venues open today
                     </label>
-
-
                     
-                    <div className="flex flex-row pb-2 lg:mt-0 items-center">
-                        <label htmlFor="searchTerm" className="w-24 pr-2">
-                            Search
-                        </label>
-                        <input 
-                            type="text" 
-                            id="searchTerm"
-                            className="border border-gray-300 rounded px-2 py-1"
-                            value={searchTerm} 
-                            onChange={(e) => setSearchTerm(e.target.value)} 
-                        />
-                    </div>                       
-                    <span 
-                        onClick={() => {
-                            setHighlightsOnly(false);
-                            setSearchTerm('');
-                            setSelectedLocation('');
-                            // Reset county filter - this will also trigger the useEffect in CountySelector
-                            setSelectedCounty([]);
-                            setOpenHoursOnly(false);
-                            setCalendarTypeFilter('onview');
-                            
-                            // Create proper Date objects for startOfWeek and endOfWeek
-                            const weekFrom = new Date(startOfWeek);
-                            weekFrom.setHours(0, 0, 0, 0);
-                            const weekTo = new Date(endOfWeek);
-                            weekTo.setHours(23, 59, 59, 999);
-                            
-                            setCalendarDateRangeFilter({ from: weekFrom, to: weekTo });
-                            setCalendarDateRangePreset('thisWeek');
-                            
-                            // Clear URL parameters
-                            window.history.pushState({}, '', window.location.pathname);
-                        }} 
-                        className="underline cursor-pointer mb-4 inline-block text-gray-800 text-sm"
+                    <button 
+                        onClick={clearAllFilters}
+                        className="self-start border-b border-black mb-4"
                     >
                         Clear All
-                    </span>
+                    </button>
+                    
                                 
                     <button 
                         onClick={() => {
@@ -368,9 +366,7 @@ export default function DisplayListings() {
                     ></div>
                 )}            
                 <a className="hidden lg:block" href="/about" >About</a>
-                {/* <div className="hidden lg:block">
-                    <AddEmailForm /> 
-                </div> */}
+
             </div>
 
             {/* Main Col */}

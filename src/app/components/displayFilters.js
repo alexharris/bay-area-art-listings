@@ -8,7 +8,7 @@ export default function DisplayFilters({ type, presetRange, customRange, display
   const formatType = () => {
     switch (type) {
       case 'onview':
-        return 'On view';
+        return 'Anything';
       case 'opening':
         return 'Opening';
       case 'closing':
@@ -31,7 +31,14 @@ export default function DisplayFilters({ type, presetRange, customRange, display
       case 'anytime':
         return 'anytime';
       default:
-        return 'Custom Range';
+        return 'anytime';
+    }
+  };
+
+  const formatSelectedCounty = () => {
+    switch (selectedCounty[0]?.county) {
+      default:
+        return 'anywhere';
     }
   };
 
@@ -44,8 +51,10 @@ export default function DisplayFilters({ type, presetRange, customRange, display
       ) : (
         <>{formatType(type)} {formatDate(customRange.from)} - {formatDate(customRange.to)}</>
       )} 
-      {selectedCounty[0] && (
+      {selectedCounty[0] ? (
           <> in {selectedCounty[0].county} county</>
+        ) : (
+          <> {formatSelectedCounty()}</>
         )}
         
     </div>
