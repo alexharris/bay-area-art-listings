@@ -22,25 +22,28 @@ export default function SortSelector({ onSortChange, currentSort }) {
     };
 
     return (
-        <div className="relative">
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex w-48 items-center gap-1 px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 justify-between"
-            >
-                <span>{getCurrentSortLabel()}</span>
-                <svg 
-                    className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                    xmlns="http://www.w3.org/2000/svg" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    strokeWidth="1.5" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
+        <div className="">
+            <div className="flex items-end gap-2">
+                sorted by 
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="flex  items-center gap-1 px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 justify-between"
                 >
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-            </button>
+                    <span>{getCurrentSortLabel()}</span>
+                    <svg 
+                        className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                        xmlns="http://www.w3.org/2000/svg" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="1.5" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                    >
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+            </div>
 
             {isOpen && (
                 <>

@@ -355,8 +355,8 @@ export default function DisplayListings() {
                     <>  
                         {/* Top bar */}
                         <div className="flex flex-col justify-between align-bottom items-center  sticky top-0 z-30 bg-white">                    
-                            <div className="flex flex-row items-center justify-between w-full border-b border-dashed border-black py-2">
-                                <div className="flex flex-row gap-1 lg:items-start">
+                            <div className="flex flex-row items-center justify-between w-full border-b border-dashed border-black py-4">
+                                <div className="flex flex-row gap-1 lg:items-end text-xl">
                                     <DisplayFilters                                 
                                         type={calendarTypeFilter}
                                         presetRange={calendarDateRangePreset}
@@ -364,12 +364,13 @@ export default function DisplayListings() {
                                         displayedResults={displayedResults}
                                         selectedCounty={selectedCounty}
                                     />                                    
-                                    <span className="hidden lg:block text-xs">({displayedResults})</span>
+                                    <span className="hidden lg:block text-xs relative bottom-2">({displayedResults})</span>
+                                    <SortSelector 
+                                        onSortChange={setSortMethod}
+                                        currentSort={sortMethod}
+                                    />
                                 </div>
-                                <SortSelector 
-                                    onSortChange={setSortMethod}
-                                    currentSort={sortMethod}
-                                />
+
                                 {/* <svg className="icon-link block lg:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
                                 <div className="hidden lg:flex flex-row gap-2 items-center">
                                     <div className="flex items-center">

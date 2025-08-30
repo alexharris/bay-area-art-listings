@@ -8,11 +8,11 @@ export default function DisplayFilters({ type, presetRange, customRange, display
   const formatType = () => {
     switch (type) {
       case 'onview':
-        return 'All exhibitions';
+        return 'all exhibitions';
       case 'opening':
-        return 'Upcoming exhibitions';
+        return 'upcoming exhibitions';
       case 'closing':
-        return 'Closing exhibitions';
+        return 'closing exhibitions';
       default:
         return type
     } 
@@ -44,6 +44,7 @@ export default function DisplayFilters({ type, presetRange, customRange, display
 
   return (
     <div className="normal-case leading-1">
+      Showing&nbsp;
       {presetRange !== 'custom' ? (
         <>{formatType(type)} {formatPresetRange()}</>
       ) : formatDate(customRange.from) === formatDate(customRange.to) ? (
