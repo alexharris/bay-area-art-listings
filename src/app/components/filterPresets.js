@@ -69,7 +69,7 @@ export default function FilterPresets({
 
     return (
         <div className="flex flex-row items-center relative">
-            <label htmlFor="timeFilter" className="w-24 pr-2">Date Range</label>
+            <label htmlFor="timeFilter" className="w-24 pr-2">When</label>
             <select 
                 id="timeFilter" 
                 value={calendarDateRangePreset}

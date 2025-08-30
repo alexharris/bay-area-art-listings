@@ -102,7 +102,6 @@ export default function DisplayListings() {
                 const locationData = await getLocations();
                 setLocations(locationData); 
                 // Set Filter Status
-                // setCalendarTypeFilter('onview');
                 
                 // Only set calendar filters if the feature flag is enabled
                 // if (sidebarCalendarIsEnabled) {
@@ -260,21 +259,20 @@ export default function DisplayListings() {
                         />
                     </div>    
                     <div className="pb-0 flex flex-row items-center">
-                        <label htmlFor="calendarTypeDropdown" className="pr-2 w-24">Event Type</label>
+                        <label htmlFor="calendarTypeDropdown" className="pr-2 w-24">What</label>
                         <select
                             id="calendarTypeDropdown"
                             value={calendarTypeFilter}
                             onChange={e => setCalendarTypeFilter(e.target.value)}
                             className="border border-gray-300 bg-white rounded px-2 py-1 flex-grow"                           
                         >
-                            <option value="onview">Anything</option>
-                            <option value="opening">Openings</option>
-                            <option value="closing">Closings</option>
+                            <option value="onview">All exhibitions</option>
+                            <option value="opening">Upcoming exhibitions</option>
+                            {/* <option value="closing">Closing exhibitions</option> */}
                             
                         </select>
                     </div>
                     <div className="flex flex-col w-full">
-                        <label htmlFor="filterResults" className="sr-only pr-2 w-24">Date Range</label>
                         <div id="filterResults">
                             <FilterPresets 
                                 className="hidden lg:block"

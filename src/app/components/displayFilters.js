@@ -8,11 +8,11 @@ export default function DisplayFilters({ type, presetRange, customRange, display
   const formatType = () => {
     switch (type) {
       case 'onview':
-        return 'Anything';
+        return 'All exhibitions';
       case 'opening':
-        return 'Opening';
+        return 'Upcoming exhibitions';
       case 'closing':
-        return 'Closing';
+        return 'Closing exhibitions';
       default:
         return type
     } 

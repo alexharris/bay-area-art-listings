@@ -87,10 +87,10 @@ export function getFilteredListings(filters, listings) {
     calendarTypeFilter: filters.calendarTypeFilter || '',
     calendarDateRangeFilter: filters.calendarDateRangeFilter || { from: startOfWeek, to: endOfWeek },
   };
-  
+
+  console.log(filters);
 
   let filteredListings = listings
-  .filter(item => filters.highlightsOnly ? item.Highlight : true) //Highlights Only
   .filter(item =>filters.openHoursOnly ? determineOpenHoursFilter(item) : true)
   .filter(item => filters.selectedLocation ? item.locationName === filters.selectedLocation : true) // Selected Location
   .filter(item => 
@@ -105,11 +105,13 @@ export function getFilteredListings(filters, listings) {
   .filter(item => {
       const startDate = new Date(item.StartDate + 'T00:00:00');
       const endDate = new Date(item.EndDate + 'T23:59:59Z');
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
 
       if (filters.calendarTypeFilter === 'onview') {
         return (startDate <= filters.calendarDateRangeFilter.to && endDate >= filters.calendarDateRangeFilter.from);
       } else if (filters.calendarTypeFilter === 'opening') {
-        return startDate >= filters.calendarDateRangeFilter.from && startDate <= filters.calendarDateRangeFilter.to;
+        return startDate >= todayStart && startDate <= filters.calendarDateRangeFilter.to;
       } else if (filters.calendarTypeFilter === 'closing') {
         return endDate >= filters.calendarDateRangeFilter.from && endDate <= filters.calendarDateRangeFilter.to;
       }
