@@ -28,7 +28,7 @@ export default function NotesRenderer({ notes, itemIndex }) {
     
     // Check if the notes contain the +++ delimiter
     if (!notesString.includes('+++')) {
-        return <div className="my-2">{notesString}</div>;
+        return <div className="my-2 whitespace-pre-wrap">{notesString}</div>;
     }
     
     const parts = notesString.split('+++');
@@ -38,11 +38,11 @@ export default function NotesRenderer({ notes, itemIndex }) {
     
     return (
         <div className="my-2">
-            <span>{previewText}</span>
+            <span className="whitespace-pre-wrap">{previewText}</span>
             {expandedText && (
                 <>
                     {isExpanded && (
-                        <span> {expandedText}</span>
+                        <span className="whitespace-pre-wrap"> {expandedText}</span>
                     )}
                     <button
                         onClick={() => setExpandedNotes(prev => ({
