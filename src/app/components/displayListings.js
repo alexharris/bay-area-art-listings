@@ -89,7 +89,7 @@ export default function DisplayListings() {
     const [showBottomSheet, setShowBottomSheet] = useState(false);
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
-    const [sortMethod, setSortMethod] = useState('openingSoon');
+    const [sortMethod, setSortMethod] = useState('closingSoon');
 
 
     // Load initial data
@@ -142,6 +142,17 @@ export default function DisplayListings() {
         
     }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, openHoursOnly, searchTerm, listings, selectedLocation, selectedCounty, sortMethod]);
 
+    // Auto-adjust sort method based on calendar type filter
+    useEffect(() => {
+        if (calendarTypeFilter === 'opening') {
+            setSortMethod('openingSoon');
+        } else if (calendarTypeFilter === 'onview' && sortMethod === 'openingSoon') {
+            // Only switch back to closingSoon if we're currently on openingSoon
+            // This prevents overriding user's manual sort selection
+            setSortMethod('closingSoon');
+        }
+    }, [calendarTypeFilter]);
+
     function toggleOpenHoursOnly() {
         setOpenHoursOnly(!openHoursOnly);
     }
@@ -191,7 +202,7 @@ export default function DisplayListings() {
         setSearchTerm('');
         setSelectedLocation('');
         setSelectedCounty([]);
-        setSortMethod('openingSoon');
+        setSortMethod('closingSoon');
         
         // Reset calendar date range to initial state (10 years from start of month)
         const tenYearsFromNow = new Date(startOfMonth);

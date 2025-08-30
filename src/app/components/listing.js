@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import CalendarLink from './calendarLink';
 import TodaysHoursStatus from './TodaysHoursStatus';
 import NotesRenderer from './NotesRenderer';
+import DateNote from './DateNote';
 
 export default function Listings({ listings, formatDate }) {
     const [showDetails, setShowDetails] = useState({});
@@ -56,23 +57,8 @@ export default function Listings({ listings, formatDate }) {
                   <div className="flex flex-col items-start gap-1">
                     <div className="font-semibold">
                       {item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`}
-                    </div>                    
-                    {(() => {
-                      // Check if event is closing soon (within 7 days)
-                      const today = new Date();
-                      const endDate = new Date(item.EndDate);
-                      const diffTime = endDate - today;
-                      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                      
-                      if (diffDays >= 0 && diffDays <= 7) {
-                        return (
-                          <div className="text-sm">
-                            Ending soon
-                          </div>
-                        );
-                      }
-                      return null;
-                    })()}                    
+                    </div>         
+                    <DateNote startDate={item.StartDate} endDate={item.EndDate} />                   
                   </div>
 
 
