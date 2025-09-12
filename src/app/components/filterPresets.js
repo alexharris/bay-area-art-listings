@@ -25,11 +25,12 @@ export default function FilterPresets({
                 todayTo.setHours(23, 59, 59, 999);
                 setCalendarDateRangeFilter({ from: todayFrom, to: todayTo }); 
                 break;
-            case 'thisweek':
+            case 'next7':
                 setShowCustomCalendar(false); 
-                const weekFrom = new Date(startOfWeek);
+                const weekFrom = new Date();
                 weekFrom.setHours(0, 0, 0, 0);
-                const weekTo = new Date(endOfWeek);
+                const weekTo = new Date(weekFrom);
+                weekTo.setDate(weekTo.getDate() + 7);
                 weekTo.setHours(23, 59, 59, 999);
                 setCalendarDateRangeFilter({ from: weekFrom, to: weekTo }); 
                 break;
@@ -78,7 +79,7 @@ export default function FilterPresets({
             >
                 <option value="anytime">Anytime</option>
                 <option value="today">Today</option>
-                <option value="thisweek">This Week</option>
+                <option value="next7">Next 7 Days</option>
                 <option value="thismonth">This Month</option>
                 <option value="nextmonth">Next Month</option>
                 <option value="custom">Custom</option>

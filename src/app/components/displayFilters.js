@@ -22,8 +22,8 @@ export default function DisplayFilters({ type, presetRange, customRange, display
     switch (presetRange) {
       case 'today':
         return 'today';
-      case 'thisweek':
-        return 'this week';
+      case 'next7':
+        return 'in the next 7 days';
       case 'thismonth':
         return 'this month';
       case 'nextmonth':
