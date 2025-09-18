@@ -51,7 +51,7 @@ export default function DateNote({ startDate, endDate }) {
   if (isOpeningToday) {
     return (
       <div className="text-sm font-medium text-green-600">
-        Opening today
+        Starts today
       </div>
     );
   }

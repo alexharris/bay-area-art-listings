@@ -49,7 +49,7 @@ export default function MapView({
 
     if (!L) {
         return (
-            <div className="h-[70vh] border w-full flex items-center justify-center">
+            <div className="h-screen border w-full flex items-center justify-center">
                 <div className="animate-pulse text-2xl">🗺️ Loading map...</div>
             </div>
         );
@@ -184,8 +184,8 @@ export default function MapView({
 
     return (
         <div id="map-view" className="w-full">
-            <div className="h-[70vh] border w-full">
-                <MapContainer center={[37.7749, -122.4194]} zoom={9} scrollWheelZoom={true} className="h-[70vh] border w-full z-0">
+            <div className="h-screen w-full">
+                <MapContainer center={[37.7749, -122.4194]} zoom={9} scrollWheelZoom={true} className="h-screen w-full z-0">
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -6,8 +6,8 @@ export default function SortSelector({ onSortChange, currentSort }) {
     const [isOpen, setIsOpen] = useState(false);
 
     const sortOptions = [
-        { value: 'openingSoon', label: 'Opening Date' },
-        { value: 'closingSoon', label: 'Closing Date' },
+        { value: 'openingSoon', label: 'Start Date' },
+        { value: 'closingSoon', label: 'End Date' },
         { value: 'alphabetical', label: 'Alphabetical' },
     ];
 

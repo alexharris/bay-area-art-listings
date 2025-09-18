@@ -90,6 +90,7 @@ export default function DisplayListings() {
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
     const [sortMethod, setSortMethod] = useState('closingSoon');
+    const [hideTopBar, setHideTopBar] = useState(true);
 
 
     // Load initial data
@@ -218,11 +219,11 @@ export default function DisplayListings() {
     return (
    
           
-        <div className="flex flex-row w-full items-start lg:gap-4">
+        <div className={`flex flex-row w-full items-start lg:gap-4 ${isMapView ? 'h-screen' : ''}`}>
 
             {/* Sidebar */ }
             
-            <div id="sidebar" className={`${showMenu ? 'inset-0': ''} flex flex-col lg:gap-4 fixed lg:sticky lg:top-4 w-full z-40 lg:w-[430px]`}>
+            <div id="sidebar" className={`${showMenu ? 'inset-0': ''} flex flex-col lg:gap-4 fixed lg:sticky lg:top-4 w-full z-40 lg:w-[350px] ${isMapView ? 'lg:h-full' : ''}`}>
                 {/* Filter Menu */}
                 <div className={`${showMenu ? 'translate-x-0 inset-0 ' : '-translate-x-full hidden'}   
                 transform
@@ -239,7 +240,7 @@ export default function DisplayListings() {
                 p-2
                 lg:p-0
                 mr-0
-                lg:mr-8
+                lg:mr-4
                 lg:inset-unset
                 gap-2
                 bg-white
@@ -269,6 +270,9 @@ export default function DisplayListings() {
                             onChange={(e) => setSearchTerm(e.target.value)} 
                         />
                     </div>    
+                    
+
+                    
                     <div className="pb-0 flex flex-row items-center">
                         <label htmlFor="calendarTypeDropdown" className="pr-2 w-24">What</label>
                         <select
@@ -327,7 +331,31 @@ export default function DisplayListings() {
                         />
                         Only show venues open today
                     </label>
-                    
+                    {/* Map/List View Toggle */}
+                    <div className="flex flex-row py-4 items-center">
+                        <div className="flex border border-gray-300 rounded">
+                            <button
+                                onClick={() => setIsMapView(false)}
+                                className={`px-3 py-1 text-sm ${
+                                    !isMapView 
+                                        ? 'bg-gray-700 text-white' 
+                                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                                } rounded-l transition-colors`}
+                            >
+                                List
+                            </button>
+                            <button
+                                onClick={() => setIsMapView(true)}
+                                className={`px-3 py-1 text-sm ${
+                                    isMapView 
+                                        ? 'bg-gray-700 text-white' 
+                                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                                } rounded-r transition-colors`}
+                            >
+                                Map
+                            </button>
+                        </div>
+                    </div>                    
                     <button 
                         onClick={clearAllFilters}
                         className="self-start border-b border-black mb-4"
@@ -357,7 +385,7 @@ export default function DisplayListings() {
             </div>
 
             {/* Main Col */}
-            <div id="main-col" className="flex flex-col justify-start w-full flex-shrink min-h-screen">
+            <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
                 {loading ? (
                     <div className="animate-pulse text-5xl flex items-center justify-center w-full h-[70vh]">
                         🎨
@@ -365,72 +393,74 @@ export default function DisplayListings() {
                 ) : (
                     <>  
                         {/* Top bar */}
-                        <div className="flex flex-col justify-between align-bottom items-center  sticky top-0 z-30 bg-white">                    
-                            <div className="flex flex-row items-center justify-between w-full border-b border-dashed border-black py-4">
-                                <div className="flex flex-row gap-1 lg:items-end text-xl">
-                                    <DisplayFilters                                 
-                                        type={calendarTypeFilter}
-                                        presetRange={calendarDateRangePreset}
-                                        customRange={calendarDateRangeFilter}
-                                        displayedResults={displayedResults}
-                                        selectedCounty={selectedCounty}
-                                    />                                    
-                                    <span className="hidden lg:block text-xs relative bottom-2">({displayedResults})</span>
-                                    <SortSelector 
-                                        onSortChange={setSortMethod}
-                                        currentSort={sortMethod}
-                                    />
-                                </div>
-
-                                {/* <svg className="icon-link block lg:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
-                                <div className="hidden lg:flex flex-row gap-2 items-center">
-                                    <div className="flex items-center">
-                                        <svg 
-                                            xmlns="http://www.w3.org/2000/svg" 
-                                            className="w-5 h-5 mr-2 cursor-pointer" 
-                                            viewBox="0 0 24 24" 
-                                            fill="none" 
-                                            stroke="currentColor" 
-                                            strokeWidth="1.5" 
-                                            strokeLinecap="round" 
-                                            strokeLinejoin="round"
-                                            onClick={() => isMapView && toggleMapView()}
-                                        >
-                                            <line x1="8" y1="6" x2="21" y2="6"></line>
-                                            <line x1="8" y1="12" x2="21" y2="12"></line>
-                                            <line x1="8" y1="18" x2="21" y2="18"></line>
-                                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                                        </svg>
-                                        <label className="relative inline-flex items-center cursor-pointer">
-                                            <input 
-                                                type="checkbox" 
-                                                className="sr-only peer" 
-                                                checked={isMapView} 
-                                                onChange={toggleMapView} 
-                                            />
-                                            <div className="w-10 h-5 bg-gray-100 border border-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-gray-700 after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-100"></div>
-                                        </label>
-                                        <svg 
-                                            xmlns="http://www.w3.org/2000/svg" 
-                                            className="w-5 h-5 ml-2 cursor-pointer" 
-                                            viewBox="0 0 24 24" 
-                                            fill="none" 
-                                            stroke="currentColor" 
-                                            strokeWidth="1.5" 
-                                            strokeLinecap="round" 
-                                            strokeLinejoin="round"
-                                            onClick={() => !isMapView && toggleMapView()}
-                                        >
-                                            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-                                            <line x1="8" y1="2" x2="8" y2="18"></line>
-                                            <line x1="16" y1="6" x2="16" y2="22"></line>
-                                        </svg>
+                        {!hideTopBar && (
+                            <div className="flex flex-col justify-between align-bottom items-center  sticky top-0 z-30 bg-white">                    
+                                <div className="flex flex-row items-center justify-between w-full border-b border-dashed border-black py-4">
+                                    <div className="flex flex-row gap-1 lg:items-end text-xl">
+                                        <DisplayFilters                                 
+                                            type={calendarTypeFilter}
+                                            presetRange={calendarDateRangePreset}
+                                            customRange={calendarDateRangeFilter}
+                                            displayedResults={displayedResults}
+                                            selectedCounty={selectedCounty}
+                                        />                                    
+                                        <span className="hidden lg:block text-xs relative bottom-2">({displayedResults})</span>
+                                        <SortSelector 
+                                            onSortChange={setSortMethod}
+                                            currentSort={sortMethod}
+                                        />
                                     </div>
-                                </div>
-                            </div>                                                                    
-                        </div>
+
+                                    {/* <svg className="icon-link block lg:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
+                                    <div className="hidden lg:flex flex-row gap-2 items-center">
+                                        <div className="flex items-center">
+                                            <svg 
+                                                xmlns="http://www.w3.org/2000/svg" 
+                                                className="w-5 h-5 mr-2 cursor-pointer" 
+                                                viewBox="0 0 24 24" 
+                                                fill="none" 
+                                                stroke="currentColor" 
+                                                strokeWidth="1.5" 
+                                                strokeLinecap="round" 
+                                                strokeLinejoin="round"
+                                                onClick={() => isMapView && toggleMapView()}
+                                            >
+                                                <line x1="8" y1="6" x2="21" y2="6"></line>
+                                                <line x1="8" y1="12" x2="21" y2="12"></line>
+                                                <line x1="8" y1="18" x2="21" y2="18"></line>
+                                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                                            </svg>
+                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                <input 
+                                                    type="checkbox" 
+                                                    className="sr-only peer" 
+                                                    checked={isMapView} 
+                                                    onChange={toggleMapView} 
+                                                />
+                                                <div className="w-10 h-5 bg-gray-100 border border-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-gray-700 after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-100"></div>
+                                            </label>
+                                            <svg 
+                                                xmlns="http://www.w3.org/2000/svg" 
+                                                className="w-5 h-5 ml-2 cursor-pointer" 
+                                                viewBox="0 0 24 24" 
+                                                fill="none" 
+                                                stroke="currentColor" 
+                                                strokeWidth="1.5" 
+                                                strokeLinecap="round" 
+                                                strokeLinejoin="round"
+                                                onClick={() => !isMapView && toggleMapView()}
+                                            >
+                                                <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                                                <line x1="8" y1="2" x2="8" y2="18"></line>
+                                                <line x1="16" y1="6" x2="16" y2="22"></line>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>                                                                    
+                            </div>
+                        )}
 
                         {displayedResults === 0 && 
                             <div className="text-center flex-grow flex flex-col justify-center text-2xl py-36">
@@ -441,13 +471,15 @@ export default function DisplayListings() {
                         }            
 
                         {displayedResults > 0 && isMapView ? (
-                            <MapView 
-                                filteredListings={filteredListings}
-                                locations={locations}
-                                highlightsOnly={highlightsOnly}
-                                selectedLocation={selectedLocation}
-                                searchTerm={searchTerm}
-                            />
+                            <div className="h-full flex-1">
+                                <MapView 
+                                    filteredListings={filteredListings}
+                                    locations={locations}
+                                    highlightsOnly={highlightsOnly}
+                                    selectedLocation={selectedLocation}
+                                    searchTerm={searchTerm}
+                                />
+                            </div>
                         ) : displayedResults > 0 ? (
                             <Listing listings={filteredListings} formatDate={formatDate} />                            
                         ) : null}
