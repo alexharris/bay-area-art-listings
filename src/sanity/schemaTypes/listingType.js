@@ -41,6 +41,7 @@ export const listingType = defineType({
       type: 'reference',
       to: [{type: 'location'}],
       weak: true,
+      validation: Rule => Rule.required(),
     }),
     defineField({
       name: 'Notes',
