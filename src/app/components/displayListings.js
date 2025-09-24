@@ -15,6 +15,7 @@ import AddEmailForm from './old/addEmailForm';
 import { getFilteredListings } from '../../utils/filters';
 import { sortListingsChronologically, applySorting } from '../../utils/sort'; 
 import { extractPortableTextContent } from '../../utils/helpers';
+import { getCalendarTypeCounts } from '../../utils/filterCounts';
 import MobileIconMenu from './mobileIconMenu';
 import MobileFilterBottomSheet from './mobileFilterBottomSheet';
 import Link from "next/link";
@@ -76,7 +77,7 @@ export default function DisplayListings() {
     const [openHoursOnly, setOpenHoursOnly] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
-    const [selectedCounty, setSelectedCounty] = useState({});
+    const [selectedCounty, setSelectedCounty] = useState([]);
     //  Sorting
     const [sortDate, setSortDate] = useState([]);
     // Display
@@ -91,6 +92,7 @@ export default function DisplayListings() {
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
     const [sortMethod, setSortMethod] = useState('closingSoon');
     const [hideTopBar, setHideTopBar] = useState(true);
+    const [calendarTypeCounts, setCalendarTypeCounts] = useState({});
 
 
     // Load initial data
@@ -110,7 +112,7 @@ export default function DisplayListings() {
                 const tenYearsFromNow = new Date(startOfMonth);
                 tenYearsFromNow.setFullYear(tenYearsFromNow.getFullYear() + 10);
                 setCalendarDateRangeFilter({ from: startOfMonth, to: tenYearsFromNow });
-                setCalendarDateRangePreset('everything');
+                setCalendarDateRangePreset('anytime');
                 // }
             } catch (error) {
                 console.error('Data retrieval failed:', error);
@@ -140,6 +142,12 @@ export default function DisplayListings() {
         
         setFilteredListings(sortedListings);
         setDisplayedResults(filteredListings.length);
+
+        // Calculate calendar type counts for the "What" dropdown
+        if (listings && listings.length > 0) {
+            const typeCounts = getCalendarTypeCounts(filters, listings);
+            setCalendarTypeCounts(typeCounts);
+        }
         
     }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, openHoursOnly, searchTerm, listings, selectedLocation, selectedCounty, sortMethod]);
 
@@ -209,7 +217,7 @@ export default function DisplayListings() {
         const tenYearsFromNow = new Date(startOfMonth);
         tenYearsFromNow.setFullYear(tenYearsFromNow.getFullYear() + 10);
         setCalendarDateRangeFilter({ from: startOfMonth, to: tenYearsFromNow });
-        setCalendarDateRangePreset('everything');
+        setCalendarDateRangePreset('anytime');
         
         // Close custom calendar if open
         setShowCustomCalendar(false);
@@ -258,6 +266,12 @@ export default function DisplayListings() {
                             />
                         </Link>
                     </div>
+                    {/* Stats indicator showing total vs. filtered listings */}
+                    <div className="flex flex-row items-center mt-10 text-md">
+                        
+                            Viewing {displayedResults} of {listings.length} listings
+                        
+                    </div>
                     <div className="flex flex-row py-8 lg:mt-0 items-center">
                         <label htmlFor="searchTerm" className="w-24 pr-2">
                             Search
@@ -281,9 +295,9 @@ export default function DisplayListings() {
                             onChange={e => setCalendarTypeFilter(e.target.value)}
                             className="border border-gray-300 bg-white rounded px-2 py-1 flex-grow"                           
                         >
-                            <option value="onview">All exhibitions</option>
-                            <option value="opening">Upcoming exhibitions</option>
-                            {/* <option value="closing">Closing exhibitions</option> */}
+                            <option value="onview">All exhibitions {calendarTypeFilter !== 'onview' && calendarTypeCounts['onview'] !== undefined ? `(${calendarTypeCounts['onview']})` : ''}</option>
+                            <option value="opening">Upcoming exhibitions {calendarTypeFilter !== 'opening' && calendarTypeCounts['opening'] !== undefined ? `(${calendarTypeCounts['opening']})` : ''}</option>
+                            {/* <option value="closing">Closing exhibitions {calendarTypeFilter !== 'closing' && calendarTypeCounts['closing'] !== undefined ? `(${calendarTypeCounts['closing']})` : ''}</option> */}
                             
                         </select>
                     </div>
@@ -301,6 +315,16 @@ export default function DisplayListings() {
                                 endOfMonth={endOfMonth}
                                 startOfNextMonth={startOfNextMonth}
                                 endOfNextMonth={endOfNextMonth}
+                                currentFilters={{
+                                    highlightsOnly: highlightsOnly,
+                                    openHoursOnly: openHoursOnly,
+                                    searchTerm: searchTerm,
+                                    selectedLocation: selectedLocation,
+                                    selectedCounty: selectedCounty,
+                                    calendarTypeFilter: calendarTypeFilter,
+                                    calendarDateRangeFilter: calendarDateRangeFilter,
+                                }}
+                                listings={listings}
                             />
                         </div>
                     </div>   
@@ -319,7 +343,17 @@ export default function DisplayListings() {
                     <div className="flex flex-col">
                         <CountySelector 
                             onCountyChange={setSelectedCounty} 
-                            selectedCountyProp={selectedCounty} 
+                            selectedCountyProp={selectedCounty}
+                            currentFilters={{
+                                highlightsOnly: highlightsOnly,
+                                openHoursOnly: openHoursOnly,
+                                searchTerm: searchTerm,
+                                selectedLocation: selectedLocation,
+                                selectedCounty: selectedCounty,
+                                calendarTypeFilter: calendarTypeFilter,
+                                calendarDateRangeFilter: calendarDateRangeFilter,
+                            }}
+                            listings={listings}
                         />                                       
                     </div>   
                     <label className="pb-2">

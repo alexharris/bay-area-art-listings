@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getDateRangeCounts } from '../../utils/filterCounts';
 
 export default function FilterPresets({ 
     setShowCustomCalendar, 
@@ -10,8 +11,28 @@ export default function FilterPresets({
     startOfMonth,
     endOfMonth,
     startOfNextMonth,
-    endOfNextMonth
+    endOfNextMonth,
+    currentFilters,
+    listings
 }) {
+    const [dateRangeCounts, setDateRangeCounts] = useState({});
+
+    // Calculate counts when filters or listings change
+    useEffect(() => {
+        if (currentFilters && listings && listings.length > 0) {
+            const dateRanges = {
+                startOfWeek,
+                endOfWeek,
+                startOfMonth,
+                endOfMonth,
+                startOfNextMonth,
+                endOfNextMonth
+            };
+            const counts = getDateRangeCounts(currentFilters, listings, dateRanges);
+            setDateRangeCounts(counts);
+        }
+    }, [currentFilters, listings, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfNextMonth, endOfNextMonth]);
+
     const handlePresetChange = (e) => {
         const presetValue = e.target.value;
         setCalendarDateRangePreset(presetValue);
@@ -77,11 +98,11 @@ export default function FilterPresets({
                 onChange={handlePresetChange}
                 className="border border-gray-300 flex-grow bg-white rounded px-2 py-1"
             >
-                <option value="anytime">Anytime</option>
-                <option value="today">Today</option>
-                <option value="next7">Next 7 Days</option>
-                <option value="thismonth">This Month</option>
-                <option value="nextmonth">Next Month</option>
+                <option value="anytime">Anytime {calendarDateRangePreset !== 'anytime' && dateRangeCounts['anytime'] !== undefined ? `(${dateRangeCounts['anytime']})` : ''}</option>
+                <option value="today">Today {calendarDateRangePreset !== 'today' && dateRangeCounts['today'] !== undefined ? `(${dateRangeCounts['today']})` : ''}</option>
+                <option value="next7">Next 7 Days {calendarDateRangePreset !== 'next7' && dateRangeCounts['next7'] !== undefined ? `(${dateRangeCounts['next7']})` : ''}</option>
+                <option value="thismonth">This Month {calendarDateRangePreset !== 'thismonth' && dateRangeCounts['thismonth'] !== undefined ? `(${dateRangeCounts['thismonth']})` : ''}</option>
+                <option value="nextmonth">Next Month {calendarDateRangePreset !== 'nextmonth' && dateRangeCounts['nextmonth'] !== undefined ? `(${dateRangeCounts['nextmonth']})` : ''}</option>
                 <option value="custom">Custom</option>
             </select>
         </div>

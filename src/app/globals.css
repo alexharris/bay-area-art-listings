@@ -60,3 +60,22 @@ body {
   font-family: var(--font-geist-sans) !important;
 }
 
+/* Filter count styling */
+.filtercount {
+  opacity: 0.7;
+  font-size: 0.9em;
+  color: #666;
+}
+
+/* Style filter dropdown options with counts - this targets the pattern (number) */
+select option {
+  font-family: inherit;
+}
+
+/* For browsers that support it, we can use CSS to style text patterns */
+select[id*="Filter"] option,
+select[id*="timeFilter"] option,
+select[id*="calendarTypeDropdown"] option {
+  font-family: inherit;
+}
+
