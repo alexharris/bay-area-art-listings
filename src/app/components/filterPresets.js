@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getDateRangeCounts } from '../../utils/filterCounts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function FilterPresets({ 
     setShowCustomCalendar, 
@@ -33,8 +34,7 @@ export default function FilterPresets({
         }
     }, [currentFilters, listings, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfNextMonth, endOfNextMonth]);
 
-    const handlePresetChange = (e) => {
-        const presetValue = e.target.value;
+    const handlePresetChange = (presetValue) => {
         setCalendarDateRangePreset(presetValue);
 
         switch(presetValue) {
@@ -91,20 +91,30 @@ export default function FilterPresets({
 
     return (
         <div className="flex flex-row items-center relative">
-            <label htmlFor="timeFilter" className="pr-2">When</label>
-            <select 
-                id="timeFilter" 
-                value={calendarDateRangePreset}
-                onChange={handlePresetChange}
-                className="border border-gray-300 flex-grow bg-white rounded px-2 py-1"
-            >
-                <option value="anytime">Anytime {calendarDateRangePreset !== 'anytime' && dateRangeCounts['anytime'] !== undefined ? `(${dateRangeCounts['anytime']})` : ''}</option>
-                <option value="today">Today {calendarDateRangePreset !== 'today' && dateRangeCounts['today'] !== undefined ? `(${dateRangeCounts['today']})` : ''}</option>
-                <option value="next7">Next 7 Days {calendarDateRangePreset !== 'next7' && dateRangeCounts['next7'] !== undefined ? `(${dateRangeCounts['next7']})` : ''}</option>
-                <option value="thismonth">This Month {calendarDateRangePreset !== 'thismonth' && dateRangeCounts['thismonth'] !== undefined ? `(${dateRangeCounts['thismonth']})` : ''}</option>
-                <option value="nextmonth">Next Month {calendarDateRangePreset !== 'nextmonth' && dateRangeCounts['nextmonth'] !== undefined ? `(${dateRangeCounts['nextmonth']})` : ''}</option>
-                <option value="custom">Custom</option>
-            </select>
+            <label className="pr-2 w-20">When</label>
+            <Select value={calendarDateRangePreset} onValueChange={handlePresetChange}>
+                <SelectTrigger className="flex-grow">
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="anytime">
+                        Anytime {calendarDateRangePreset !== 'anytime' && dateRangeCounts['anytime'] !== undefined ? `(${dateRangeCounts['anytime']})` : ''}
+                    </SelectItem>
+                    <SelectItem value="today">
+                        Today {calendarDateRangePreset !== 'today' && dateRangeCounts['today'] !== undefined ? `(${dateRangeCounts['today']})` : ''}
+                    </SelectItem>
+                    <SelectItem value="next7">
+                        Next 7 Days {calendarDateRangePreset !== 'next7' && dateRangeCounts['next7'] !== undefined ? `(${dateRangeCounts['next7']})` : ''}
+                    </SelectItem>
+                    <SelectItem value="thismonth">
+                        This Month {calendarDateRangePreset !== 'thismonth' && dateRangeCounts['thismonth'] !== undefined ? `(${dateRangeCounts['thismonth']})` : ''}
+                    </SelectItem>
+                    <SelectItem value="nextmonth">
+                        Next Month {calendarDateRangePreset !== 'nextmonth' && dateRangeCounts['nextmonth'] !== undefined ? `(${dateRangeCounts['nextmonth']})` : ''}
+                    </SelectItem>
+                    <SelectItem value="custom">Custom</SelectItem>
+                </SelectContent>
+            </Select>
         </div>
     );
 }

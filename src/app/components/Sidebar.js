@@ -6,6 +6,8 @@ import CountySelector from './countySelector';
 import FilterPresets from './filterPresets';
 import SortSelector from './sortSelector';
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Sidebar({
     // Display states
@@ -107,17 +109,23 @@ export default function Sidebar({
                 </div>    
                 
                 <div className="pb-0 flex flex-row items-center">
-                    <label htmlFor="calendarTypeDropdown" className="pr-2">What</label>
-                    <select
-                        id="calendarTypeDropdown"
-                        value={calendarTypeFilter}
-                        onChange={e => setCalendarTypeFilter(e.target.value)}
-                        className="border border-gray-300 bg-white rounded px-2 py-1 flex-grow"                           
-                    >
-                        <option value="onview">All exhibitions {calendarTypeFilter !== 'onview' && calendarTypeCounts['onview'] !== undefined ? `(${calendarTypeCounts['onview']})` : ''}</option>
-                        <option value="opening">Upcoming exhibitions {calendarTypeFilter !== 'opening' && calendarTypeCounts['opening'] !== undefined ? `(${calendarTypeCounts['opening']})` : ''}</option>
-                        {/* <option value="closing">Closing exhibitions {calendarTypeFilter !== 'closing' && calendarTypeCounts['closing'] !== undefined ? `(${calendarTypeCounts['closing']})` : ''}</option> */}
-                    </select>
+                    <label className="pr-2 w-20">What</label>
+                    <Select value={calendarTypeFilter} onValueChange={setCalendarTypeFilter}>
+                        <SelectTrigger className="flex-grow">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="onview">
+                                All exhibitions {calendarTypeFilter !== 'onview' && calendarTypeCounts['onview'] !== undefined ? `(${calendarTypeCounts['onview']})` : ''}
+                            </SelectItem>
+                            <SelectItem value="opening">
+                                Upcoming exhibitions {calendarTypeFilter !== 'opening' && calendarTypeCounts['opening'] !== undefined ? `(${calendarTypeCounts['opening']})` : ''}
+                            </SelectItem>
+                            {/* <SelectItem value="closing">
+                                Closing exhibitions {calendarTypeFilter !== 'closing' && calendarTypeCounts['closing'] !== undefined ? `(${calendarTypeCounts['closing']})` : ''}
+                            </SelectItem> */}
+                        </SelectContent>
+                    </Select>
                 </div>
                 <div className="flex flex-col w-full">
                     <div id="filterResults">
@@ -216,12 +224,13 @@ export default function Sidebar({
                         </button>
                     </div>
                 </div>     
-                <button 
+                <Button 
                     onClick={clearAllFilters}
-                    className="self-start bg-gray-200 hover:bg-gray-400 rounded mb-4 px-3 py-2 mt-4"
+                    variant="secondary"
+                    className="self-start mb-4 mt-4"
                 >
                     Clear All
-                </button>
+                </Button>
                 
                 <button 
                     onClick={() => {
