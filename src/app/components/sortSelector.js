@@ -22,7 +22,7 @@ export default function SortSelector({ onSortChange, currentSort }) {
     };
 
     return (
-        <div className="my-1">
+        <div className="relative my-1">
             <div className="flex items-center gap-2">
                 Sort by 
                 <button
