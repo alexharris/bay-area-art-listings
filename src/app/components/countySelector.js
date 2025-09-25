@@ -61,7 +61,7 @@ const CountySelector = ({ onCountyChange, selectedCountyProp, currentFilters, li
         <path d="M0.330059 9.33014L0.330059 0.669885L7.83006 5.00001L0.330059 9.33014Z" fill="black"/>
       </svg> */}
 
-      <label htmlFor="countyFilter" className="pr-2 w-24">Where</label>
+      <label htmlFor="countyFilter" className="pr-2">Where</label>
       <select 
         id="countyFilter" 
         value={selectedCounty}

@@ -22,9 +22,9 @@ export default function SortSelector({ onSortChange, currentSort }) {
     };
 
     return (
-        <div className="relative">
-            <div className="flex items-end gap-2">
-                sorted by 
+        <div className="my-1">
+            <div className="flex items-center gap-2">
+                Sort by 
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className="flex  items-center gap-1 px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 justify-between"

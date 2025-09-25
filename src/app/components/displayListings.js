@@ -231,7 +231,7 @@ export default function DisplayListings() {
 
             {/* Sidebar */ }
             
-            <div id="sidebar" className={`${showMenu ? 'inset-0': ''} flex flex-col lg:gap-4 fixed lg:sticky lg:top-4 w-full z-40 lg:w-[350px] ${isMapView ? 'lg:h-full' : ''}`}>
+            <div id="sidebar" className={`${showMenu ? 'inset-0': ''} flex flex-col lg:gap-4 fixed lg:sticky lg:top-4 w-full z-40 lg:w-[300px] ${isMapView ? 'lg:h-full' : ''}`}>
                 {/* Filter Menu */}
                 <div className={`${showMenu ? 'translate-x-0 inset-0 ' : '-translate-x-full hidden'}   
                 transform
@@ -272,14 +272,14 @@ export default function DisplayListings() {
                             Viewing {displayedResults} of {listings.length} listings
                         
                     </div>
-                    <div className="flex flex-row py-8 lg:mt-0 items-center">
-                        <label htmlFor="searchTerm" className="w-24 pr-2">
-                            Search
+                    <div className="flex flex-row py-8 lg:mt-0 items-center justify-between w-full">
+                        <label htmlFor="searchTerm" className="pr-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>                            
                         </label>
                         <input 
                             type="text" 
                             id="searchTerm"
-                            className="border border-gray-300 rounded px-2 py-1"
+                            className="border border-gray-300 rounded py-1 mr-1 flex-grow"
                             value={searchTerm} 
                             onChange={(e) => setSearchTerm(e.target.value)} 
                         />
@@ -288,7 +288,7 @@ export default function DisplayListings() {
 
                     
                     <div className="pb-0 flex flex-row items-center">
-                        <label htmlFor="calendarTypeDropdown" className="pr-2 w-24">What</label>
+                        <label htmlFor="calendarTypeDropdown" className="pr-2">What</label>
                         <select
                             id="calendarTypeDropdown"
                             value={calendarTypeFilter}
@@ -356,17 +356,25 @@ export default function DisplayListings() {
                             listings={listings}
                         />                                       
                     </div>   
-                    <label className="pb-2">
+                    <hr className="my-2 border-gray-200"/>
+                    <label className="">
                         <input 
                             type="checkbox" 
                             className="mr-2"
                             checked={openHoursOnly} 
                             onChange={toggleOpenHoursOnly} 
                         />
-                        Only show venues open today
+                        Only open today
                     </label>
+                    {/* Sort Selector */}
+                    <div className="flex flex-row items-center">
+                        <SortSelector 
+                            onSortChange={setSortMethod}
+                            currentSort={sortMethod}
+                        />
+                    </div>
                     {/* Map/List View Toggle */}
-                    <div className="flex flex-row py-4 items-center">
+                    <div className="flex flex-row items-center">
                         <div className="flex border border-gray-300 rounded">
                             <button
                                 onClick={() => setIsMapView(false)}
@@ -389,10 +397,10 @@ export default function DisplayListings() {
                                 Map
                             </button>
                         </div>
-                    </div>                    
+                    </div>     
                     <button 
                         onClick={clearAllFilters}
-                        className="self-start border-b border-black mb-4"
+                        className="self-start bg-gray-200 hover:bg-gray-400 rounded mb-4 px-3 py-2 mt-4"
                     >
                         Clear All
                     </button>
