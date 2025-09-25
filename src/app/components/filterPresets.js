@@ -91,7 +91,7 @@ export default function FilterPresets({
 
     return (
         <div className="flex flex-row items-center relative">
-            <label className="pr-2 w-20">When</label>
+            <label className="pr-2 w-20 text-sm">When</label>
             <Select value={calendarDateRangePreset} onValueChange={handlePresetChange}>
                 <SelectTrigger className="flex-grow">
                     <SelectValue />

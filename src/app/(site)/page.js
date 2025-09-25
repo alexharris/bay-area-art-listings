@@ -4,7 +4,7 @@ import DisplayListings from "../components/displayListings";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-start justify-between min-h-screen px-4 gap-8 sm:px-4 font-[family-name:var(--font-geist-sans)]">
+    <div className="flex flex-col items-start justify-between min-h-screen gap-8 font-[family-name:var(--font-geist-sans)]">
       <main className="w-full">
         <DisplayListings />
       </main>

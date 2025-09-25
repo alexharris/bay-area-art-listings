@@ -57,7 +57,7 @@ const CountySelector = ({ onCountyChange, selectedCountyProp, currentFilters, li
   
   return (
     <div className="flex flex-row items-center relative">
-      <label className="pr-2 w-20">Where</label>
+      <label className="pr-2 w-20 text-sm">Where</label>
       <Select value={selectedCounty} onValueChange={handleCountyChange}>
         <SelectTrigger className="flex-grow">
           <SelectValue />
