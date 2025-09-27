@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SidebarContent } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export default function Sidebar({
     // Display states
@@ -62,7 +63,7 @@ export default function Sidebar({
 
         >
                 {/* Logo at the top of the sidebar */}
-                <div className="flex items-start">
+                <div className="flex items-start mb-8">
                     <Link href="/">
                         <img 
                             src="/baal-handwritten-logo.png" 
@@ -177,28 +178,22 @@ export default function Sidebar({
                 </div>
                 {/* Map/List View Toggle */}
                 <div className="flex flex-row items-center">
-                  <div className="flex border border-gray-300 rounded">
-                    <button
-                      onClick={() => setIsMapView(false)}
-                      className={`px-3 py-1 ${
-                          !isMapView 
-                              ? 'bg-gray-700 text-white' 
-                              : 'bg-white text-gray-700 hover:bg-gray-50'
-                      } rounded-l transition-colors`}
-                    >
+                  <ToggleGroup 
+                    type="single" 
+                    value={isMapView ? "map" : "list"}
+                    onValueChange={(value) => {
+                      if (value) setIsMapView(value === "map");
+                    }}
+                    size="sm"
+                    variant="outline"
+                  >
+                    <ToggleGroupItem value="list">
                       List
-                    </button>
-                    <button
-                      onClick={() => setIsMapView(true)}
-                      className={`px-3 py-1 text-sm ${
-                        isMapView 
-                          ? 'bg-gray-700 text-white' 
-                          : 'bg-white text-gray-700 hover:bg-gray-50'
-                      } rounded-r transition-colors`}
-                    >
-                        Map
-                    </button>
-                  </div>
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="map">
+                      Map
+                    </ToggleGroupItem>
+                  </ToggleGroup>
                 </div>    
                 {/* Stats indicator showing total vs. filtered listings */}
                 <div className="flex flex-row items-center text-md">
@@ -212,7 +207,7 @@ export default function Sidebar({
                     Clear All
                 </Button>
                 
-                <a className="hidden lg:block" href="/about" >About</a> 
+                <a className="hidden lg:block mt-8" href="/about" >About</a> 
         </SidebarContent>
     );
 }

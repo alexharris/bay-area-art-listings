@@ -185,7 +185,7 @@ export default function MapView({
     return (
         <div id="map-view" className="w-full">
             <div className="h-screen w-full">
-                <MapContainer center={[37.7749, -122.4194]} zoom={9} scrollWheelZoom={true} className="h-screen w-full z-0">
+                <MapContainer center={[37.7749, -122.4194]} zoom={10} scrollWheelZoom={true} className="h-screen w-full z-0">
                     <TileLayer
                         attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
                         url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png"
