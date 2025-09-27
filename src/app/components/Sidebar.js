@@ -57,14 +57,10 @@ export default function Sidebar({
     toggleOpenHoursOnly
 }) {
     return (
-        <div id="sidebar" className="flex flex-col lg:gap-4 fixed lg:sticky lg:top-4 w-full z-40 lg:w-[400px] pl-3 hidden lg:block">
-            <SidebarContent className=" 
-            flex
-            gap-4
-            pr-2
-    
+        <SidebarContent 
+            id="sidebar" 
 
-            ">
+        >
                 {/* Logo at the top of the sidebar */}
                 <div className="flex items-start">
                     <Link href="/">
@@ -75,11 +71,7 @@ export default function Sidebar({
                         />
                     </Link>
                 </div>
-                {/* Stats indicator showing total vs. filtered listings */}
-                <div className="flex flex-row items-center mt-10 text-md">
-                    Viewing {displayedResults} of {listings.length} listings
-                </div>
-                <div className="flex flex-row py-8 lg:mt-0 items-center justify-between w-full">
+                <div className="flex flex-row lg:mt-0 items-center justify-between w-full">
                     <label htmlFor="searchTerm" className="pr-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-search"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>                            
                     </label>
@@ -207,19 +199,20 @@ export default function Sidebar({
                         Map
                     </button>
                   </div>
-                </div>     
+                </div>    
+                {/* Stats indicator showing total vs. filtered listings */}
+                <div className="flex flex-row items-center text-md">
+                    Viewing {displayedResults} of {listings.length} listings
+                </div>                 
                 <Button 
                     onClick={clearAllFilters}
                     variant="secondary"
-                    className="self-start mb-4 mt-4"
+                    className="self-start"
                 >
                     Clear All
                 </Button>
                 
                 <a className="hidden lg:block" href="/about" >About</a> 
-            </SidebarContent>
-          
-            
-        </div>
+        </SidebarContent>
     );
 }

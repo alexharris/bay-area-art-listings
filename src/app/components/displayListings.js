@@ -21,6 +21,7 @@ import TodaysHoursStatus from './TodaysHoursStatus';
 import SortSelector from './sortSelector';
 import MapView from './MapView';
 import Sidebar from './Sidebar';
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 // Feature flags
 const sidebarCalendarIsEnabled = true; // Set to false to disable calendar features
@@ -227,51 +228,55 @@ export default function DisplayListings() {
         <div className={`flex flex-row w-full items-start lg:gap-4 ${isMapView ? 'h-screen' : ''}`}>
 
             {/* Sidebar */ }
-            <Sidebar
-                // Display states
-                showMenu={showMenu}
-                setShowMenu={setShowMenu}
-                displayedResults={displayedResults}
-                listings={listings}
-                isMapView={isMapView}
-                setIsMapView={setIsMapView}
-                showCustomCalendar={showCustomCalendar}
-                setShowCustomCalendar={setShowCustomCalendar}
-                
-                // Filter states
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                calendarTypeFilter={calendarTypeFilter}
-                setCalendarTypeFilter={setCalendarTypeFilter}
-                calendarTypeCounts={calendarTypeCounts}
-                calendarDateRangeFilter={calendarDateRangeFilter}
-                setCalendarDateRangeFilter={setCalendarDateRangeFilter}
-                calendarDateRangePreset={calendarDateRangePreset}
-                setCalendarDateRangePreset={setCalendarDateRangePreset}
-                highlightsOnly={highlightsOnly}
-                setHighlightsOnly={setHighlightsOnly}
-                openHoursOnly={openHoursOnly}
-                setOpenHoursOnly={setOpenHoursOnly}
-                selectedLocation={selectedLocation}
-                setSelectedLocation={setSelectedLocation}
-                selectedCounty={selectedCounty}
-                setSelectedCounty={setSelectedCounty}
-                sortMethod={sortMethod}
-                setSortMethod={setSortMethod}
-                
-                // Date ranges for presets
-                startOfWeek={startOfWeek}
-                endOfWeek={endOfWeek}
-                startOfMonth={startOfMonth}
-                endOfMonth={endOfMonth}
-                startOfNextMonth={startOfNextMonth}
-                endOfNextMonth={endOfNextMonth}
-                
-                // Functions
-                updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
-                clearAllFilters={clearAllFilters}
-                toggleOpenHoursOnly={toggleOpenHoursOnly}
-            />
+            <SidebarProvider
+                className="w-[400px] sticky top-0 pl-4 pt-4 hidden lg:block"
+            >         
+                <Sidebar                    
+                    // Display states
+                    showMenu={showMenu}
+                    setShowMenu={setShowMenu}
+                    displayedResults={displayedResults}
+                    listings={listings}
+                    isMapView={isMapView}
+                    setIsMapView={setIsMapView}
+                    showCustomCalendar={showCustomCalendar}
+                    setShowCustomCalendar={setShowCustomCalendar}
+                    
+                    // Filter states
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    calendarTypeFilter={calendarTypeFilter}
+                    setCalendarTypeFilter={setCalendarTypeFilter}
+                    calendarTypeCounts={calendarTypeCounts}
+                    calendarDateRangeFilter={calendarDateRangeFilter}
+                    setCalendarDateRangeFilter={setCalendarDateRangeFilter}
+                    calendarDateRangePreset={calendarDateRangePreset}
+                    setCalendarDateRangePreset={setCalendarDateRangePreset}
+                    highlightsOnly={highlightsOnly}
+                    setHighlightsOnly={setHighlightsOnly}
+                    openHoursOnly={openHoursOnly}
+                    setOpenHoursOnly={setOpenHoursOnly}
+                    selectedLocation={selectedLocation}
+                    setSelectedLocation={setSelectedLocation}
+                    selectedCounty={selectedCounty}
+                    setSelectedCounty={setSelectedCounty}
+                    sortMethod={sortMethod}
+                    setSortMethod={setSortMethod}
+                    
+                    // Date ranges for presets
+                    startOfWeek={startOfWeek}
+                    endOfWeek={endOfWeek}
+                    startOfMonth={startOfMonth}
+                    endOfMonth={endOfMonth}
+                    startOfNextMonth={startOfNextMonth}
+                    endOfNextMonth={endOfNextMonth}
+                    
+                    // Functions
+                    updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
+                    clearAllFilters={clearAllFilters}
+                    toggleOpenHoursOnly={toggleOpenHoursOnly}
+                />
+            </SidebarProvider>   
 
             {/* Main Col */}
             <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
