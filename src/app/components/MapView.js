@@ -115,8 +115,8 @@ export default function MapView({
                 position={group.position}
                 icon={L.icon({
                     iconUrl: totalItems > 1 
-                        ? "data:image/svg+xml,%3Csvg width='20' height='16' viewBox='0 0 20 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8.00001 14.6667C11.6819 14.6667 14.6667 11.6819 14.6667 8C14.6667 4.3181 11.6819 1.33333 8.00001 1.33333C4.31811 1.33333 1.33334 4.3181 1.33334 8C1.33334 11.6819 4.31811 14.6667 8.00001 14.6667Z' fill='%239ACD32' stroke='black' strokeWidth='0.666667' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M10 14.6667C13.6819 14.6667 16.6667 11.6819 16.6667 8C16.6667 4.3181 13.6819 1.33333 10 1.33333C6.31811 1.33333 3.33334 4.3181 3.33334 8C3.33334 11.6819 6.31811 14.6667 10 14.6667Z' fill='%239ACD32' stroke='black' strokeWidth='0.666667' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M12 14.6667C15.6819 14.6667 18.6667 11.6819 18.6667 8C18.6667 4.3181 15.6819 1.33333 12 1.33333C8.31811 1.33333 5.33334 4.3181 5.33334 8C5.33334 11.6819 8.31811 14.6667 12 14.6667Z' fill='%239ACD32' stroke='black' strokeWidth='0.666667' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A"
-                        : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='yellowgreen' fill-opacity='1' stroke='currentColor' strokeWidth='1' strokeLinecap='round' strokeLinejoin='round' class='feather feather-circle'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3C/svg%3E"
+                        ? "data:image/svg+xml,%3Csvg width='20' height='16' viewBox='0 0 20 16' fill='yellow' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8.00001 14.6667C11.6819 14.6667 14.6667 11.6819 14.6667 8C14.6667 4.3181 11.6819 1.33333 8.00001 1.33333C4.31811 1.33333 1.33334 4.3181 1.33334 8C1.33334 11.6819 4.31811 14.6667 8.00001 14.6667Z' fill='%2fafafa' stroke='black' strokeWidth='0.666667' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M10 14.6667C13.6819 14.6667 16.6667 11.6819 16.6667 8C16.6667 4.3181 13.6819 1.33333 10 1.33333C6.31811 1.33333 3.33334 4.3181 3.33334 8C3.33334 11.6819 6.31811 14.6667 10 14.6667Z' fill='%2fafafafa' stroke='black' strokeWidth='0.666667' strokeLinecap='round' strokeLinejoin='round'/%3E%3Cpath d='M12 14.6667C15.6819 14.6667 18.6667 11.6819 18.6667 8C18.6667 4.3181 15.6819 1.33333 12 1.33333C8.31811 1.33333 5.33334 4.3181 5.33334 8C5.33334 11.6819 8.31811 14.6667 12 14.6667Z' fill='%2FAFAFA' stroke='black' strokeWidth='0.666667' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A"
+                        : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='yellow' fill-opacity='.8' stroke='currentColor' strokeWidth='1' strokeLinecap='round' strokeLinejoin='round' class='feather feather-circle'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3C/svg%3E"
                 })}
             >
                 <Popup>
@@ -187,8 +187,8 @@ export default function MapView({
             <div className="h-screen w-full">
                 <MapContainer center={[37.7749, -122.4194]} zoom={9} scrollWheelZoom={true} className="h-screen w-full z-0">
                     <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+                        url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png"
                     />
                     {markers}
                 </MapContainer>
