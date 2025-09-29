@@ -48,7 +48,9 @@ export default function Listings({ listings, formatDate }) {
                       </a>                      
                     </div>
                   : <div className="flex flex-col justify-between mb-2 lg:mb-0 w-full lg:w-1/2">
-                      <h2>{item.Event}</h2>
+                      <span className="text-2xl lg:text-3xl mb-2 lg:mb-0">
+                        <h2>{item.Event}</h2>
+                      </span>
                       <NotesRenderer notes={item.Notes} itemIndex={index} />
                     </div>
                 }                   
