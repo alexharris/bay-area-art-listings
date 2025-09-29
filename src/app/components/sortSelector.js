@@ -10,7 +10,7 @@ export default function SortSelector({ onSortChange, currentSort }) {
     ];
 
     return (
-        <div className="flex flex-rows items-center relative">
+        <div className="flex flex-rows items-center relative w-full">
             <label className="w-20 text-sm pr-2">Sort by</label>
             <Select value={currentSort} onValueChange={onSortChange}>
                 <SelectTrigger className="flex-grow">

@@ -74,12 +74,12 @@ export default function Sidebar({
                 </div>
                 <div className="flex flex-row lg:mt-0 items-center justify-between w-full">
                     <label htmlFor="searchTerm" className="pr-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-search"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>                            
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="feather feather-search"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>                            
                     </label>
                     <Input 
                         type="text" 
                         id="searchTerm"
-                        className="flex-grow mr-1"
+                        className="flex-grow"
                         value={searchTerm} 
                         onChange={(e) => setSearchTerm(e.target.value)} 
                         placeholder="Search exhibitions..."
@@ -169,6 +169,20 @@ export default function Sidebar({
                     />
                     Only open today
                 </label>
+                {/* Stats indicator showing total vs. filtered listings */}
+                <div className="flex flex-row justify-between">
+                    <div className="flex flex-row items-center text-sm">
+                        {displayedResults} of {listings.length} listings
+                    </div>                 
+                    <Button 
+                        onClick={clearAllFilters}
+                        variant="secondary"
+                        className="self-start"
+                    >
+                        Clear All
+                    </Button>                
+                </div>
+                <hr className="my-2 border-dashed" />
                 {/* Sort Selector */}
                 <div className="flex flex-row items-center">
                   <SortSelector 
@@ -195,19 +209,9 @@ export default function Sidebar({
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>    
-                {/* Stats indicator showing total vs. filtered listings */}
-                <div className="flex flex-row items-center text-md">
-                    Viewing {displayedResults} of {listings.length} listings
-                </div>                 
-                <Button 
-                    onClick={clearAllFilters}
-                    variant="secondary"
-                    className="self-start"
-                >
-                    Clear All
-                </Button>
+
                 
-                <a className="hidden lg:block mt-8" href="/about" >About</a> 
+                <a className="hidden lg:block mt-8 text-blue-800 underline" href="/about" >About</a> 
         </SidebarContent>
     );
 }
