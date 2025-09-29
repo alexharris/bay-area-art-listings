@@ -13,7 +13,7 @@ export default function Home() {
           
         </div>
         <div>
-          <a href="/about">About Bay Area Art List</a>
+          <a href="/about">About Art Board</a>
         </div>
         <div>
 

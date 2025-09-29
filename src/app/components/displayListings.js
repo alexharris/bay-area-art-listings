@@ -229,7 +229,7 @@ export default function DisplayListings() {
 
             {/* Sidebar */ }
             <SidebarProvider
-                className="w-[400px] sticky top-0 pl-4 pt-4 hidden lg:block"
+                className="w-[400px] sticky top-0 px-4 pt-4 hidden lg:block"
             >         
                 <Sidebar                    
                     // Display states

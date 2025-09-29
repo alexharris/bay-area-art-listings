@@ -63,12 +63,12 @@ export default function Sidebar({
 
         >
                 {/* Logo at the top of the sidebar */}
-                <div className="flex items-start mb-8">
+                <div className="flex flex-col justify-center items-center w-full mb-4">
                     <Link href="/">
                         <img 
-                            src="/baal-handwritten-logo.png" 
-                            alt="Bay Area Art List Logo"     
-                            className="h-24"                       
+                            src="/art-board-logo.png" 
+                            alt="Art Board"     
+                            className="h-48"                       
                         />
                     </Link>
                 </div>

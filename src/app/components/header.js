@@ -16,14 +16,14 @@ export default function header() {
         <img
           className="h-24"
           src="/baal-handwritten-logo.png"
-          alt="Bay Area Art List Logo"
+          alt="Art Board Logo"
         />
       </Link>
       <Link className="" href="/about">
         About
       </Link>
       <Link className="hidden" href="/">
-        Bay Area Art Listings
+        Art Board
       </Link>
     </header>
   );
