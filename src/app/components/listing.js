@@ -47,10 +47,10 @@ export default function Listings({ listings, formatDate }) {
                         <svg className="feather feather-external-link w-6 lg:w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>                      
                       </a>                      
                     </div>
-                  : <span className="flex flex-col text-2xl lg:text-3xl mb-2 lg:mb-0 w-full lg:w-1/2">
+                  : <div className="flex flex-col justify-between mb-2 lg:mb-0 w-full lg:w-1/2">
                       <h2>{item.Event}</h2>
                       <NotesRenderer notes={item.Notes} itemIndex={index} />
-                    </span>
+                    </div>
                 }                   
               {/* Middle Column - Date Info  */}
               <div className="flex flex-col gap-2 w-full lg:w-1/4 text-left items-start justify-between">      
