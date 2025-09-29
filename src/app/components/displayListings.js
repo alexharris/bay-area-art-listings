@@ -13,8 +13,9 @@ import { getFilteredListings } from '../../utils/filters';
 import { sortListingsChronologically, applySorting } from '../../utils/sort'; 
 import { extractPortableTextContent } from '../../utils/helpers';
 import { getCalendarTypeCounts } from '../../utils/filterCounts';
-import MobileIconMenu from './mobileIconMenu';
-import MobileFilterBottomSheet from './mobileFilterBottomSheet';
+
+import MobileHeader from './MobileHeader';
+import MobileSidebarOverlay from './MobileSidebarOverlay';
 import Link from "next/link";
 import Listing from './listing';
 import TodaysHoursStatus from './TodaysHoursStatus';
@@ -85,12 +86,12 @@ export default function DisplayListings() {
     const [isMapView, setIsMapView] = useState(false);
     const [displayedResults, setDisplayedResults] = useState(0); // number of results
     const [showMenu, setShowMenu] = useState(false);
-    const [showBottomSheet, setShowBottomSheet] = useState(false);
-    const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
     const [sortMethod, setSortMethod] = useState('closingSoon');
     const [hideTopBar, setHideTopBar] = useState(true);
     const [calendarTypeCounts, setCalendarTypeCounts] = useState({});
+    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
 
     // Load initial data
@@ -221,18 +222,27 @@ export default function DisplayListings() {
         setShowCustomCalendar(false);
     }
 
+    function closeMobileSidebar() {
+        setMobileSidebarOpen(false);
+    }
+
 
     return (
-   
-          
-        <div className={`flex flex-row w-full items-start lg:gap-4 ${isMapView ? 'h-screen' : ''}`}>
+        <>
+            {/* Mobile Header */}
+            <MobileHeader 
+                onSidebarToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+                sidebarOpen={mobileSidebarOpen}
+            />
 
-            {/* Sidebar */ }
-            <SidebarProvider
-                className="w-[400px] sticky top-0 pl-4 pt-4 hidden lg:block"
-            >         
+            {/* Mobile Sidebar Overlay */}
+            <MobileSidebarOverlay 
+                isOpen={mobileSidebarOpen} 
+                onClose={() => setMobileSidebarOpen(false)}
+            >
                 <Sidebar                    
                     // Display states
+                    showLogo={false}
                     showMenu={showMenu}
                     setShowMenu={setShowMenu}
                     displayedResults={displayedResults}
@@ -275,8 +285,63 @@ export default function DisplayListings() {
                     updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
                     clearAllFilters={clearAllFilters}
                     toggleOpenHoursOnly={toggleOpenHoursOnly}
+                    closeMobileSidebar={closeMobileSidebar}
                 />
-            </SidebarProvider>   
+            </MobileSidebarOverlay>
+          
+            <div className={`flex flex-row w-full items-start lg:gap-4 ${isMapView ? 'h-screen' : ''}`}>
+
+                {/* Desktop Sidebar */ }
+                <SidebarProvider
+                    className="w-[400px] sticky top-0 pl-4 pt-4 hidden lg:block"
+                >         
+                    <Sidebar                    
+                        // Display states
+                        showMenu={showMenu}
+                        setShowMenu={setShowMenu}
+                        displayedResults={displayedResults}
+                        listings={listings}
+                        isMapView={isMapView}
+                        setIsMapView={setIsMapView}
+                        showCustomCalendar={showCustomCalendar}
+                        setShowCustomCalendar={setShowCustomCalendar}
+                        
+                        // Filter states
+                        searchTerm={searchTerm}
+                        setSearchTerm={setSearchTerm}
+                        calendarTypeFilter={calendarTypeFilter}
+                        setCalendarTypeFilter={setCalendarTypeFilter}
+                        calendarTypeCounts={calendarTypeCounts}
+                        calendarDateRangeFilter={calendarDateRangeFilter}
+                        setCalendarDateRangeFilter={setCalendarDateRangeFilter}
+                        calendarDateRangePreset={calendarDateRangePreset}
+                        setCalendarDateRangePreset={setCalendarDateRangePreset}
+                        highlightsOnly={highlightsOnly}
+                        setHighlightsOnly={setHighlightsOnly}
+                        openHoursOnly={openHoursOnly}
+                        setOpenHoursOnly={setOpenHoursOnly}
+                        selectedLocation={selectedLocation}
+                        setSelectedLocation={setSelectedLocation}
+                        selectedCounty={selectedCounty}
+                        setSelectedCounty={setSelectedCounty}
+                        sortMethod={sortMethod}
+                        setSortMethod={setSortMethod}
+                        
+                        // Date ranges for presets
+                        startOfWeek={startOfWeek}
+                        endOfWeek={endOfWeek}
+                        startOfMonth={startOfMonth}
+                        endOfMonth={endOfMonth}
+                        startOfNextMonth={startOfNextMonth}
+                        endOfNextMonth={endOfNextMonth}
+                        
+                        // Functions
+                        updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
+                        clearAllFilters={clearAllFilters}
+                        toggleOpenHoursOnly={toggleOpenHoursOnly}
+                        closeMobileSidebar={closeMobileSidebar}
+                    />
+                </SidebarProvider>   
 
             {/* Main Col */}
             <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
@@ -379,44 +444,11 @@ export default function DisplayListings() {
                         ) : null}
                     </>
                 )}
-                
-          
-                <MobileIconMenu 
-                    toggleBottomSheet={() => setShowBottomSheet(true)} 
-                    isMapView={isMapView}
-                    displayedResults={displayedResults}
-                    toggleMapView={toggleMapView}
-                    isBottomSheetOpen={showBottomSheet}
-                />
-                
-                {/* Mobile Filter Bottom Sheet */}
-                <MobileFilterBottomSheet
-                    isOpen={showBottomSheet}
-                    onClose={() => setShowBottomSheet(false)}
-                    calendarTypeFilter={calendarTypeFilter}
-                    setCalendarTypeFilter={setCalendarTypeFilter}
-                    calendarDateRangeFilter={calendarDateRangeFilter}
-                    setCalendarDateRangeFilter={setCalendarDateRangeFilter}
-                    calendarDateRangePreset={calendarDateRangePreset}
-                    setCalendarDateRangePreset={setCalendarDateRangePreset}
-                    highlightsOnly={highlightsOnly}
-                    setHighlightsOnly={setHighlightsOnly}
-                    openHoursOnly={openHoursOnly}
-                    setOpenHoursOnly={setOpenHoursOnly}
-                    searchTerm={searchTerm}
-                    setSearchTerm={setSearchTerm}
-                    showAdvancedFilters={showAdvancedFilters}
-                    setShowAdvancedFilters={setShowAdvancedFilters}
-                    showCustomCalendar={showCustomCalendar}
-                    setShowCustomCalendar={setShowCustomCalendar}
-                    selectedCounty={selectedCounty}
-                    setSelectedCounty={setSelectedCounty}
-                    displayedResults={displayedResults}
-                    setShowMenu={setShowMenu}
-                />
+
             
             </div>
         </div>
+        </>
     );
     
 }

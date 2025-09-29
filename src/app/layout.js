@@ -12,14 +12,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Bay Area Art List",
+  title: "Art Board",
   description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
   metadataBase: new URL("https://bayareaartlist.com"),
   openGraph: {
-    title: "Bay Area Art List",
+    title: "Art Board",
     description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
     url: "https://bayareaartlist.com",
-    siteName: "Bay Area Art List",
+    siteName: "Art Board",
     images: [
       {
         url: "/favicon/opengraph-image.png",
@@ -32,7 +32,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bay Area Art List",
+    title: "Art Board",
     description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
     images: ["/favicon/opengraph-image.png"],
   },
@@ -48,7 +48,7 @@ export const metadata = {
   },
   manifest: "/favicon/site.webmanifest",
   appleWebApp: {
-    title: "Bay Area Art List",
+    title: "Art Board",
   },
 };
 
@@ -56,7 +56,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <meta itemProp="name" content="Bay Area Art List"></meta>    
+        <meta itemProp="name" content="Art Board"></meta>    
         <meta itemProp="description" content="A directory of visual arts exhibitions in the San Francisco Bay Area."></meta>    
         <meta itemProp="image" content="https://bayareaartlist.com/favicon/opengraph-image.png"></meta>        
       </head>
