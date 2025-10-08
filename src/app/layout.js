@@ -64,6 +64,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <script async data-id="101494168" src="//static.getclicky.com/js"></script>
       </body>
     </html>
   );
