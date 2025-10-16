@@ -1,27 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import CalendarLink from './calendarLink';
 import TodaysHoursStatus from './TodaysHoursStatus';
 import NotesRenderer from './NotesRenderer';
 import DateNote from './DateNote';
+import HoursPopup from './HoursPopup';
 
 export default function Listings({ listings, formatDate }) {
     const [showDetails, setShowDetails] = useState({});
-    const [showHoursPopup, setShowHoursPopup] = useState(null);
-    const popupRef = useRef(null);
-
-    // Close popup when clicking outside
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (popupRef.current && !popupRef.current.contains(event.target)) {
-                setShowHoursPopup(null);
-            }
-        }
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
 
     return (
       <ul id="list-view" className="w-full p-2 lg:p-0">
@@ -121,69 +106,25 @@ export default function Listings({ listings, formatDate }) {
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-globe w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>                        
                       </a>
-                      <div className="relative">
+                      <div>
                         {item.locationHours ? (
-                          <span 
-                          className="underline flex flex-row gap-1 items-center cursor-pointer" 
-                          onClick={() => setShowHoursPopup(showHoursPopup === index ? null : index)}
-                          title="View hours"
+                          <HoursPopup
+                            locationName={item.locationName}
+                            locationHours={item.locationHours}
+                            locationUrl={item.locationUrl}
                           >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
-                          </span>
+                            <span 
+                              className="underline flex flex-row gap-1 items-center cursor-pointer" 
+                              title="View hours"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
+                            </span>
+                          </HoursPopup>
                         ) : (
                           <span className="flex flex-row gap-1 items-center">
                           <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
                           </span>
                         )}                                   
-                        {showHoursPopup === index && (
-                          <div 
-                            ref={popupRef}
-                            className="absolute z-50 top-full -left-16 lg:-left-80 lg:right-0 mt-1 p-3 bg-white shadow-lg border border-black w-80 lg:w-96"
-                          >
-                            <button 
-                              onClick={() => setShowHoursPopup(null)}   
-                              className="absolute top-1 right-1 p-1 text-gray-500 hover:text-gray-800"
-                              aria-label="Close"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                              </svg>
-                            </button>
-                            <h4 className="font-semibold mb-2">{item.locationName} Hours</h4>
-                            {item.locationHours ? (
-                              <ul className="text-xs lg:text-sm space-y-1">
-                                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
-                                  const isToday = day === ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][new Date().getDay()];
-                                  const hours = item.locationHours[day]
-                                    ? item.locationHours[day].replace(`${day}: `, '').replace(`${day}:`, '')
-                                    : 'Not specified';
-                                  const isClosed = hours.toLowerCase().includes('closed');
-                                
-                                  return (
-                                    <li key={day} className={`flex justify-between ${isToday ? 'bg-gray-200 p-1' : ''}`}>
-                                      <span className="mr-4">{day}:</span>
-                                      <span>
-                                        {hours}
-                                      </span>
-                                    </li>
-                                  );
-                                })}
-                              </ul>
-                            ) : (
-                              <div className="text-sm text-gray-600">
-                                <p>No hours information available.</p>
-                                {item.locationUrl && (
-                                  <p className="mt-1">
-                                    <a href={item.locationUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                                      Visit website for details
-                                    </a>
-                                  </p>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        )}
                       </div>
                       {item.locationInstagram && (
                         <a

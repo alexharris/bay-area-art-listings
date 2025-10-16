@@ -1,26 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import AddToAppleCalendar from './addToAppleCalendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 
 export default function calendarLink(data) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState('start');
     const [icsEvent, setIcsEvent] = useState({});
-    const popupRef = useRef(null);
-    
-    // Close popup when clicking outside
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (popupRef.current && !popupRef.current.contains(event.target)) {
-                setIsModalOpen(false);
-            }
-        }
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
 
     // Set the initial state for the ICS event based on the selected date
     // For APPLE calendar
@@ -91,42 +80,29 @@ export default function calendarLink(data) {
     };
 
     return (
-        <div className="relative inline-block">
-            <svg 
-                onClick={() => setIsModalOpen(!isModalOpen)} 
-                className="feather feather-calendar w-6 lg:w-5 cursor-pointer" 
-                xmlns="http://www.w3.org/2000/svg" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="#000000" 
-                strokeWidth="1" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-                title="Add to calendar"
-            >
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-            
-            {isModalOpen && (
-                <div 
-                    ref={popupRef}
-                    className="absolute z-50 top-full lg:-right-20 lg:right-0 mt-1 p-3 bg-white shadow-lg border border-black w-80"
+        <Popover>
+            <PopoverTrigger asChild>
+                <svg 
+                    className="feather feather-calendar w-6 lg:w-5 cursor-pointer" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="#000000" 
+                    strokeWidth="1" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    title="Add to calendar"
                 >
-                    <button 
-                        onClick={() => setIsModalOpen(!isModalOpen)} 
-                        className="absolute top-1 right-1 p-1 text-gray-500 hover:text-gray-800"
-                        aria-label="Close"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>                    
-                    <h4 className="font-semibold mb-2">Add to Calendar</h4>
-                    <div className="pb-2">{data.listing.Event}</div>
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+            </PopoverTrigger>
+            <PopoverContent className="w-80" align="end">
+                <div className="space-y-3">
+                    <h4 className="font-semibold text-sm">Add to Calendar</h4>
+                    <div className="text-sm font-medium">{data.listing.Event}</div>
                     <div className="text-sm">
                         <fieldset className="flex flex-col space-y-2 mb-3">
                             <label className="flex items-center">
@@ -162,7 +138,7 @@ export default function calendarLink(data) {
                         </div>
                     </div>
                 </div>
-            )}
-        </div>
+            </PopoverContent>
+        </Popover>
     );
 }
