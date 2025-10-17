@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import bayAreaZipcodes from '../../data/bay-area-zipcodes.json';
-import { getCountyCounts } from '../../utils/filterCounts';
+import bayAreaZipcodes from '../../../data/bay-area-zipcodes.json';
+import { getCountyCounts } from '../../../utils/filterCounts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 function getZipcodesByCounty(county) {

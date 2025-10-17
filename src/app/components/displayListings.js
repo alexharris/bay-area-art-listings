@@ -1,30 +1,20 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import getListings from './getListings';
 import getLocations from './getLocations';
-import CalendarLink from './calendarLink';
-import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
-import { format, set, setDay } from 'date-fns';
-import DisplayFilters from './displayFilters';
-import AddEmailForm from './old/addEmailForm';
+import DisplayFilters from './sidebar/displayFilters';
 import { getFilteredListings } from '../../utils/filters';
-import { sortListingsChronologically, applySorting } from '../../utils/sort'; 
-import { extractPortableTextContent } from '../../utils/helpers';
+import { applySorting } from '../../utils/sort'; 
 import { getCalendarTypeCounts } from '../../utils/filterCounts';
 
-import MobileHeader from './MobileHeader';
-import MobileSidebarOverlay from './MobileSidebarOverlay';
-import Link from "next/link";
+import MobileHeader from './mobileHeader';
+import MobileSidebarOverlay from './sidebar/mobileSidebarOverlay';
 import Listing from './listing';
-import TodaysHoursStatus from './TodaysHoursStatus';
-import SortSelector from './sortSelector';
-import MapView from './MapView';
-import Sidebar from './Sidebar';
-
-// Feature flags
-const sidebarCalendarIsEnabled = true; // Set to false to disable calendar features
+import SortSelector from './sidebar/sortSelector';
+import MapView from './map/mapView';
+import Sidebar from './sidebar/sidebar';
 
 // Don't show year if its the current year
 function formatDate(dateString) {

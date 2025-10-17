@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
-import { extractPortableTextContent } from '../../utils/helpers';
-import TodaysHoursStatus from './TodaysHoursStatus';
+import { extractPortableTextContent } from '../../../utils/helpers';
+import TodaysHoursStatus from '../todaysHoursStatus';
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
