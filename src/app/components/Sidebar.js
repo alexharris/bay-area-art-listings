@@ -8,7 +8,6 @@ import SortSelector from './sortSelector';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SidebarContent } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
@@ -60,9 +59,9 @@ export default function Sidebar({
     closeMobileSidebar
 }) {
     return (
-        <SidebarContent 
+        <div 
             id="sidebar" 
-
+            className="flex flex-col p-4 space-y-4 max-h-full overflow-y-auto"
         >
                 {/* Logo at the top of the sidebar */}
                 {showLogo && (
@@ -227,6 +226,6 @@ export default function Sidebar({
                 >
                     About
                 </a> 
-        </SidebarContent>
+        </div>
     );
 }

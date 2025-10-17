@@ -22,7 +22,6 @@ import TodaysHoursStatus from './TodaysHoursStatus';
 import SortSelector from './sortSelector';
 import MapView from './MapView';
 import Sidebar from './Sidebar';
-import { SidebarProvider } from "@/components/ui/sidebar";
 
 // Feature flags
 const sidebarCalendarIsEnabled = true; // Set to false to disable calendar features
@@ -292,8 +291,8 @@ export default function DisplayListings() {
             <div className={`flex flex-row w-full items-start lg:gap-4 ${isMapView ? 'h-screen' : ''}`}>
 
                 {/* Desktop Sidebar */ }
-                <SidebarProvider
-                    className="w-[400px] sticky top-0 pl-4 pt-4 hidden lg:block"
+                <div
+                    className="w-[400px] sticky top-0 pt-4 hidden lg:block h-screen"
                 >         
                     <Sidebar                    
                         // Display states
@@ -341,7 +340,7 @@ export default function DisplayListings() {
                         toggleOpenHoursOnly={toggleOpenHoursOnly}
                         closeMobileSidebar={closeMobileSidebar}
                     />
-                </SidebarProvider>   
+                </div>   
 
             {/* Main Col */}
             <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
