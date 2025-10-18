@@ -37,7 +37,7 @@ export default function NotesRenderer({ notes, itemIndex }) {
     const isExpanded = expandedNotes[itemIndex];
     
     return (
-        <div className="my-2">
+        <div className="my-2 text-sm">
             <span className="whitespace-pre-wrap">{previewText}</span>
             {expandedText && (
                 <>
