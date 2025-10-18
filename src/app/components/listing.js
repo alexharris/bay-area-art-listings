@@ -10,7 +10,7 @@ export default function Listings({ listings, formatDate }) {
   const [showDetails, setShowDetails] = useState({});
 
   return (
-    <ul id="list-view" className="w-full p-2 lg:p-0">
+    <ul id="list-view" className="w-full px-3 md:p-2 lg:p-0">
       {listings.map((item, index) => (
         <li className="border-b min-h-40 border-dashed border-gray-400 pt-5 pb-6 w-full relative flex flex-col lg:flex-row justify-between gap-2 lg:gap-4" key={index}>
           {/* Left Column - Event and Today's Hours */}
