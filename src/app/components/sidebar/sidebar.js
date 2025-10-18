@@ -189,7 +189,7 @@ export default function Sidebar({
                 </div>
                 <Button 
                     variant="secondary"
-                    className="w-full"
+                    className="w-full md:hidden"
                     onClick={closeMobileSidebar}
                 >
                     View {displayedResults} Results
