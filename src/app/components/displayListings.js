@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import getListings from './getListings';
 import getLocations from './getLocations';
 import 'leaflet/dist/leaflet.css';
-import DisplayFilters from './sidebar/displayFilters';
 import { getFilteredListings } from '../../utils/filters';
 import { applySorting } from '../../utils/sort'; 
 import { getCalendarTypeCounts } from '../../utils/filterCounts';
@@ -12,7 +11,6 @@ import { getCalendarTypeCounts } from '../../utils/filterCounts';
 import MobileHeader from './mobileHeader';
 import MobileSidebarOverlay from './sidebar/mobileSidebarOverlay';
 import Listing from './listing';
-import SortSelector from './sidebar/sortSelector';
 import MapView from './map/mapView';
 import Sidebar from './sidebar/sidebar';
 
@@ -67,10 +65,8 @@ export default function DisplayListings() {
     const [selectedLocation, setSelectedLocation] = useState('');
     const [selectedCounty, setSelectedCounty] = useState([]);
     //  Sorting
-    const [sortDate, setSortDate] = useState([]);
     // Display
     const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('custom');
-    const [showDetails, setShowDetails] = useState({});
     const [loading, setLoading] = useState(true);
     const [isMapView, setIsMapView] = useState(false);
     const [displayedResults, setDisplayedResults] = useState(0); // number of results
@@ -78,7 +74,6 @@ export default function DisplayListings() {
 
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
     const [sortMethod, setSortMethod] = useState('closingSoon');
-    const [hideTopBar, setHideTopBar] = useState(true);
     const [calendarTypeCounts, setCalendarTypeCounts] = useState({});
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -340,75 +335,6 @@ export default function DisplayListings() {
                     </div>
                 ) : (
                     <>  
-                        {/* Top bar */}
-                        {!hideTopBar && (
-                            <div className="flex flex-col justify-between align-bottom items-center  sticky top-0 z-30 bg-white">                    
-                                <div className="flex flex-row items-center justify-between w-full border-b border-dashed border-black py-4">
-                                    <div className="flex flex-row gap-1 lg:items-end text-xl">
-                                        <DisplayFilters                                 
-                                            type={calendarTypeFilter}
-                                            presetRange={calendarDateRangePreset}
-                                            customRange={calendarDateRangeFilter}
-                                            displayedResults={displayedResults}
-                                            selectedCounty={selectedCounty}
-                                        />                                    
-                                        <span className="hidden lg:block text-xs relative bottom-2">({displayedResults})</span>
-                                        <SortSelector 
-                                            onSortChange={setSortMethod}
-                                            currentSort={sortMethod}
-                                        />
-                                    </div>
-
-                                    {/* <svg className="icon-link block lg:hidden w-[24px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>                          */}
-                                    <div className="hidden lg:flex flex-row gap-2 items-center">
-                                        <div className="flex items-center">
-                                            <svg 
-                                                xmlns="http://www.w3.org/2000/svg" 
-                                                className="w-5 h-5 mr-2 cursor-pointer" 
-                                                viewBox="0 0 24 24" 
-                                                fill="none" 
-                                                stroke="currentColor" 
-                                                strokeWidth="1.5" 
-                                                strokeLinecap="round" 
-                                                strokeLinejoin="round"
-                                                onClick={() => isMapView && toggleMapView()}
-                                            >
-                                                <line x1="8" y1="6" x2="21" y2="6"></line>
-                                                <line x1="8" y1="12" x2="21" y2="12"></line>
-                                                <line x1="8" y1="18" x2="21" y2="18"></line>
-                                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                                            </svg>
-                                            <label className="relative inline-flex items-center cursor-pointer">
-                                                <input 
-                                                    type="checkbox" 
-                                                    className="sr-only peer" 
-                                                    checked={isMapView} 
-                                                    onChange={toggleMapView} 
-                                                />
-                                                <div className="w-10 h-5 bg-gray-100 border border-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-gray-700 after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-100"></div>
-                                            </label>
-                                            <svg 
-                                                xmlns="http://www.w3.org/2000/svg" 
-                                                className="w-5 h-5 ml-2 cursor-pointer" 
-                                                viewBox="0 0 24 24" 
-                                                fill="none" 
-                                                stroke="currentColor" 
-                                                strokeWidth="1.5" 
-                                                strokeLinecap="round" 
-                                                strokeLinejoin="round"
-                                                onClick={() => !isMapView && toggleMapView()}
-                                            >
-                                                <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-                                                <line x1="8" y1="2" x2="8" y2="18"></line>
-                                                <line x1="16" y1="6" x2="16" y2="22"></line>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>                                                                    
-                            </div>
-                        )}
 
                         {displayedResults === 0 && 
                             <div className="text-center flex-grow flex flex-col justify-center text-2xl py-36">

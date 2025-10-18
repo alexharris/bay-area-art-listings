@@ -88,8 +88,6 @@ export function getFilteredListings(filters, listings) {
     calendarDateRangeFilter: filters.calendarDateRangeFilter || { from: startOfWeek, to: endOfWeek },
   };
 
-  console.log(filters);
-
   let filteredListings = listings
   .filter(item =>filters.openHoursOnly ? determineOpenHoursFilter(item) : true)
   .filter(item => filters.selectedLocation ? item.locationName === filters.selectedLocation : true) // Selected Location

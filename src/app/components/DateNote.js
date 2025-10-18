@@ -27,15 +27,6 @@ export default function DateNote({ startDate, endDate }) {
   const eventStartDateLA = getEventDateInLA(startDate);
   const eventEndDateLA = getEventDateInLA(endDate);
 
-  // Debug logging to see what dates we're comparing
-  console.log('DateNote Debug:', {
-    startDate,
-    endDate,
-    todayLA,
-    eventStartDateLA,
-    eventEndDateLA,
-    isMatch: eventStartDateLA === todayLA
-  });
 
   // Check if event is opening today by comparing date strings
   const isOpeningToday = eventStartDateLA === todayLA;
