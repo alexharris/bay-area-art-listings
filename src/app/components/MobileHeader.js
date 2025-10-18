@@ -10,14 +10,14 @@ export default function MobileHeader({ onSidebarToggle }) {
         <img 
           src="/art-board-logo.png" 
           alt="Art Board"     
-          className="h-12"                       
+          className="h-8"                       
         />
       </Link>
       
       {/* Sidebar Toggle Button */}
       <button
         onClick={onSidebarToggle}
-        className="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+        className=""
         aria-label="Toggle sidebar"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="feather feather-sidebar"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>

@@ -355,7 +355,11 @@ export default function DisplayListings() {
                                 />
                             </div>
                         ) : displayedResults > 0 ? (
+                            <>
+                            <div className=" p-3 text-sm bg-gray-100 text-center md:hidden">A directory of visual arts exhibitions in the Bay Area</div>
+
                             <Listing listings={filteredListings} formatDate={formatDate} />                            
+                            </>
                         ) : null}
                     </>
                 )}

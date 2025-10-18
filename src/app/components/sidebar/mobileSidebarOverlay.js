@@ -12,12 +12,12 @@ export default function MobileSidebarOverlay({ isOpen, onClose, children }) {
       )}
       
       {/* Sidebar */}
-      <div className={`fixed top-0 left-0 right-8 h-full bg-white z-50 transform transition-transform duration-300 ease-out lg:hidden ${
+      <div className={`fixed top-0 left-0 right-6 h-full bg-white z-50 transform transition-transform duration-300 ease-out lg:hidden ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex flex-col h-full">
           {/* Close button */}
-          <div className="flex justify-end pl-4 py-2">
+          <div className="flex justify-end pt-2">
             <button
               onClick={onClose}
               className="p-2 mr-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
