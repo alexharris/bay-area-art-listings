@@ -17,7 +17,7 @@ export default function MobileSidebarOverlay({ isOpen, onClose, children }) {
       }`}>
         <div className="flex flex-col h-full">
           {/* Close button */}
-          <div className="flex justify-end pl-4 py-4">
+          <div className="flex justify-end pl-4 py-2">
             <button
               onClick={onClose}
               className="p-2 mr-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
@@ -36,7 +36,7 @@ export default function MobileSidebarOverlay({ isOpen, onClose, children }) {
           </div>
           
           {/* Sidebar content */}
-          <div className="flex-1 overflow-y-auto pl-4">
+          <div className="flex-1 overflow-y-auto md:pl-4">
             {children}
           </div>
         </div>

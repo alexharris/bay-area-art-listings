@@ -61,7 +61,7 @@ export default function Sidebar({
     return (
         <div 
             id="sidebar" 
-            className="flex flex-col p-4 space-y-4 max-h-full overflow-y-auto"
+            className="flex flex-col px-4 space-y-4 max-h-full overflow-y-auto"
         >
                 {/* Logo at the top of the sidebar */}
                 {showLogo && (
@@ -174,18 +174,26 @@ export default function Sidebar({
                     Only open today
                 </label>
                 {/* Stats indicator showing total vs. filtered listings */}
-                <div className="flex flex-row justify-between">
+                <div className="flex flex-row gap-2 justify-end">
                     <div className="flex flex-row items-center text-sm">
                         {displayedResults} of {listings.length} listings
                     </div>                 
                     <Button 
                         onClick={clearAllFilters}
-                        variant="secondary"
+                        variant="outline"
+                        size="sm"
                         className="self-start"
                     >
-                        Clear All
+                        Reset
                     </Button>                
                 </div>
+                <Button 
+                    variant="secondary"
+                    className="w-full"
+                    onClick={closeMobileSidebar}
+                >
+                    View {displayedResults} Results
+                </Button>
                 <hr className="my-2 border-dashed" />
                 {/* Sort Selector */}
                 <div className="flex flex-row items-center">
