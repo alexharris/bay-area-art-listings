@@ -1,20 +1,52 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+
 export default function MobileSidebarOverlay({ isOpen, onClose, children }) {
+  const [shouldRender, setShouldRender] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  useEffect(() => {
+    if (isOpen) {
+      // Mount the component
+      setShouldRender(true)
+      // Trigger animation after a brief delay to ensure DOM is ready
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsAnimating(true)
+        })
+      })
+    } else {
+      // Start closing animation
+      setIsAnimating(false)
+      // Unmount after animation completes
+      const timer = setTimeout(() => {
+        setShouldRender(false)
+      }, 200) // Match this to your transition duration
+      return () => clearTimeout(timer)
+    }
+  }, [isOpen])
+
+  if (!shouldRender) return null
+
   return (
     <>
       {/* Backdrop */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden"
-          onClick={onClose}
-        />
-      )}
+      <div 
+        className={`fixed inset-0 bg-black z-50 lg:hidden transition-opacity duration-50 ${
+          isAnimating ? 'opacity-50' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={onClose}
+      />
       
       {/* Sidebar */}
-      <div className={`fixed top-0 left-0 right-6 h-full bg-white z-50 transform transition-transform duration-300 ease-out lg:hidden ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <div 
+        className="fixed top-0 left-0 right-6 h-full bg-white z-50 lg:hidden"
+        style={{
+          transform: isAnimating ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'transform 100ms ease-in-out'
+        }}
+      >
         <div className="flex flex-col h-full">
           {/* Close button */}
           <div className="flex justify-end pt-2">
