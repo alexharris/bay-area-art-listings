@@ -28,7 +28,7 @@ export default function NotesRenderer({ notes, itemIndex }) {
     
     // Check if the notes contain the +++ delimiter
     if (!notesString.includes('+++')) {
-        return <div className="my-2 whitespace-pre-wrap">{notesString}</div>;
+        return <div className="my-2 whitespace-pre-wrap text-sm">{notesString}</div>;
     }
     
     const parts = notesString.split('+++');

@@ -30,18 +30,10 @@ export default function MobileSidebarOverlay({ isOpen, onClose, children }) {
   if (!shouldRender) return null
 
   return (
-    <>
-      {/* Backdrop */}
-      <div 
-        className={`fixed inset-0 bg-black z-50 lg:hidden transition-opacity duration-50 ${
-          isAnimating ? 'opacity-50' : 'opacity-0 pointer-events-none'
-        }`}
-        onClick={onClose}
-      />
-      
+    <> 
       {/* Sidebar */}
       <div 
-        className="fixed top-0 left-0 right-6 h-full bg-white z-50 lg:hidden"
+        className="fixed top-0 left-0 right-0 h-full bg-white z-50 lg:hidden"
         style={{
           transform: isAnimating ? 'translateX(0)' : 'translateX(-100%)',
           transition: 'transform 100ms ease-in-out'
