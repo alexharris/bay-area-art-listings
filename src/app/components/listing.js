@@ -5,15 +5,17 @@ import NotesRenderer from './notesRenderer';
 import DateNote from './dateNote';
 import HoursPopup from './hoursPopup';
 import CityFromPlaceId from './cityFromPlaceId';
+import HoverImage from './hoverImage';
 
 export default function Listings({ listings, formatDate }) {
   const [showDetails, setShowDetails] = useState({});
+  const { handleMouseEnter, handleMouseLeave, ImageDisplay } = HoverImage({ listings });
 
   return (
     <ul id="list-view" className="w-full px-3 md:p-2 lg:p-0">
       {listings.map((item, index) => (
         <li className="border-b min-h-40 border-dashed border-gray-400 pt-5 pb-6 w-full relative flex flex-col lg:flex-row justify-between gap-2 lg:gap-4" key={index}>
-          {/* Left Column - Event and Today's Hours */}
+          {/* Left Column - Event and Note */}
           {item.EventUrl
             ? <div className="flex flex-col justify-between mb-2 lg:mb-0 w-full lg:w-1/2">
                 <div className="flex flex-col">
@@ -21,6 +23,8 @@ export default function Listings({ listings, formatDate }) {
                     href={item.EventUrl}
                     target="_blank"
                     className="text-2xl lg:text-3xl mb-2 lg:mb-0"
+                    onMouseEnter={() => handleMouseEnter(index)}
+                    onMouseLeave={handleMouseLeave}
                   >
                     <h2 className=""><span className="inline-block float-left">{item.Event}</span></h2>
                   </a>
@@ -32,7 +36,11 @@ export default function Listings({ listings, formatDate }) {
                 </a>                      
               </div>
             : <div className="flex flex-col justify-between mb-2 lg:mb-0 w-full lg:w-1/2">
-                <span className="text-2xl lg:text-3xl mb-2 lg:mb-0">
+                <span 
+                  className="text-2xl lg:text-3xl mb-2 lg:mb-0"
+                  onMouseEnter={() => handleMouseEnter(index)}
+                  onMouseLeave={handleMouseLeave}
+                >
                   <h2>{item.Event}</h2>
                 </span>
                 <NotesRenderer notes={item.Notes} itemIndex={index} />
@@ -179,6 +187,8 @@ export default function Listings({ listings, formatDate }) {
           )}
         </li>
       ))}
+      
+      <ImageDisplay />
     </ul>
   );
 }

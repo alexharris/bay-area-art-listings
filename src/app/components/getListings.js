@@ -1,4 +1,5 @@
 import { createClient } from '@sanity/client';
+import imageUrlBuilder from '@sanity/image-url';
 
 const client = createClient({
     projectId: 'ride9vgj',
@@ -6,6 +7,12 @@ const client = createClient({
     useCdn: false,
     apiVersion: 'v2022-03-07'
 });
+
+const builder = imageUrlBuilder(client);
+
+function urlFor(source) {
+  return builder.image(source);
+}
 
 export default async function getListings() {
   try {
@@ -20,14 +27,26 @@ export default async function getListings() {
     }));
 
     // combine them
-    data = data.map((listing, index) => ({
-      ...listing,
-      locationName: locations[index][0]?.Name || 'Unknown',
-      locationAddress: locations[index][0]?.Address || 'Address Not Listed',
-      locationUrl: locations[index][0]?.Url || '',
-      locationHours: locations[index][0]?.Hours || '',
-      locationInstagram: locations[index][0]?.Instagram || '',
-    }));
+    data = data.map((listing, index) => {
+      let eventImageUrl = null;
+      
+      // Uploaded image takes priority over URL string
+      if (listing.EventImageUpload) {
+        eventImageUrl = urlFor(listing.EventImageUpload).width(400).height(300).url();
+      } else if (listing.EventImageUrl) {
+        eventImageUrl = listing.EventImageUrl;
+      }
+      
+      return {
+        ...listing,
+        locationName: locations[index][0]?.Name || 'Unknown',
+        locationAddress: locations[index][0]?.Address || 'Address Not Listed',
+        locationUrl: locations[index][0]?.Url || '',
+        locationHours: locations[index][0]?.Hours || '',
+        locationInstagram: locations[index][0]?.Instagram || '',
+        eventImageUrl,
+      };
+    });
 
     if(data.length > 0) {
         return data
