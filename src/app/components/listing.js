@@ -5,26 +5,38 @@ import NotesRenderer from './notesRenderer';
 import DateNote from './dateNote';
 import HoursPopup from './hoursPopup';
 import CityFromPlaceId from './cityFromPlaceId';
-import HoverImage from './hoverImage';
 
 export default function Listings({ listings, formatDate }) {
   const [showDetails, setShowDetails] = useState({});
-  const { handleMouseEnter, handleMouseLeave, ImageDisplay } = HoverImage({ listings });
 
   return (
     <ul id="list-view" className="w-full px-3 md:p-2 lg:p-0">
       {listings.map((item, index) => (
         <li className="border-b min-h-40 border-dashed border-gray-400 pt-5 pb-6 w-full relative flex flex-col lg:flex-row justify-between gap-2 lg:gap-4" key={index}>
+
+          
           {/* Left Column - Event and Note */}
           {item.EventUrl
-            ? <div className="flex flex-col justify-between mb-2 lg:mb-0 w-full lg:w-1/2">
+            ? <div className="flex flex-col lg:flex-row lg:gap-4 justify-between mb-2 lg:mb-0 w-full lg:w-1/2">
+              {/* Thumbnail Image */}
+              {item.eventImageUrl && (
+                <div className=" flex-shrink-0 mb-3 lg:mb-0">
+                  <img 
+                    src={item.eventImageUrl} 
+                    alt={item.eventImageCaption || item.Event}
+                    className="max-h-56 w-auto lg:max-h-none lg:w-36 lg:h-36 object-cover"
+                  />
+                  {item.eventImageCaption && (
+                    <p className="text-xs text-gray-600 mt-1">{item.eventImageCaption}</p>
+                  )}
+                </div>
+              )}         
+              <div>
                 <div className="flex flex-col">
                   <a 
                     href={item.EventUrl}
                     target="_blank"
                     className="text-2xl lg:text-3xl mb-2 lg:mb-0"
-                    onMouseEnter={() => handleMouseEnter(index)}
-                    onMouseLeave={handleMouseLeave}
                   >
                     <h2 className=""><span className="inline-block float-left">{item.Event}</span></h2>
                   </a>
@@ -35,12 +47,9 @@ export default function Listings({ listings, formatDate }) {
                   <svg className="feather feather-external-link w-6 lg:w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>                      
                 </a>                      
               </div>
+              </div>       
             : <div className="flex flex-col justify-between mb-2 lg:mb-0 w-full lg:w-1/2">
-                <span 
-                  className="text-2xl lg:text-3xl mb-2 lg:mb-0"
-                  onMouseEnter={() => handleMouseEnter(index)}
-                  onMouseLeave={handleMouseLeave}
-                >
+                <span className="text-2xl lg:text-3xl mb-2 lg:mb-0">
                   <h2>{item.Event}</h2>
                 </span>
                 <NotesRenderer notes={item.Notes} itemIndex={index} />
@@ -187,8 +196,6 @@ export default function Listings({ listings, formatDate }) {
           )}
         </li>
       ))}
-      
-      <ImageDisplay />
     </ul>
   );
 }

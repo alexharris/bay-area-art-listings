@@ -18,16 +18,13 @@ export const listingType = defineType({
       type: 'url',
       title: 'Event Image URL',
       description: 'URL of image to display when hovering over the event title'
-    }),
+    }),     
     defineField({
-      name: 'EventImageUpload',
-      type: 'image',
-      title: 'Event Image Upload',
-      description: 'Upload an image to display when hovering. This will override the Image URL if both are set.',
-      options: {
-        hotspot: true
-      }
-    }),      
+      name: 'EventImageCaption',
+      type: 'string',
+      title: 'Event Image Caption',
+      description: 'Caption for the event image. Will be displayed below the image.'
+    }),
     defineField({
       name: 'StartDate',
       type: 'date',

@@ -135,6 +135,18 @@ export default function MapView({
                                 <h2>{currentItem.Event}</h2>
                                 </span>
                         }  
+                        {currentItem.eventImageUrl && (
+                            <div className="flex-shrink-0">
+                                <img 
+                                    src={currentItem.eventImageUrl} 
+                                    alt={currentItem.eventImageCaption || currentItem.Event}
+                                    className="max-h-36 w-auto lg:max-h-none lg:w-36 lg:h-36 object-cover"
+                                />
+                                {currentItem.eventImageCaption && (
+                                    <p className="text-xs text-gray-600 mt-1">{currentItem.eventImageCaption}</p>
+                                )}
+                            </div>
+                        )}
                         <span className="font-semibold">
                             {currentItem.DateOverride || `${formatDate(currentItem.StartDate)} - ${formatDate(currentItem.EndDate)}`}
                         </span>                                                            

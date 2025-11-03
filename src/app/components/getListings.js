@@ -29,12 +29,14 @@ export default async function getListings() {
     // combine them
     data = data.map((listing, index) => {
       let eventImageUrl = null;
+      let eventImageCaption = null;
       
       // Uploaded image takes priority over URL string
       if (listing.EventImageUpload) {
         eventImageUrl = urlFor(listing.EventImageUpload).width(400).height(300).url();
       } else if (listing.EventImageUrl) {
         eventImageUrl = listing.EventImageUrl;
+        eventImageCaption = listing.EventImageCaption;
       }
       
       return {
@@ -45,6 +47,7 @@ export default async function getListings() {
         locationHours: locations[index][0]?.Hours || '',
         locationInstagram: locations[index][0]?.Instagram || '',
         eventImageUrl,
+        eventImageCaption,
       };
     });
 

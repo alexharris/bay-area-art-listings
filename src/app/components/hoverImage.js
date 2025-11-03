@@ -51,7 +51,7 @@ export default function HoverImage({ listings }) {
           >
             <img 
               src={listings[hoveredItem].eventImageUrl} 
-              alt={listings[hoveredItem].Event}
+              alt={listings[hoveredItem].eventImageAlt || listings[hoveredItem].Event}
               className="w-80 h-80 object-contain"
             />
           </div>
