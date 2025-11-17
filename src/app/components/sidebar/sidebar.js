@@ -2,6 +2,7 @@
 
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
+import { useState } from "react";
 import CountySelector from './countySelector';
 import FilterPresets from '../filterPresets';
 import SortSelector from './sortSelector';
@@ -10,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import AboutContent from '../aboutContent';
 
 export default function Sidebar({
     // Display states
@@ -58,6 +61,8 @@ export default function Sidebar({
     toggleOpenHoursOnly,
     closeMobileSidebar
 }) {
+    const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
+    
     return (
         <div 
             id="sidebar" 
@@ -227,13 +232,26 @@ export default function Sidebar({
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>    
-                <a 
-                    className="mt-8 text-blue-800 underline" 
-                    href="/about" 
-                    onClick={closeMobileSidebar}
+                <button 
+                    className="mt-8 text-blue-800 underline text-left" 
+                    onClick={() => {
+                        setAboutDialogOpen(true);
+                        if (closeMobileSidebar && window.innerWidth < 1024) {
+                            closeMobileSidebar();
+                        }
+                    }}
                 >
                     About
-                </a> 
+                </button>
+                
+                <Dialog open={aboutDialogOpen} onOpenChange={setAboutDialogOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle className="sr-only">About</DialogTitle>
+                        </DialogHeader>
+                        <AboutContent />
+                    </DialogContent>
+                </Dialog>
         </div>
     );
 }
