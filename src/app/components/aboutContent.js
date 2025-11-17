@@ -83,6 +83,7 @@ export default function AboutContent() {
         content.map((item, index) => (
           <div className="prose max-w-none" key={index}>
             <h1>{item.Header}</h1>
+            
             <PortableText
               value={item.Content}
               components={components}
