@@ -12,12 +12,12 @@ export default function Listings({ listings, formatDate }) {
   return (
     <ul id="list-view" className="w-full px-3 md:p-2 lg:p-0">
       {listings.map((item, index) => (
-        <li className="border-b min-h-40 border-dashed border-gray-400 pt-5 pb-6 w-full relative flex flex-col lg:flex-row justify-between gap-2 lg:gap-4" key={index}>
+        <li className="border-b min-h-40 border-dashed border-gray-400 pt-5 pb-6 w-full relative flex flex-col md:flex-row justify-between gap-2 lg:gap-4" key={index}>
 
           
           {/* Left Column - Event and Note */}
           {item.EventUrl
-            ? <div className="flex flex-col lg:flex-row lg:gap-4 justify-between mb-2 lg:mb-0 w-full lg:w-1/2">
+            ? <div className="flex flex-col lg:flex-row lg:gap-4 justify-between mb-2 lg:mb-0 w-full lg:w-2/3">
               {/* Thumbnail Image */}
               {item.eventImageUrl && (
                 <div className=" flex-shrink-0 mb-3 lg:mb-0">
@@ -56,8 +56,11 @@ export default function Listings({ listings, formatDate }) {
               </div>
           }
           
+          {/* Right Side Container - Date and Location stacked */}
+          <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-2 lg:gap-4 w-full lg:w-1/2">
+          
           {/* Middle Column - Date Info  */}
-          <div className="flex flex-col gap-2 w-full lg:w-1/4 text-left items-start justify-between">      
+          <div className="flex flex-col gap-2 w-full text-left items-start justify-between">      
             <div className="flex flex-col items-start gap-1">
               <div className="font-semibold">
                 {item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`}
@@ -69,7 +72,7 @@ export default function Listings({ listings, formatDate }) {
           </div>
 
           {/* Right Column - Location Info */}
-          <div className="flex flex-col items-start justify-between w-full lg:w-1/4">              
+          <div className="flex flex-col items-start justify-between w-full">              
             
             {item.locationName.toLowerCase() === 'various' 
               ? <div className="flex flex-row font-semibold">
@@ -166,6 +169,8 @@ export default function Listings({ listings, formatDate }) {
                   </div>                             
                 </>                  
             }                                                
+          </div>
+          
           </div>       
 
           {/*               
