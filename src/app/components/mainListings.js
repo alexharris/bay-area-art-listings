@@ -8,7 +8,7 @@ import { getFilteredListings } from '../../utils/filters';
 import { applySorting } from '../../utils/sort'; 
 import { getCalendarTypeCounts } from '../../utils/filterCounts';
 
-import MobileHeader from './mobileHeader';
+import MobileHeader from './MobileHeader';
 import MobileSidebarOverlay from './sidebar/mobileSidebarOverlay';
 import Listing from './listing';
 import MapView from './map/mapView';
