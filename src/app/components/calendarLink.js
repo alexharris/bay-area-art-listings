@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/popover";
 
 
-export default function calendarLink(data) {
+export default function CalendarLink(data) {
     const [selectedDate, setSelectedDate] = useState('start');
     const [icsEvent, setIcsEvent] = useState({});
 

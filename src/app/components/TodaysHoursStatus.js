@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function OpenStatus({ locationHours, locationUrl }) {
+export default function TodaysHoursStatus({ locationHours, locationUrl }) {
   if (!locationHours) {
     return (
       <a className="flex flex-row items-center gap-1 text-sm" href={locationUrl} target="_blank">
