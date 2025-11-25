@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import AddToAppleCalendar from './addToAppleCalendar';
+import AddToAppleCalendar from './AddToAppleCalendar';
 import {
   Popover,
   PopoverContent,

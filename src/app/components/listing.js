@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import CalendarLink from './calendarLink';
-import TodaysHoursStatus from './todaysHoursStatus';
-import NotesRenderer from './notesRenderer';
-import DateNote from './dateNote';
-import HoursPopup from './hoursPopup';
-import CityFromPlaceId from './cityFromPlaceId';
+import CalendarLink from './CalendarLink';
+import TodaysHoursStatus from './TodaysHoursStatus';
+import NotesRenderer from './NotesRenderer';
+import DateNote from './DateNote';
+import HoursPopup from './HoursPopup';
+import CityFromPlaceId from './CityFromPlaceId';
 
 export default function Listings({ listings, formatDate }) {
   const [showDetails, setShowDetails] = useState({});
