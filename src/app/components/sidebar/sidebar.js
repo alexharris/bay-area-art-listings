@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import AboutContent from '../aboutContent';
 
 export default function Sidebar({
@@ -234,23 +235,30 @@ export default function Sidebar({
                 </div>    
                 <button 
                     className="mt-8 text-blue-800 underline text-left" 
-                    onClick={() => {
-                        setAboutDialogOpen(true);
-                        if (closeMobileSidebar && window.innerWidth < 1024) {
-                            closeMobileSidebar();
-                        }
-                    }}
+                    onClick={() => setAboutDialogOpen(true)}
                 >
                     About
                 </button>
                 
                 <Dialog open={aboutDialogOpen} onOpenChange={setAboutDialogOpen}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle className="sr-only">About</DialogTitle>
-                        </DialogHeader>
-                        <AboutContent />
-                    </DialogContent>
+                    <DialogPortal>
+                        <DialogOverlay className="z-[60]" />
+                        <DialogPrimitive.Content
+                            className="fixed left-[50%] top-[50%] z-[60] grid w-full max-w-2xl translate-x-[-50%] translate-y-[-50%] gap-4 bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] max-h-[85vh] overflow-y-auto"
+                        >
+                            <DialogHeader>
+                                <DialogTitle className="sr-only">About</DialogTitle>
+                            </DialogHeader>
+                            <AboutContent />
+                            <DialogPrimitive.Close className="absolute right-4 top-4 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                                    <path d="M18 6 6 18"/>
+                                    <path d="m6 6 12 12"/>
+                                </svg>
+                                <span className="sr-only">Close</span>
+                            </DialogPrimitive.Close>
+                        </DialogPrimitive.Content>
+                    </DialogPortal>
                 </Dialog>
         </div>
     );
