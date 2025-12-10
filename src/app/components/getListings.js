@@ -16,18 +16,21 @@ function urlFor(source) {
 
 export default async function getListings() {
   try {
-    // get the listing
-    let today = new Date().toISOString().split('T')[0];
-    let data = await client.fetch('*[_type == "listing" && EndDate > $today]', {today});    
-
-    // get the locations reference by the listing
-    const locations = await Promise.all(data.map(async listing => {
-      const location = await client.fetch(`*[_type == "location" && _id == "${listing.Location._ref}"]`);      
-      return location
-    }));
+    // get the listings
+    let data = await client.fetch(`
+      *[_type == "listing"] {
+        ...,
+        _createdAt,
+        "locationName": Location->Name,
+        "locationAddress": Location->Address,
+        "locationUrl": Location->Url,
+        "locationGeolocation": Location->Geolocation,
+        "locationHours": Location->Hours
+      }
+    `);    
 
     // combine them
-    data = data.map((listing, index) => {
+    data = data.map((listing) => {
       let eventImageUrl = null;
       let eventImageCaption = null;
       
@@ -41,11 +44,6 @@ export default async function getListings() {
       
       return {
         ...listing,
-        locationName: locations[index][0]?.Name || 'Unknown',
-        locationAddress: locations[index][0]?.Address || 'Address Not Listed',
-        locationUrl: locations[index][0]?.Url || '',
-        locationHours: locations[index][0]?.Hours || '',
-        locationInstagram: locations[index][0]?.Instagram || '',
         eventImageUrl,
         eventImageCaption,
       };

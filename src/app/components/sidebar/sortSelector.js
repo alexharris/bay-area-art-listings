@@ -7,13 +7,14 @@ export default function SortSelector({ onSortChange, currentSort }) {
         { value: 'openingSoon', label: 'Start Date' },
         { value: 'closingSoon', label: 'End Date' },
         { value: 'alphabetical', label: 'Alphabetical' },
+        { value: 'recentlyAdded', label: 'Recently Added' },
     ];
 
     return (
         <div className="flex flex-rows items-center relative w-full">
             <label className="w-20 text-sm pr-2">Sort by</label>
             <Select value={currentSort} onValueChange={onSortChange}>
-                <SelectTrigger className="flex-grow">
+                <SelectTrigger>
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
