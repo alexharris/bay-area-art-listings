@@ -94,11 +94,11 @@ export function getFilteredListings(filters, listings) {
   .filter(item => 
     item.Event.toLowerCase().includes(filters.searchTerm.toLowerCase()) || 
     item.locationName.toLowerCase().includes(filters.searchTerm.toLowerCase()) || 
-    item.locationAddress.toLowerCase().includes(filters.searchTerm.toLowerCase()) || 
+    (item.locationAddress ? item.locationAddress.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false) || 
     extractPortableTextContent(item.Notes).toLowerCase().includes(filters.searchTerm.toLowerCase()) || 
     (item.locationUrl ? item.locationUrl.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false)
   )
-  .filter(item => filters.selectedCounty[0] ? filters.selectedCounty[0].zipcodes.some(zipcode => item.locationAddress.includes(zipcode)) : true) // Selected County
+  .filter(item => filters.selectedCounty[0] ? filters.selectedCounty[0].zipcodes.some(zipcode => item.locationAddress && item.locationAddress.includes(zipcode)) : true) // Selected County
 
   .filter(item => {
       const startDate = new Date(item.StartDate + 'T00:00:00');

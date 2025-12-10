@@ -65,9 +65,9 @@ export default function MapView({
             
             return item.Event.toLowerCase().includes(searchLower) || 
                    item.locationName.toLowerCase().includes(searchLower) || 
-                   item.locationAddress.toLowerCase().includes(searchLower) ||
+                   (item.locationAddress ? item.locationAddress.toLowerCase().includes(searchLower) : false) ||
                    extractPortableTextContent(item.Notes).toLowerCase().includes(searchLower) ||
-                   item.locationUrl.toLowerCase().includes(searchLower);
+                   (item.locationUrl ? item.locationUrl.toLowerCase().includes(searchLower) : false);
         });
     
     // Group listings by location coordinates
