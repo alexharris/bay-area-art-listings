@@ -16,9 +16,11 @@ function urlFor(source) {
 
 export default async function getListings() {
   try {
+
+    let today = new Date().toISOString().split('T')[0];
     // get the listings
     let data = await client.fetch(`
-      *[_type == "listing"] {
+      *[_type == "listing" && EndDate >= $today] {
         ...,
         _createdAt,
         "locationName": Location->Name,
@@ -27,7 +29,8 @@ export default async function getListings() {
         "locationGeolocation": Location->Geolocation,
         "locationHours": Location->Hours
       }
-    `);    
+    `, { today });    
+
 
     // combine them
     data = data.map((listing) => {
