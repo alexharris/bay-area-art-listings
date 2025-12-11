@@ -6,6 +6,14 @@ import DateNote from './DateNote';
 import HoursPopup from './HoursPopup';
 import CityFromPlaceId from './CityFromPlaceId';
 
+// Generate URL-friendly slug from title
+function generateSlug(title) {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 export default function Listings({ listings, formatDate }) {
   const [showDetails, setShowDetails] = useState({});
 
@@ -43,9 +51,17 @@ export default function Listings({ listings, formatDate }) {
 
                   <NotesRenderer notes={item.Notes} itemIndex={index} />
                 </div>
-                <a className="self-start" href={item.EventUrl} target="_blank">
-                  <svg className="feather feather-external-link w-6 lg:w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>                      
-                </a>                      
+                <div className="flex gap-3 items-center">
+                  <a className="self-start" href={item.EventUrl} target="_blank">
+                    <svg className="feather feather-external-link w-6 lg:w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>                      
+                  </a>
+                  {/* <a 
+                    href={`/show/${generateSlug(item.Event)}`}
+                    className="text-sm underline hover:no-underline"
+                  >
+                    View details
+                  </a> */}
+                </div>                      
               </div>
               </div>       
             : <div className="flex flex-col justify-between mb-2 lg:mb-0 w-full lg:w-1/2">
