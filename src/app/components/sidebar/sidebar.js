@@ -177,7 +177,7 @@ export default function Sidebar({
                         checked={openHoursOnly} 
                         onChange={toggleOpenHoursOnly} 
                     />
-                    Only open today
+                    Open today
                 </label>
                 {/* Stats indicator showing total vs. filtered listings */}
                 <div className="flex flex-row gap-2 justify-end">
