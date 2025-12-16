@@ -14,6 +14,11 @@ export const listingType = defineType({
       type: 'url'
     }),
     defineField({
+      name: 'sfawUrl',
+      type: 'url',
+      title: 'SFAW URL'
+    }),
+    defineField({
       name: 'EventImageUrl',
       type: 'url',
       title: 'Event Image URL',

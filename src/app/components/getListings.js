@@ -27,7 +27,8 @@ export default async function getListings() {
         "locationAddress": Location->Address,
         "locationUrl": Location->Url,
         "locationGeolocation": Location->Geolocation,
-        "locationHours": Location->Hours
+        "locationHours": Location->Hours,
+        "sfawUrl": sfawUrl
       }
     `, { today });    
 
