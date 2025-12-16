@@ -81,6 +81,7 @@ export function getFilteredListings(filters, listings) {
   filters = {
     highlightsOnly: filters.highlightsOnly || false,
     openHoursOnly: filters.openHoursOnly || false,
+    sfArtWeekOnly: filters.sfArtWeekOnly || false,
     searchTerm: filters.searchTerm || '',
     selectedLocation: filters.selectedLocation || '',
     selectedCounty: filters.selectedCounty || [],
@@ -90,6 +91,7 @@ export function getFilteredListings(filters, listings) {
 
   let filteredListings = listings
   .filter(item =>filters.openHoursOnly ? determineOpenHoursFilter(item) : true)
+  .filter(item =>filters.sfArtWeekOnly ? item.sfawUrl : true)
   .filter(item => filters.selectedLocation ? item.locationName === filters.selectedLocation : true) // Selected Location
   .filter(item => 
     item.Event.toLowerCase().includes(filters.searchTerm.toLowerCase()) || 

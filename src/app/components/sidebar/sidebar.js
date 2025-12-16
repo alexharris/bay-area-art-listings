@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import AboutContent from '../aboutContent';
@@ -41,6 +42,8 @@ export default function Sidebar({
     setHighlightsOnly,
     openHoursOnly,
     setOpenHoursOnly,
+    sfArtWeekOnly,
+    setSfArtWeekOnly,
     selectedLocation,
     setSelectedLocation,
     selectedCounty,
@@ -59,7 +62,6 @@ export default function Sidebar({
     // Functions
     updateCalendarDateRangeFilter,
     clearAllFilters,
-    toggleOpenHoursOnly,
     closeMobileSidebar
 }) {
     const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
@@ -132,6 +134,7 @@ export default function Sidebar({
                             currentFilters={{
                                 highlightsOnly: highlightsOnly,
                                 openHoursOnly: openHoursOnly,
+                                sfArtWeekOnly: sfArtWeekOnly,
                                 searchTerm: searchTerm,
                                 selectedLocation: selectedLocation,
                                 selectedCounty: selectedCounty,
@@ -161,6 +164,7 @@ export default function Sidebar({
                         currentFilters={{
                             highlightsOnly: highlightsOnly,
                             openHoursOnly: openHoursOnly,
+                            sfArtWeekOnly: sfArtWeekOnly,
                             searchTerm: searchTerm,
                             selectedLocation: selectedLocation,
                             selectedCounty: selectedCounty,
@@ -170,15 +174,46 @@ export default function Sidebar({
                         listings={listings}
                     />                                       
                 </div>   
-                <label className="text-sm">
-                    <input 
-                        type="checkbox" 
-                        className="mr-2"
-                        checked={openHoursOnly} 
-                        onChange={toggleOpenHoursOnly} 
-                    />
-                    Open today
-                </label>
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-row items-center">
+                        <label className="pr-2 w-20">Filters</label>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" className="flex-grow justify-between">
+                                    <span>
+                                        {!openHoursOnly && !sfArtWeekOnly && 'None selected'}
+                                        {openHoursOnly && !sfArtWeekOnly && 'Open today'}
+                                        {!openHoursOnly && sfArtWeekOnly && 'SF Art Week'}
+                                        {openHoursOnly && sfArtWeekOnly && 'Both selected'}
+                                    </span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><polyline points="6 9 12 15 18 9"/></svg>
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-56">
+                                <div className="flex flex-col gap-3">
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={openHoursOnly}
+                                            onChange={(e) => setOpenHoursOnly(e.target.checked)}
+                                            className="cursor-pointer"
+                                        />
+                                        <span>Open today</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={sfArtWeekOnly}
+                                            onChange={(e) => setSfArtWeekOnly(e.target.checked)}
+                                            className="cursor-pointer"
+                                        />
+                                        <span>SF Art Week</span>
+                                    </label>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                </div>
                 {/* Stats indicator showing total vs. filtered listings */}
                 <div className="flex flex-row gap-2 justify-end">
                     <div className="flex flex-row items-center text-sm">

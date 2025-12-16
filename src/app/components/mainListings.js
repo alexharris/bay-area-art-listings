@@ -61,6 +61,7 @@ export default function DisplayListings() {
     const [filteredListings, setFilteredListings] = useState([]);
     const [highlightsOnly, setHighlightsOnly] = useState(false);
     const [openHoursOnly, setOpenHoursOnly] = useState(false);
+    const [sfArtWeekOnly, setSfArtWeekOnly] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [selectedCounty, setSelectedCounty] = useState([]);
@@ -113,6 +114,7 @@ export default function DisplayListings() {
         const filters = {
             highlightsOnly: highlightsOnly,
             openHoursOnly: openHoursOnly,
+            sfArtWeekOnly: sfArtWeekOnly,
             searchTerm: searchTerm,
             selectedLocation: selectedLocation,
             selectedCounty: selectedCounty,
@@ -132,7 +134,7 @@ export default function DisplayListings() {
             setCalendarTypeCounts(typeCounts);
         }
         
-    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, openHoursOnly, searchTerm, listings, selectedLocation, selectedCounty, sortMethod]);
+    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, openHoursOnly, sfArtWeekOnly, searchTerm, listings, selectedLocation, selectedCounty, sortMethod]);
 
     // Auto-adjust sort method based on calendar type filter
     useEffect(() => {
@@ -145,9 +147,7 @@ export default function DisplayListings() {
         }
     }, [calendarTypeFilter]);
 
-    function toggleOpenHoursOnly() {
-        setOpenHoursOnly(!openHoursOnly);
-    }
+
 
     // Toggle map view
     function toggleMapView() {
@@ -191,6 +191,7 @@ export default function DisplayListings() {
         setCalendarTypeFilter('onview');
         setHighlightsOnly(false);
         setOpenHoursOnly(false);
+        setSfArtWeekOnly(false);
         setSearchTerm('');
         setSelectedLocation('');
         setSelectedCounty([]);
@@ -250,6 +251,8 @@ export default function DisplayListings() {
                     setHighlightsOnly={setHighlightsOnly}
                     openHoursOnly={openHoursOnly}
                     setOpenHoursOnly={setOpenHoursOnly}
+                    sfArtWeekOnly={sfArtWeekOnly}
+                    setSfArtWeekOnly={setSfArtWeekOnly}
                     selectedLocation={selectedLocation}
                     setSelectedLocation={setSelectedLocation}
                     selectedCounty={selectedCounty}
@@ -268,7 +271,6 @@ export default function DisplayListings() {
                     // Functions
                     updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
                     clearAllFilters={clearAllFilters}
-                    toggleOpenHoursOnly={toggleOpenHoursOnly}
                     closeMobileSidebar={closeMobileSidebar}
                 />
             </MobileSidebarOverlay>
@@ -304,6 +306,8 @@ export default function DisplayListings() {
                         setHighlightsOnly={setHighlightsOnly}
                         openHoursOnly={openHoursOnly}
                         setOpenHoursOnly={setOpenHoursOnly}
+                        sfArtWeekOnly={sfArtWeekOnly}
+                        setSfArtWeekOnly={setSfArtWeekOnly}
                         selectedLocation={selectedLocation}
                         setSelectedLocation={setSelectedLocation}
                         selectedCounty={selectedCounty}
@@ -322,7 +326,6 @@ export default function DisplayListings() {
                         // Functions
                         updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
                         clearAllFilters={clearAllFilters}
-                        toggleOpenHoursOnly={toggleOpenHoursOnly}
                         closeMobileSidebar={closeMobileSidebar}
                     />
                 </div>   
