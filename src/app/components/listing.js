@@ -26,7 +26,7 @@ export default function Listings({ listings, formatDate }) {
           
           {/* Left Column - Event and Note */}
           {item.EventUrl
-            ? <div className="flex flex-col lg:flex-row lg:gap-4 justify-between mb-2 lg:mb-0 w-full lg:w-2/3">
+            ? <div className="flex flex-col lg:flex-row lg:gap-4 justify-start mb-2 lg:mb-0 w-full lg:w-2/3">
               {/* Thumbnail Image */}
               {item.eventImageUrl && (
                 <div className=" flex-shrink-0 mb-3 lg:mb-0">
