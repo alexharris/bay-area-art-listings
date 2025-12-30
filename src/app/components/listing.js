@@ -139,7 +139,7 @@ export default function Listings({ listings, formatDate }) {
                     </div>    
                   </div>    
                   
-                  <div className="flex flex-row items-center gap-2">
+                  <div className="flex flex-row items-center gap-2 mt-1">
                     <a
                       className="flex flex-row gap-1 items-center"
                       href={item.googlePlaceId 
