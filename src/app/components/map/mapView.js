@@ -167,7 +167,22 @@ export default function MapView({
                             <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-4" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                             {currentItem.locationAddress}
                         </a>
-                        <TodaysHoursStatus locationHours={currentItem.locationHours} locationUrl={currentItem.locationUrl} />
+                        {(() => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            
+                            const startDate = new Date(currentItem.StartDate);
+                            startDate.setHours(0, 0, 0, 0);
+                            
+                            const endDate = new Date(currentItem.EndDate);
+                            endDate.setHours(0, 0, 0, 0);
+                            
+                            const isCurrentlyViewable = startDate <= today && endDate >= today;
+                            
+                            return isCurrentlyViewable ? (
+                                <TodaysHoursStatus locationHours={currentItem.locationHours} locationUrl={currentItem.locationUrl} />
+                            ) : null;
+                        })()}
                         
                         {totalItems > 1 && (
                             <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
