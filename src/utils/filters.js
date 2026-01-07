@@ -75,6 +75,65 @@ function determineOpenHoursFilter(item) {
     }
 }
 
+// Function to determine if event is ending soon (within 7 days)
+function determineEndingSoonFilter(item) {
+    const getTodayInLA = () => {
+        const now = new Date();
+        return now.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+    };
+
+    const getEventDateInLA = (dateString) => {
+        let date;
+        if (typeof dateString === 'string') {
+            if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                date = new Date(dateString + 'T12:00:00');
+            } else {
+                date = new Date(dateString);
+            }
+        } else {
+            date = new Date(dateString);
+        }
+        return date.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+    };
+
+    const todayLA = getTodayInLA();
+    const eventEndDateLA = getEventDateInLA(item.EndDate);
+
+    const today = new Date(todayLA + "T00:00:00");
+    const endDateObj = new Date(eventEndDateLA + "T00:00:00");
+    const diffTime = endDateObj.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays >= 0 && diffDays <= 7;
+}
+
+// Function to determine if event is opening today
+function determineOpeningTodayFilter(item) {
+    const getTodayInLA = () => {
+        const now = new Date();
+        return now.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+    };
+
+    const getEventDateInLA = (dateString) => {
+        let date;
+        if (typeof dateString === 'string') {
+            if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                date = new Date(dateString + 'T12:00:00');
+            } else {
+                date = new Date(dateString);
+            }
+        } else {
+            date = new Date(dateString);
+        }
+        return date.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+    };
+
+    const todayLA = getTodayInLA();
+    const eventStartDateLA = getEventDateInLA(item.StartDate);
+    
+    return eventStartDateLA === todayLA;
+}
+
 export function getFilteredListings(filters, listings) {
   
   // Set default filter values
@@ -82,6 +141,8 @@ export function getFilteredListings(filters, listings) {
     highlightsOnly: filters.highlightsOnly || false,
     openHoursOnly: filters.openHoursOnly || false,
     sfArtWeekOnly: filters.sfArtWeekOnly || false,
+    endingSoonOnly: filters.endingSoonOnly || false,
+    openingTodayOnly: filters.openingTodayOnly || false,
     searchTerm: filters.searchTerm || '',
     selectedLocation: filters.selectedLocation || '',
     selectedCounty: filters.selectedCounty || [],
@@ -92,6 +153,8 @@ export function getFilteredListings(filters, listings) {
   let filteredListings = listings
   .filter(item =>filters.openHoursOnly ? determineOpenHoursFilter(item) : true)
   .filter(item =>filters.sfArtWeekOnly ? item.sfawUrl : true)
+  .filter(item =>filters.endingSoonOnly ? determineEndingSoonFilter(item) : true)
+  .filter(item =>filters.openingTodayOnly ? determineOpeningTodayFilter(item) : true)
   .filter(item => filters.selectedLocation ? item.locationName === filters.selectedLocation : true) // Selected Location
   .filter(item => 
     item.Event.toLowerCase().includes(filters.searchTerm.toLowerCase()) || 
