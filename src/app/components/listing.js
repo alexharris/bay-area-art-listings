@@ -164,11 +164,7 @@ export default function Listings({ listings, formatDate }) {
                           {item.locationName}
                         </a>              
                       </div> 
-                      <div>
-                        <div className="leading-tight">
-                          <TodaysHoursStatus locationHours={item.locationHours} locationUrl={item.locationUrl} />
-                        </div>
-                      </div>  
+ 
                       <CityFromPlaceId 
                         googlePlaceId={item.googlePlaceId} 
                         fallbackAddress={item.locationAddress} 
