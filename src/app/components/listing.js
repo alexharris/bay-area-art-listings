@@ -3,6 +3,7 @@ import CalendarLink from './CalendarLink';
 import NotesRenderer from './NotesRenderer';
 import DateNote from './DateNote';
 import HoursPopup from './HoursPopup';
+import TodaysHoursStatus from './TodaysHoursStatus';
 import CityFromPlaceId from './CityFromPlaceId';
 import { Badge } from '@/components/ui/badge';
 
@@ -168,6 +169,11 @@ export default function Listings({ listings, formatDate }) {
                       <CityFromPlaceId 
                         googlePlaceId={item.googlePlaceId} 
                         fallbackAddress={item.locationAddress} 
+                      />
+                      
+                      <TodaysHoursStatus 
+                        locationHours={item.locationHours}
+                        locationUrl={item.locationUrl}
                       />
                     </div>    
                     
