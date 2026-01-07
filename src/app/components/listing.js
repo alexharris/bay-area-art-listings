@@ -101,103 +101,102 @@ export default function Listings({ listings, formatDate }) {
           </div>
 
           {/* Right Column - Location Info */}
-          <div className="flex flex-col items-start justify-between w-full">              
-            
-            {item.locationName.toLowerCase() === 'various' 
-              ? <div className="flex flex-row font-semibold">
-                  {item.eventUrl
-                    ? <a 
-                        href={item.eventUrl}
-                        target="_blank"
-                      >
-                        {item.locationName}
-                      </a>
-                    : <span>{item.locationName}</span>
-                  }                     
-                </div> 
-              : <>
-                  <div className="flex flex-col items-start gap-1 mb-1 lg:mb-0">
-                    <div>
-                      <a 
-                        href={item.locationUrl}
-                        target="_blank"
-                        className="font-semibold"
-                      >
-                        {item.locationName}
-                      </a>              
-                    </div> 
-                    
+          <div className="w-full">              
+            <div className="bg-gray-50 rounded p-4 mr-4 h-full flex flex-col justify-between">
+              {item.locationName.toLowerCase() === 'various' 
+                ? <div className="flex flex-row font-semibold">
+                    {item.eventUrl
+                      ? <a 
+                          href={item.eventUrl}
+                          target="_blank"
+                        >
+                          {item.locationName}
+                        </a>
+                      : <span>{item.locationName}</span>
+                    }                     
+                  </div> 
+                : <>
+                    <div className="flex flex-col items-start gap-1 mb-1 lg:mb-0">
+                      <div>
+                        <a 
+                          href={item.locationUrl}
+                          target="_blank"
+                          className="font-semibold"
+                        >
+                          {item.locationName}
+                        </a>              
+                      </div> 
+                      <div>
+                        <div className="leading-tight">
+                          <TodaysHoursStatus locationHours={item.locationHours} locationUrl={item.locationUrl} />
+                        </div>
+                      </div>  
                       <CityFromPlaceId 
                         googlePlaceId={item.googlePlaceId} 
                         fallbackAddress={item.locationAddress} 
                       />
-                    
-                    <div>
-                      <div className="leading-tight">
-                        <TodaysHoursStatus locationHours={item.locationHours} locationUrl={item.locationUrl} />
-                      </div>
                     </div>    
-                  </div>    
-                  
-                  <div className="flex flex-row items-center gap-2 mt-1">
-                    <a
-                      className="flex flex-row gap-1 items-center"
-                      href={item.googlePlaceId 
-                        ? `https://www.google.com/maps/place/?q=place_id:${item.googlePlaceId}` 
-                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.locationName + ' ' + item.locationAddress)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                      {/* {item.locationAddress} */}
-                    </a>
-          
-                    <a 
-                      className="underline flex flex-row gap-1 items-center" 
-                      href={item.locationUrl}
-                      target="_blank"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-globe w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>                        
-                    </a>
                     
-                    <div>
-                      {item.locationHours ? (
-                        <HoursPopup
-                          locationName={item.locationName}
-                          locationHours={item.locationHours}
-                          locationUrl={item.locationUrl}
-                        >
-                          <span 
-                            className="underline flex flex-row gap-1 items-center cursor-pointer" 
-                            title="View hours"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
-                          </span>
-                        </HoursPopup>
-                      ) : (
-                        <span className="flex flex-row gap-1 items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
-                        </span>
-                      )}                                   
-                    </div>
-                    
-                    {item.locationInstagram && (
+                    <div className="flex flex-row items-center gap-2 mt-1">
                       <a
-                        className="underline flex flex-row gap-1 items-center"
-                        href={`https://instagram.com/${item.locationInstagram.replace(/^@/, '')}`}
+                        className="flex flex-row gap-1 items-center"
+                        href={item.googlePlaceId 
+                          ? `https://www.google.com/maps/place/?q=place_id:${item.googlePlaceId}` 
+                          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.locationName + ' ' + item.locationAddress)}`}
                         target="_blank"
-                        title="Instagram"
+                        rel="noopener noreferrer"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-instagram w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                          <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        {/* {item.locationAddress} */}
                       </a>
-                    )}
-                  </div>                             
-                </>                  
-            }                                                
+            
+                      <a 
+                        className="underline flex flex-row gap-1 items-center" 
+                        href={item.locationUrl}
+                        target="_blank"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-globe w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>                        
+                      </a>
+                      
+                      <div>
+                        {item.locationHours ? (
+                          <HoursPopup
+                            locationName={item.locationName}
+                            locationHours={item.locationHours}
+                            locationUrl={item.locationUrl}
+                          >
+                            <span 
+                              className="underline flex flex-row gap-1 items-center cursor-pointer" 
+                              title="View hours"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
+                            </span>
+                          </HoursPopup>
+                        ) : (
+                          <span className="flex flex-row gap-1 items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
+                          </span>
+                        )}                                   
+                      </div>
+                      
+                      {item.locationInstagram && (
+                        <a
+                          className="underline flex flex-row gap-1 items-center"
+                          href={`https://instagram.com/${item.locationInstagram.replace(/^@/, '')}`}
+                          target="_blank"
+                          title="Instagram"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-instagram w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+                          </svg>
+                        </a>
+                      )}
+                    </div>                             
+                  </>                  
+              }        
+            </div>                                        
           </div>
           
           </div>       
