@@ -125,7 +125,7 @@ export default function Listings({ listings, formatDate }) {
           <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-2 lg:gap-4 w-full lg:w-1/2">
           
           {/* Middle Column - Date Info  */}
-          <div className="flex flex-col gap-2 w-full text-left items-start justify-between">      
+          <div className="flex flex-col gap-2 w-full text-left items-start justify-start">      
             <div className="flex flex-col items-start gap-1">
               <div className="font-semibold">
                 {item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`}

@@ -43,8 +43,9 @@ export default function DateNote({ startDate, endDate }) {
   // Return opening today message first (higher priority)
   if (isOpeningToday) {
     return (
-      <Badge className="bg-orange-300 text-black">
-        Opening today
+      <Badge variant="outline">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="black" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="mr-1 stroke-orange-500"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>        
+        Opening Today
       </Badge>
     );
   }
@@ -52,7 +53,8 @@ export default function DateNote({ startDate, endDate }) {
   // Return ending soon message
   if (isEndingSoon) {
     return (
-      <Badge className="bg-orange-300 text-black">
+      <Badge variant="outline">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="black" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="mr-1 stroke-orange-500"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>        
         Ending soon
       </Badge>
     );
