@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import CalendarLink from './CalendarLink';
-import TodaysHoursStatus from './TodaysHoursStatus';
 import NotesRenderer from './NotesRenderer';
 import DateNote from './DateNote';
 import HoursPopup from './HoursPopup';
@@ -17,6 +16,34 @@ function generateSlug(title) {
 
 export default function Listings({ listings, formatDate }) {
   const [showDetails, setShowDetails] = useState({});
+
+  // Helper function to check if show is on view and gallery is open today
+  const shouldShowOpenToday = (item) => {
+    // Check if show is on view today
+    const now = new Date();
+    const options = { timeZone: 'America/Los_Angeles' };
+    const todayInPT = new Date(now.toLocaleString('en-US', options));
+    todayInPT.setHours(0, 0, 0, 0);
+    
+    const startDate = new Date(item.StartDate + 'T00:00:00');
+    const endDate = new Date(item.EndDate + 'T23:59:59');
+    
+    const isOnView = todayInPT >= startDate && todayInPT <= endDate;
+    
+    if (!isOnView) return false;
+    
+    // Check if gallery is open today
+    if (!item.locationHours) return false;
+    
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const currentDay = daysOfWeek[todayInPT.getDay()];
+    const todaysHours = item.locationHours[currentDay];
+    
+    if (!todaysHours) return false;
+    
+    const isClosed = todaysHours.toLowerCase().includes('closed');
+    return !isClosed;
+  };
 
   return (
     <ul id="list-view" className="w-full px-3 md:p-2 lg:p-0">
@@ -56,11 +83,15 @@ export default function Listings({ listings, formatDate }) {
                   <a className="self-start" href={item.EventUrl} target="_blank">
                     <svg className="feather feather-external-link w-6 lg:w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>                      
                   </a>
+                  {shouldShowOpenToday(item) && (
+                    <Badge className="bg-green-400 hover:bg-green-500 text-black">Open Today</Badge>
+                  )}                  
                   {item.sfawUrl && (
                     <a href={item.sfawUrl} target="_blank">
                       <Badge className="bg-[#FFEB3B] hover:bg-[#FDD835] text-black">SF Art Week</Badge>
                     </a>
                   )}
+
                   {/* <a 
                     href={`/show/${generateSlug(item.Event)}`}
                     className="text-sm underline hover:no-underline"
@@ -75,11 +106,16 @@ export default function Listings({ listings, formatDate }) {
                   <h2>{item.Event}</h2>
                 </span>
                 <NotesRenderer notes={item.Notes} itemIndex={index} />
-                {item.sfawUrl && (
-                  <div className="mt-2">
-                    <a href={item.sfawUrl} target="_blank">
-                      <Badge className="bg-[#FFEB3B] hover:bg-[#FDD835] text-black">SF Art Week</Badge>
-                    </a>
+                {(item.sfawUrl || shouldShowOpenToday(item)) && (
+                  <div className="mt-2 flex gap-3 items-center">
+                    {item.sfawUrl && (
+                      <a href={item.sfawUrl} target="_blank">
+                        <Badge className="bg-[#FFEB3B] hover:bg-[#FDD835] text-black">SF Art Week</Badge>
+                      </a>
+                    )}
+                    {shouldShowOpenToday(item) && (
+                      <Badge className="bg-green-400 hover:bg-green-500 text-black">Open Today</Badge>
+                    )}
                   </div>
                 )}
               </div>
@@ -131,12 +167,6 @@ export default function Listings({ listings, formatDate }) {
                         googlePlaceId={item.googlePlaceId} 
                         fallbackAddress={item.locationAddress} 
                       />
-                    
-                    <div>
-                      <div className="leading-tight">
-                        <TodaysHoursStatus locationHours={item.locationHours} locationUrl={item.locationUrl} />
-                      </div>
-                    </div>    
                   </div>    
                   
                   <div className="flex flex-row items-center gap-2 mt-1">
