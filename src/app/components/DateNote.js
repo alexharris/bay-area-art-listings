@@ -1,3 +1,5 @@
+import { Badge } from '@/components/ui/badge';
+
 export default function DateNote({ startDate, endDate }) {
   // Get current date in LA timezone as YYYY-MM-DD string
   const getTodayInLA = () => {
@@ -41,18 +43,18 @@ export default function DateNote({ startDate, endDate }) {
   // Return opening today message first (higher priority)
   if (isOpeningToday) {
     return (
-      <div className="text-sm font-medium text-green-600">
-        Starts today
-      </div>
+      <Badge className="bg-orange-300 text-black">
+        Opening today
+      </Badge>
     );
   }
 
   // Return ending soon message
   if (isEndingSoon) {
     return (
-      <div className="text-sm">
+      <Badge className="bg-orange-300 text-black">
         Ending soon
-      </div>
+      </Badge>
     );
   }
 

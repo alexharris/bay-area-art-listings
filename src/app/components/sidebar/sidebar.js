@@ -44,6 +44,10 @@ export default function Sidebar({
     setOpenHoursOnly,
     sfArtWeekOnly,
     setSfArtWeekOnly,
+    endingSoonOnly,
+    setEndingSoonOnly,
+    openingTodayOnly,
+    setOpeningTodayOnly,
     selectedLocation,
     setSelectedLocation,
     selectedCounty,
@@ -135,6 +139,8 @@ export default function Sidebar({
                                 highlightsOnly: highlightsOnly,
                                 openHoursOnly: openHoursOnly,
                                 sfArtWeekOnly: sfArtWeekOnly,
+                                endingSoonOnly: endingSoonOnly,
+                                openingTodayOnly: openingTodayOnly,
                                 searchTerm: searchTerm,
                                 selectedLocation: selectedLocation,
                                 selectedCounty: selectedCounty,
@@ -165,6 +171,8 @@ export default function Sidebar({
                             highlightsOnly: highlightsOnly,
                             openHoursOnly: openHoursOnly,
                             sfArtWeekOnly: sfArtWeekOnly,
+                            endingSoonOnly: endingSoonOnly,
+                            openingTodayOnly: openingTodayOnly,
                             searchTerm: searchTerm,
                             selectedLocation: selectedLocation,
                             selectedCounty: selectedCounty,
@@ -181,10 +189,16 @@ export default function Sidebar({
                             <PopoverTrigger asChild>
                                 <Button variant="outline" className="flex-grow justify-between">
                                     <span>
-                                        {!openHoursOnly && !sfArtWeekOnly && 'None selected'}
-                                        {openHoursOnly && !sfArtWeekOnly && 'Open today'}
-                                        {!openHoursOnly && sfArtWeekOnly && 'SF Art Week'}
-                                        {openHoursOnly && sfArtWeekOnly && 'Both selected'}
+                                        {!openHoursOnly && !sfArtWeekOnly && !endingSoonOnly && !openingTodayOnly && 'None selected'}
+                                        {[openHoursOnly, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 1 && (
+                                            openHoursOnly ? 'Open today' :
+                                            sfArtWeekOnly ? 'SF Art Week' :
+                                            endingSoonOnly ? 'Ending soon' :
+                                            'Opening today'
+                                        )}
+                                        {[openHoursOnly, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 2 && 'Multiple selected'}
+                                        {[openHoursOnly, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 3 && 'Multiple selected'}
+                                        {[openHoursOnly, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 4 && 'All selected'}
                                     </span>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><polyline points="6 9 12 15 18 9"/></svg>
                                 </Button>
@@ -198,7 +212,7 @@ export default function Sidebar({
                                             onChange={(e) => setOpenHoursOnly(e.target.checked)}
                                             className="cursor-pointer"
                                         />
-                                        <span>Open today</span>
+                                        <span>On view today</span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input 
@@ -208,6 +222,24 @@ export default function Sidebar({
                                             className="cursor-pointer"
                                         />
                                         <span>SF Art Week</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={openingTodayOnly}
+                                            onChange={(e) => setOpeningTodayOnly(e.target.checked)}
+                                            className="cursor-pointer"
+                                        />
+                                        <span>Opening today</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={endingSoonOnly}
+                                            onChange={(e) => setEndingSoonOnly(e.target.checked)}
+                                            className="cursor-pointer"
+                                        />
+                                        <span>Ending soon</span>
                                     </label>
                                 </div>
                             </PopoverContent>

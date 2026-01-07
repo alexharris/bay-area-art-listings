@@ -62,6 +62,8 @@ export default function DisplayListings() {
     const [highlightsOnly, setHighlightsOnly] = useState(false);
     const [openHoursOnly, setOpenHoursOnly] = useState(false);
     const [sfArtWeekOnly, setSfArtWeekOnly] = useState(false);
+    const [endingSoonOnly, setEndingSoonOnly] = useState(false);
+    const [openingTodayOnly, setOpeningTodayOnly] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [selectedCounty, setSelectedCounty] = useState([]);
@@ -115,6 +117,8 @@ export default function DisplayListings() {
             highlightsOnly: highlightsOnly,
             openHoursOnly: openHoursOnly,
             sfArtWeekOnly: sfArtWeekOnly,
+            endingSoonOnly: endingSoonOnly,
+            openingTodayOnly: openingTodayOnly,
             searchTerm: searchTerm,
             selectedLocation: selectedLocation,
             selectedCounty: selectedCounty,
@@ -134,7 +138,7 @@ export default function DisplayListings() {
             setCalendarTypeCounts(typeCounts);
         }
         
-    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, openHoursOnly, sfArtWeekOnly, searchTerm, listings, selectedLocation, selectedCounty, sortMethod]);
+    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, openHoursOnly, sfArtWeekOnly, endingSoonOnly, openingTodayOnly, searchTerm, listings, selectedLocation, selectedCounty, sortMethod]);
 
     // Auto-adjust sort method based on calendar type filter
     useEffect(() => {
@@ -192,6 +196,8 @@ export default function DisplayListings() {
         setHighlightsOnly(false);
         setOpenHoursOnly(false);
         setSfArtWeekOnly(false);
+        setEndingSoonOnly(false);
+        setOpeningTodayOnly(false);
         setSearchTerm('');
         setSelectedLocation('');
         setSelectedCounty([]);
@@ -253,6 +259,10 @@ export default function DisplayListings() {
                     setOpenHoursOnly={setOpenHoursOnly}
                     sfArtWeekOnly={sfArtWeekOnly}
                     setSfArtWeekOnly={setSfArtWeekOnly}
+                    endingSoonOnly={endingSoonOnly}
+                    setEndingSoonOnly={setEndingSoonOnly}
+                    openingTodayOnly={openingTodayOnly}
+                    setOpeningTodayOnly={setOpeningTodayOnly}
                     selectedLocation={selectedLocation}
                     setSelectedLocation={setSelectedLocation}
                     selectedCounty={selectedCounty}
@@ -308,6 +318,10 @@ export default function DisplayListings() {
                         setOpenHoursOnly={setOpenHoursOnly}
                         sfArtWeekOnly={sfArtWeekOnly}
                         setSfArtWeekOnly={setSfArtWeekOnly}
+                        endingSoonOnly={endingSoonOnly}
+                        setEndingSoonOnly={setEndingSoonOnly}
+                        openingTodayOnly={openingTodayOnly}
+                        setOpeningTodayOnly={setOpeningTodayOnly}
                         selectedLocation={selectedLocation}
                         setSelectedLocation={setSelectedLocation}
                         selectedCounty={selectedCounty}
