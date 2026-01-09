@@ -193,8 +193,8 @@ export default function Sidebar({
                                         {[onViewToday, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 1 && (
                                             onViewToday ? 'On view today' :
                                             sfArtWeekOnly ? 'SF Art Week' :
-                                            endingSoonOnly ? 'Ending soon' :
-                                            'Opening today'
+                                            endingSoonOnly ? 'Ending Soon' :
+                                            'Starting Today'
                                         )}
                                         {[onViewToday, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 2 && 'Multiple selected'}
                                         {[onViewToday, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 3 && 'Multiple selected'}
@@ -230,7 +230,7 @@ export default function Sidebar({
                                             onChange={(e) => setOpeningTodayOnly(e.target.checked)}
                                             className="cursor-pointer"
                                         />
-                                        <span>Opening today</span>
+                                        <span>Starting Today</span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input 
@@ -239,7 +239,7 @@ export default function Sidebar({
                                             onChange={(e) => setEndingSoonOnly(e.target.checked)}
                                             className="cursor-pointer"
                                         />
-                                        <span>Ending soon</span>
+                                        <span>Ending Soon</span>
                                     </label>
                                 </div>
                             </PopoverContent>
