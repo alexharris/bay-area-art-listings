@@ -78,6 +78,12 @@ export default function DisplayListings() {
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
     const [sortMethod, setSortMethod] = useState('closingSoon');
     const [calendarTypeCounts, setCalendarTypeCounts] = useState({});
+    const [specialFilterCounts, setSpecialFilterCounts] = useState({
+        onViewToday: 0,
+        sfArtWeekOnly: 0,
+        endingSoonOnly: 0,
+        openingTodayOnly: 0
+    });
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
 
@@ -136,6 +142,14 @@ export default function DisplayListings() {
         if (listings && listings.length > 0) {
             const typeCounts = getCalendarTypeCounts(filters, listings);
             setCalendarTypeCounts(typeCounts);
+            
+            // Calculate special filter counts - showing how many items match each filter
+            setSpecialFilterCounts({
+                onViewToday: getFilteredListings({ ...filters, onViewToday: true }, listings).length,
+                sfArtWeekOnly: getFilteredListings({ ...filters, sfArtWeekOnly: true }, listings).length,
+                endingSoonOnly: getFilteredListings({ ...filters, endingSoonOnly: true }, listings).length,
+                openingTodayOnly: getFilteredListings({ ...filters, openingTodayOnly: true }, listings).length
+            });
         }
         
     }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, onViewToday, sfArtWeekOnly, endingSoonOnly, openingTodayOnly, searchTerm, listings, selectedLocation, selectedCounty, sortMethod]);
@@ -194,7 +208,7 @@ export default function DisplayListings() {
         // Reset all filters to their initial values
         setCalendarTypeFilter('onview');
         setHighlightsOnly(false);
-        setOpenHoursOnly(false);
+        setOnViewToday(false);
         setSfArtWeekOnly(false);
         setEndingSoonOnly(false);
         setOpeningTodayOnly(false);
@@ -249,6 +263,7 @@ export default function DisplayListings() {
                     calendarTypeFilter={calendarTypeFilter}
                     setCalendarTypeFilter={setCalendarTypeFilter}
                     calendarTypeCounts={calendarTypeCounts}
+                    specialFilterCounts={specialFilterCounts}
                     calendarDateRangeFilter={calendarDateRangeFilter}
                     setCalendarDateRangeFilter={setCalendarDateRangeFilter}
                     calendarDateRangePreset={calendarDateRangePreset}
@@ -308,6 +323,7 @@ export default function DisplayListings() {
                         calendarTypeFilter={calendarTypeFilter}
                         setCalendarTypeFilter={setCalendarTypeFilter}
                         calendarTypeCounts={calendarTypeCounts}
+                        specialFilterCounts={specialFilterCounts}
                         calendarDateRangeFilter={calendarDateRangeFilter}
                         setCalendarDateRangeFilter={setCalendarDateRangeFilter}
                         calendarDateRangePreset={calendarDateRangePreset}
