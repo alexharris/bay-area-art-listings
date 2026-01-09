@@ -374,7 +374,18 @@ export default function DisplayListings() {
                         ) : displayedResults > 0 ? (
                             <>
                             <div className=" p-3 text-sm bg-gray-100 text-center md:hidden">A directory of visual arts exhibitions in the Bay Area</div>
-                            <Listing listings={filteredListings} formatDate={formatDate} />                            
+                            <Listing 
+                                listings={filteredListings} 
+                                formatDate={formatDate}
+                                onViewToday={onViewToday}
+                                setOnViewToday={setOnViewToday}
+                                sfArtWeekOnly={sfArtWeekOnly}
+                                setSfArtWeekOnly={setSfArtWeekOnly}
+                                endingSoonOnly={endingSoonOnly}
+                                setEndingSoonOnly={setEndingSoonOnly}
+                                openingTodayOnly={openingTodayOnly}
+                                setOpeningTodayOnly={setOpeningTodayOnly}
+                            />                            
                             </>
                         ) : null}
                     </>
