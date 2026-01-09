@@ -60,19 +60,10 @@ const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
 const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0); 
 
 
-// Function to determine if a venue is open today
-function determineOpenHoursFilter(item) {
-    // Get current day name
-    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const today = new Date();
-    const dayOfWeek = daysOfWeek[today.getDay()];
-
-    // Only return true if locationHours is not defined or if the location is open today
-    if (!item.locationHours) {
-      return true;
-    } else {
-      return item.locationHours[dayOfWeek] && !item.locationHours[dayOfWeek].toLowerCase().includes('closed');
-    }
+// Function to determine if a show is on view today AND venue is open today
+// This now just checks the pre-computed isOnViewToday flag
+function determineOnViewTodayFilter(item) {
+    return item.isOnViewToday === true;
 }
 
 // Function to determine if event is ending soon (within 7 days)
@@ -139,7 +130,7 @@ export function getFilteredListings(filters, listings) {
   // Set default filter values
   filters = {
     highlightsOnly: filters.highlightsOnly || false,
-    openHoursOnly: filters.openHoursOnly || false,
+    onViewToday: filters.onViewToday || false,
     sfArtWeekOnly: filters.sfArtWeekOnly || false,
     endingSoonOnly: filters.endingSoonOnly || false,
     openingTodayOnly: filters.openingTodayOnly || false,
@@ -151,7 +142,7 @@ export function getFilteredListings(filters, listings) {
   };
 
   let filteredListings = listings
-  .filter(item =>filters.openHoursOnly ? determineOpenHoursFilter(item) : true)
+  .filter(item =>filters.onViewToday ? determineOnViewTodayFilter(item) : true)
   .filter(item =>filters.sfArtWeekOnly ? item.sfawUrl : true)
   .filter(item =>filters.endingSoonOnly ? determineEndingSoonFilter(item) : true)
   .filter(item =>filters.openingTodayOnly ? determineOpeningTodayFilter(item) : true)

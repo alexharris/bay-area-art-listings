@@ -40,8 +40,8 @@ export default function Sidebar({
     setCalendarDateRangePreset,
     highlightsOnly,
     setHighlightsOnly,
-    openHoursOnly,
-    setOpenHoursOnly,
+    onViewToday,
+    setOnViewToday,
     sfArtWeekOnly,
     setSfArtWeekOnly,
     endingSoonOnly,
@@ -137,7 +137,7 @@ export default function Sidebar({
                             endOfNextMonth={endOfNextMonth}
                             currentFilters={{
                                 highlightsOnly: highlightsOnly,
-                                openHoursOnly: openHoursOnly,
+                                onViewToday: onViewToday,
                                 sfArtWeekOnly: sfArtWeekOnly,
                                 endingSoonOnly: endingSoonOnly,
                                 openingTodayOnly: openingTodayOnly,
@@ -169,7 +169,7 @@ export default function Sidebar({
                         selectedCountyProp={selectedCounty}
                         currentFilters={{
                             highlightsOnly: highlightsOnly,
-                            openHoursOnly: openHoursOnly,
+                            onViewToday: onViewToday,
                             sfArtWeekOnly: sfArtWeekOnly,
                             endingSoonOnly: endingSoonOnly,
                             openingTodayOnly: openingTodayOnly,
@@ -189,16 +189,16 @@ export default function Sidebar({
                             <PopoverTrigger asChild>
                                 <Button variant="outline" className="flex-grow justify-between">
                                     <span>
-                                        {!openHoursOnly && !sfArtWeekOnly && !endingSoonOnly && !openingTodayOnly && 'None selected'}
-                                        {[openHoursOnly, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 1 && (
-                                            openHoursOnly ? 'Open today' :
+                                        {!onViewToday && !sfArtWeekOnly && !endingSoonOnly && !openingTodayOnly && 'None selected'}
+                                        {[onViewToday, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 1 && (
+                                            onViewToday ? 'On view today' :
                                             sfArtWeekOnly ? 'SF Art Week' :
                                             endingSoonOnly ? 'Ending soon' :
                                             'Opening today'
                                         )}
-                                        {[openHoursOnly, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 2 && 'Multiple selected'}
-                                        {[openHoursOnly, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 3 && 'Multiple selected'}
-                                        {[openHoursOnly, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 4 && 'All selected'}
+                                        {[onViewToday, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 2 && 'Multiple selected'}
+                                        {[onViewToday, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 3 && 'Multiple selected'}
+                                        {[onViewToday, sfArtWeekOnly, endingSoonOnly, openingTodayOnly].filter(Boolean).length === 4 && 'All selected'}
                                     </span>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><polyline points="6 9 12 15 18 9"/></svg>
                                 </Button>
@@ -208,8 +208,8 @@ export default function Sidebar({
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input 
                                             type="checkbox" 
-                                            checked={openHoursOnly}
-                                            onChange={(e) => setOpenHoursOnly(e.target.checked)}
+                                            checked={onViewToday}
+                                            onChange={(e) => setOnViewToday(e.target.checked)}
                                             className="cursor-pointer"
                                         />
                                         <span>On view today</span>

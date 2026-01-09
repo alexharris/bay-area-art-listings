@@ -19,31 +19,9 @@ export default function Listings({ listings, formatDate }) {
   const [showDetails, setShowDetails] = useState({});
 
   // Helper function to check if show is on view and gallery is open today
+  // Now uses pre-computed value from getListings for better performance
   const shouldShowOpenToday = (item) => {
-    // Check if show is on view today
-    const now = new Date();
-    const options = { timeZone: 'America/Los_Angeles' };
-    const todayInPT = new Date(now.toLocaleString('en-US', options));
-    todayInPT.setHours(0, 0, 0, 0);
-    
-    const startDate = new Date(item.StartDate + 'T00:00:00');
-    const endDate = new Date(item.EndDate + 'T23:59:59');
-    
-    const isOnView = todayInPT >= startDate && todayInPT <= endDate;
-    
-    if (!isOnView) return false;
-    
-    // Check if gallery is open today
-    if (!item.locationHours) return false;
-    
-    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const currentDay = daysOfWeek[todayInPT.getDay()];
-    const todaysHours = item.locationHours[currentDay];
-    
-    if (!todaysHours) return false;
-    
-    const isClosed = todaysHours.toLowerCase().includes('closed');
-    return !isClosed;
+    return item.isOnViewToday === true;
   };
 
   return (

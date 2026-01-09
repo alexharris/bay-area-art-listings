@@ -60,7 +60,7 @@ export default function DisplayListings() {
     const [calendarDateRangeFilter, setCalendarDateRangeFilter] = useState([]); // actual date range to filter on    
     const [filteredListings, setFilteredListings] = useState([]);
     const [highlightsOnly, setHighlightsOnly] = useState(false);
-    const [openHoursOnly, setOpenHoursOnly] = useState(false);
+    const [onViewToday, setOnViewToday] = useState(false);
     const [sfArtWeekOnly, setSfArtWeekOnly] = useState(false);
     const [endingSoonOnly, setEndingSoonOnly] = useState(false);
     const [openingTodayOnly, setOpeningTodayOnly] = useState(false);
@@ -115,7 +115,7 @@ export default function DisplayListings() {
         // Create an object of all of the filter variables
         const filters = {
             highlightsOnly: highlightsOnly,
-            openHoursOnly: openHoursOnly,
+            onViewToday: onViewToday,
             sfArtWeekOnly: sfArtWeekOnly,
             endingSoonOnly: endingSoonOnly,
             openingTodayOnly: openingTodayOnly,
@@ -138,7 +138,7 @@ export default function DisplayListings() {
             setCalendarTypeCounts(typeCounts);
         }
         
-    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, openHoursOnly, sfArtWeekOnly, endingSoonOnly, openingTodayOnly, searchTerm, listings, selectedLocation, selectedCounty, sortMethod]);
+    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, onViewToday, sfArtWeekOnly, endingSoonOnly, openingTodayOnly, searchTerm, listings, selectedLocation, selectedCounty, sortMethod]);
 
     // Auto-adjust sort method based on calendar type filter
     useEffect(() => {
@@ -255,8 +255,8 @@ export default function DisplayListings() {
                     setCalendarDateRangePreset={setCalendarDateRangePreset}
                     highlightsOnly={highlightsOnly}
                     setHighlightsOnly={setHighlightsOnly}
-                    openHoursOnly={openHoursOnly}
-                    setOpenHoursOnly={setOpenHoursOnly}
+                    onViewToday={onViewToday}
+                    setOnViewToday={setOnViewToday}
                     sfArtWeekOnly={sfArtWeekOnly}
                     setSfArtWeekOnly={setSfArtWeekOnly}
                     endingSoonOnly={endingSoonOnly}
@@ -314,8 +314,8 @@ export default function DisplayListings() {
                         setCalendarDateRangePreset={setCalendarDateRangePreset}
                         highlightsOnly={highlightsOnly}
                         setHighlightsOnly={setHighlightsOnly}
-                        openHoursOnly={openHoursOnly}
-                        setOpenHoursOnly={setOpenHoursOnly}
+                        onViewToday={onViewToday}
+                        setOnViewToday={setOnViewToday}
                         sfArtWeekOnly={sfArtWeekOnly}
                         setSfArtWeekOnly={setSfArtWeekOnly}
                         endingSoonOnly={endingSoonOnly}
