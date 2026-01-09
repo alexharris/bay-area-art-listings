@@ -1,13 +1,27 @@
-'use client'
+import { client } from "@/sanity/lib/client";
+import TopBar from "../components/TopBar";
 
-import { usePathname } from 'next/navigation';
+async function getSettings() {
+  try {
+    const settings = await client.fetch(`*[_type == "settings" && _id == "settings"][0]{
+      topBar
+    }`)
+    return settings
+  } catch (error) {
+    console.error('Error fetching settings:', error)
+    return null
+  }
+}
 
-export default function SiteLayout({ children }) {
-  const pathname = usePathname();
-  const isMainPage = pathname === '/';
+export default async function SiteLayout({ children }) {
+  const settings = await getSettings()
+  
   return (
-    <div className="w-full mx-auto max-w-8xl">
-      {children}
-    </div>
+    <>
+      <TopBar settings={settings} />
+      <div className="w-full mx-auto max-w-8xl">
+        {children}
+      </div>
+    </>
   );
 }

@@ -1,7 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { client } from "@/sanity/lib/client";
-import TopBar from "./components/TopBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,21 +52,7 @@ export const metadata = {
   },
 };
 
-async function getSettings() {
-  try {
-    const settings = await client.fetch(`*[_type == "settings" && _id == "settings"][0]{
-      topBar
-    }`)
-    return settings
-  } catch (error) {
-    console.error('Error fetching settings:', error)
-    return null
-  }
-}
-
-export default async function RootLayout({ children }) {
-  const settings = await getSettings()
-  
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
@@ -79,7 +63,6 @@ export default async function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <TopBar settings={settings} />
         {children}
         <script async data-id="101494168" src="//static.getclicky.com/js"></script>
       </body>
