@@ -42,7 +42,18 @@ export default function TodaysHoursStatus({ locationHours, locationUrl, location
       locationUrl={locationUrl}
     >
       <span className="flex flex-row items-start gap-1 text-sm my-2 cursor-pointer">
-        <span><span className="text-gray-500">Today</span><br />{displayOpenHours}</span>
+        <span>
+          <span className="text-gray-500">Today</span><br />
+          <span className="flex flex-row items-start gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            {displayOpenHours}
+
+          </span>
+        </span>
       </span>
     </HoursPopup>
   );

@@ -1,6 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 export default {
     darkMode: ["class"],
+    safelist: [
+      'bg-green-300',
+      'bg-yellow-300',
+      'bg-orange-200',
+      'bg-red-300',
+      'bg-blue-200',
+    ],
     content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",

@@ -38,6 +38,14 @@ export const structure = (S) =>
     .title('Content')
     .items([
       S.listItem()
+        .title('Settings')
+        .child(
+          S.document()
+            .schemaType('settings')
+            .documentId('settings')
+        ),
+      S.divider(),
+      S.listItem()
         .title('Listings')
         .child(
           S.list()
@@ -48,6 +56,5 @@ export const structure = (S) =>
                 .child(S.list().title('Months').items(createMonthListItems(S, '2025'))),
             ])
         ),
-      ...S.documentTypeListItems()
-      // ...S.documentTypeListItems().filter(item => item.getId() !== 'listing'),
+      ...S.documentTypeListItems().filter(item => item.getId() !== 'settings'),
     ]);
