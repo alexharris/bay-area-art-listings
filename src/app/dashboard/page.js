@@ -76,13 +76,53 @@ async function getDashboardStats() {
   // Shows with notes
   const showsWithNotes = await client.fetch(`count(*[_type == "listing" && defined(Notes)])`);
 
+  // Get all shows with their start dates for the openings chart
+  const allShows = await client.fetch(`
+    *[_type == "listing" && defined(StartDate)] {
+      StartDate
+    }
+  `);
+
+  // Process shows by year and day
+  const showsByYear = {};
+  allShows.forEach(show => {
+    if (show.StartDate) {
+      const date = new Date(show.StartDate);
+      const year = date.getFullYear();
+      const dayOfYear = Math.floor((date - new Date(year, 0, 0)) / 1000 / 60 / 60 / 24);
+      
+      if (!showsByYear[year]) {
+        showsByYear[year] = {};
+      }
+      showsByYear[year][dayOfYear] = (showsByYear[year][dayOfYear] || 0) + 1;
+    }
+  });
+
+  // Convert to array format for each year
+  const openingsData = {};
+  Object.keys(showsByYear).forEach(year => {
+    const yearData = [];
+    for (let day = 1; day <= 365; day++) {
+      yearData.push({
+        day,
+        count: showsByYear[year][day] || 0,
+        date: new Date(parseInt(year), 0, day).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      });
+    }
+    openingsData[year] = yearData;
+  });
+
+  const availableYears = Object.keys(openingsData).sort((a, b) => b - a);
+
   return {
     totalShows,
     activeShows,
     countyData,
     topLocations,
     totalLocations,
-    showsWithNotes
+    showsWithNotes,
+    openingsData,
+    availableYears
   };
 }
 

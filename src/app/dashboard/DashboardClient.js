@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, LineChart, Line } from 'recharts';
 
 const chartConfig = {
   count: {
@@ -12,6 +13,29 @@ const chartConfig = {
 };
 
 export default function DashboardClient({ stats }) {
+  const [selectedYear, setSelectedYear] = useState(stats.availableYears?.[0] || new Date().getFullYear().toString());
+
+  // Calculate max openings across all years for consistent scale
+  const maxOpenings = Math.max(
+    ...Object.values(stats.openingsData || {}).flatMap(yearData => 
+      yearData.map(d => d.count)
+    )
+  );
+
+  const handlePreviousYear = () => {
+    const currentIndex = stats.availableYears.indexOf(selectedYear);
+    if (currentIndex < stats.availableYears.length - 1) {
+      setSelectedYear(stats.availableYears[currentIndex + 1]);
+    }
+  };
+
+  const handleNextYear = () => {
+    const currentIndex = stats.availableYears.indexOf(selectedYear);
+    if (currentIndex > 0) {
+      setSelectedYear(stats.availableYears[currentIndex - 1]);
+    }
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -90,6 +114,78 @@ export default function DashboardClient({ stats }) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Show Openings Chart */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Show Openings per Day</CardTitle>
+              <CardDescription>Daily opening distribution for {selectedYear}</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePreviousYear}
+                disabled={stats.availableYears.indexOf(selectedYear) === stats.availableYears.length - 1}
+                className="p-1 hover:bg-muted rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Previous year"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              <span className="text-sm font-medium min-w-[60px] text-center">{selectedYear}</span>
+              <button
+                onClick={handleNextYear}
+                disabled={stats.availableYears.indexOf(selectedYear) === 0}
+                className="p-1 hover:bg-muted rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Next year"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer config={chartConfig} className="h-[400px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={stats.openingsData[selectedYear] || []}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="day"
+                  tick={{ fontSize: 11 }}
+                  label={{ value: 'Date', position: 'insideBottom', offset: -5, style: { fontSize: 12 } }}
+                  ticks={[1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]}
+                  tickFormatter={(day) => {
+                    const date = new Date(parseInt(selectedYear), 0, day);
+                    const monthShort = date.toLocaleDateString('en-US', { month: 'short' });
+                    return monthShort.substring(0, 2);
+                  }}
+                />
+                <YAxis 
+                  domain={[0, maxOpenings]}
+                  label={{ value: 'Number of Openings', angle: -90, position: 'insideLeft', style: { fontSize: 12, textAnchor: 'middle' } }}
+                />
+                <Tooltip 
+                  labelFormatter={(day) => {
+                    const date = new Date(parseInt(selectedYear), 0, day);
+                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="count" 
+                  stroke="var(--color-count)" 
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </CardContent>
+      </Card>
 
       {/* Tables */}
       <div className="grid gap-4 md:grid-cols-2">
