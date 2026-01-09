@@ -1,6 +1,7 @@
 import React from 'react';
+import HoursPopup from './HoursPopup';
 
-export default function TodaysHoursStatus({ locationHours, locationUrl }) {
+export default function TodaysHoursStatus({ locationHours, locationUrl, locationName }) {
   if (!locationHours) {
     return (
       <a className="flex flex-row items-center gap-1 text-sm" href={locationUrl} target="_blank">
@@ -22,15 +23,27 @@ export default function TodaysHoursStatus({ locationHours, locationUrl }) {
   
   if (!openHours || openHours.toLowerCase().includes('closed')) {
     return (
-      <span className="flex flex-row items-start gap-1 text-sm my-2">
-        <span><span className="text-gray-500">{todayName}</span><br />Closed</span>
-      </span>
+      <HoursPopup
+        locationName={locationName}
+        locationHours={locationHours}
+        locationUrl={locationUrl}
+      >
+        <span className="flex flex-row items-start gap-1 text-sm my-2 cursor-pointer">
+          <span><span className="text-gray-500">Today</span><br />Closed</span>
+        </span>
+      </HoursPopup>
     );
   }
 
   return (
-    <span className="flex flex-row items-start gap-1 text-sm my-2">
-      <span><span className="text-gray-500">{todayName}</span><br />{displayOpenHours}</span>
-    </span>
+    <HoursPopup
+      locationName={locationName}
+      locationHours={locationHours}
+      locationUrl={locationUrl}
+    >
+      <span className="flex flex-row items-start gap-1 text-sm my-2 cursor-pointer">
+        <span><span className="text-gray-500">Today</span><br />{displayOpenHours}</span>
+      </span>
+    </HoursPopup>
   );
 }

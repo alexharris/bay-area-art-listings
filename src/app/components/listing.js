@@ -157,6 +157,7 @@ export default function Listings({ listings, formatDate }) {
                       <TodaysHoursStatus 
                         locationHours={item.locationHours}
                         locationUrl={item.locationUrl}
+                        locationName={item.locationName}
                       />
                     </div>    
                     
