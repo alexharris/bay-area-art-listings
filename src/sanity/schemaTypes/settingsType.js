@@ -98,4 +98,11 @@ export const settingsType = defineType({
       ],
     }),
   ],
+  preview: {
+    prepare() {
+      return {
+        title: 'Site Settings',
+      }
+    },
+  },
 })
