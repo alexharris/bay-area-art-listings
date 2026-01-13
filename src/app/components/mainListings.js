@@ -32,7 +32,7 @@ function formatDate(dateString) {
     return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
 
-export default function DisplayListings() {
+export default function DisplayListings({ newsletterSettings }) {
     // Get today's date in US West Coast (Pacific Time)
     const today = new Date(
         new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
@@ -256,6 +256,7 @@ export default function DisplayListings() {
                     setIsMapView={setIsMapView}
                     showCustomCalendar={showCustomCalendar}
                     setShowCustomCalendar={setShowCustomCalendar}
+                    newsletterSettings={newsletterSettings}
                     
                     // Filter states
                     searchTerm={searchTerm}
@@ -316,6 +317,7 @@ export default function DisplayListings() {
                         setIsMapView={setIsMapView}
                         showCustomCalendar={showCustomCalendar}
                         setShowCustomCalendar={setShowCustomCalendar}
+                        newsletterSettings={newsletterSettings}
                         
                         // Filter states
                         searchTerm={searchTerm}

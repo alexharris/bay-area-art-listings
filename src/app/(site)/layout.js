@@ -4,7 +4,8 @@ import TopBar from "../components/TopBar";
 async function getSettings() {
   try {
     const settings = await client.fetch(`*[_type == "settings" && _id == "settings"][0]{
-      topBar
+      topBar,
+      newsletter
     }`)
     return settings
   } catch (error) {

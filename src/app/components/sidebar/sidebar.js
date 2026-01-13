@@ -28,6 +28,7 @@ export default function Sidebar({
     setIsMapView,
     showCustomCalendar,
     setShowCustomCalendar,
+    newsletterSettings,
     
     // Filter states
     searchTerm,
@@ -71,6 +72,7 @@ export default function Sidebar({
     closeMobileSidebar
 }) {
     const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
+    const [newsletterDialogOpen, setNewsletterDialogOpen] = useState(false);
     
     return (
         <div 
@@ -84,7 +86,7 @@ export default function Sidebar({
                             <img 
                                 src="/art-board-logo.png" 
                                 alt="Art Board"     
-                                className="h-32 lg:h-48"                       
+                                className="h-32 lg:h-40"                       
                             />
                         </Link>
                     </div>
@@ -283,13 +285,20 @@ export default function Sidebar({
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>    
-                <button 
-                    className="mt-8 text-blue-800 underline text-left" 
-                    onClick={() => setAboutDialogOpen(true)}
-                >
-                    About
-                </button>
-                
+                <div className="flex flex-row gap-2 border-t border-gray-200 pt-2">
+                    <button 
+                        className="text-blue-800 underline text-left" 
+                        onClick={() => setAboutDialogOpen(true)}
+                    >
+                        About
+                    </button>
+                    <button 
+                        className="text-blue-800 underline text-left" 
+                        onClick={() => setNewsletterDialogOpen(true)}
+                    >
+                        Newsletter
+                    </button>
+                </div>
                 <Dialog open={aboutDialogOpen} onOpenChange={setAboutDialogOpen}>
                     <DialogPortal>
                         <DialogOverlay className="z-[60]" />
@@ -300,6 +309,50 @@ export default function Sidebar({
                                 <DialogTitle className="sr-only">About</DialogTitle>
                             </DialogHeader>
                             <AboutContent />
+                            <DialogPrimitive.Close className="absolute right-4 top-4 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                                    <path d="M18 6 6 18"/>
+                                    <path d="m6 6 12 12"/>
+                                </svg>
+                                <span className="sr-only">Close</span>
+                            </DialogPrimitive.Close>
+                        </DialogPrimitive.Content>
+                    </DialogPortal>
+                </Dialog>
+                
+                <Dialog open={newsletterDialogOpen} onOpenChange={setNewsletterDialogOpen}>
+                    <DialogPortal>
+                        <DialogOverlay className="z-[60]" />
+                        <DialogPrimitive.Content
+                            className="fixed left-[50%] top-[50%] z-[60] grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]"
+                        >
+                            <DialogHeader>
+                                <DialogTitle>{newsletterSettings?.title || 'Subscribe to Newsletter'}</DialogTitle>
+                            </DialogHeader>
+                            {newsletterSettings?.description && (
+                                <p className="text-sm text-muted-foreground">{newsletterSettings.description}</p>
+                            )}
+                            <form
+                                action="https://buttondown.com/api/emails/embed-subscribe/artboard"
+                                method="post"
+                                className="embeddable-buttondown-form space-y-4"
+                            >
+                                <div className="space-y-2">
+                                    <label htmlFor="bd-email" className="text-sm font-medium">
+                                        Enter your email
+                                    </label>
+                                    <Input 
+                                        type="email" 
+                                        name="email" 
+                                        id="bd-email"
+                                        placeholder="you@example.com"
+                                        required
+                                    />
+                                </div>
+                                <Button type="submit" className="w-full">
+                                    Subscribe
+                                </Button>
+                            </form>
                             <DialogPrimitive.Close className="absolute right-4 top-4 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
                                     <path d="M18 6 6 18"/>

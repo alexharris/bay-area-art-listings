@@ -2,13 +2,17 @@ import {defineField, defineType} from 'sanity'
 
 export const settingsType = defineType({
   name: 'settings',
-  title: 'Settings',
+  title: 'Site Settings',
   type: 'document',
   fields: [
     defineField({
       name: 'topBar',
       title: 'Top Bar',
       type: 'object',
+      options: {
+        collapsible: true,
+        collapsed: false,
+      },
       fields: [
         defineField({
           name: 'enabled',
@@ -65,6 +69,31 @@ export const settingsType = defineType({
             ],
           },
           initialValue: 'green-300',
+        }),
+      ],
+    }),
+    defineField({
+      name: 'newsletter',
+      title: 'Newsletter',
+      type: 'object',
+      options: {
+        collapsible: true,
+        collapsed: false,
+      },
+      fields: [
+        defineField({
+          name: 'title',
+          title: 'Dialog Title',
+          type: 'string',
+          description: 'Title displayed in the newsletter signup dialog',
+          initialValue: 'Subscribe to Newsletter',
+        }),
+        defineField({
+          name: 'description',
+          title: 'Description Text',
+          type: 'text',
+          rows: 3,
+          description: 'Description text shown above the email input field',
         }),
       ],
     }),
