@@ -77,8 +77,10 @@ export default function Sidebar({
     return (
         <div 
             id="sidebar" 
-            className="flex flex-col px-4 space-y-4 max-h-full overflow-y-auto"
+            className="flex flex-col max-h-full"
         >
+            {/* Scrollable content area */}
+            <div className="flex-1 overflow-y-auto px-4 space-y-4 pb-4">
                 {/* Logo at the top of the sidebar */}
                 {showLogo && (
                     <div className="flex flex-col justify-center items-center w-full mb-4">
@@ -285,7 +287,11 @@ export default function Sidebar({
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>    
-                <div className="flex flex-row gap-2 border-t border-gray-200 pt-2">
+            </div>
+            
+            {/* Fixed bottom section with About and Newsletter */}
+            <div className="px-4 py-2 border-t border-gray-200 bg-white">
+                <div className="flex flex-row gap-4">
                     <button 
                         className="text-blue-800 underline text-left" 
                         onClick={() => setAboutDialogOpen(true)}
@@ -299,7 +305,10 @@ export default function Sidebar({
                         Newsletter
                     </button>
                 </div>
-                <Dialog open={aboutDialogOpen} onOpenChange={setAboutDialogOpen}>
+            </div>
+            
+            {/* Dialogs */}
+            <Dialog open={aboutDialogOpen} onOpenChange={setAboutDialogOpen}>
                     <DialogPortal>
                         <DialogOverlay className="z-[60]" />
                         <DialogPrimitive.Content
