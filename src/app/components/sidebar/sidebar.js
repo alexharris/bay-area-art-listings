@@ -293,13 +293,13 @@ export default function Sidebar({
             <div className="px-4 py-2 border-t border-gray-200 bg-white">
                 <div className="flex flex-row gap-4">
                     <button 
-                        className="text-blue-800 underline text-left" 
+                        className="underline text-left" 
                         onClick={() => setAboutDialogOpen(true)}
                     >
                         About
                     </button>
                     <button 
-                        className="text-blue-800 underline text-left" 
+                        className="underline text-left" 
                         onClick={() => setNewsletterDialogOpen(true)}
                     >
                         Newsletter

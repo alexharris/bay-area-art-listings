@@ -152,3 +152,25 @@ select[id*="calendarTypeDropdown"] option {
   }
 }
 
+/* Custom map popup styling */
+.leaflet-popup-content-wrapper {
+  padding: 0 !important;
+  border-radius: 0px !important;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  padding: 16px !important;
+  min-width: 400px;
+  max-width: 400px;
+}
+
+.location-popup .leaflet-popup-content {
+  width: 100% !important;
+}
+
+.location-popup .popup-content {
+  font-size: 14px;
+  line-height: 1.5;
+}
