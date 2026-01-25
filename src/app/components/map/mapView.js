@@ -6,30 +6,13 @@ import 'leaflet/dist/leaflet.css';
 import { extractPortableTextContent } from '../../../utils/helpers';
 import TodaysHoursStatus from '../TodaysHoursStatus';
 import HoursPopup from '../HoursPopup';
+import { formatDate } from '../../../utils/shared';
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
-
-// Don't show year if its the current year
-function formatDate(dateString) {
-    const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    
-    const [year, month, day] = dateString.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
-    
-    // Check if the date is valid
-    if (isNaN(date.getTime())) {
-        throw new Error('Invalid date string');
-    }
-    
-    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
-}
 
 // ShowCard component for displaying individual show details
 function ShowCard({ item, compact = false }) {
@@ -53,9 +36,10 @@ function ShowCard({ item, compact = false }) {
                 
                 <div className="flex flex-col flex-1 min-w-0">
                     {item.EventUrl ? (
-                        <a 
+                        <a
                             href={item.EventUrl}
                             target="_blank"
+                            rel="noopener noreferrer"
                             className="text-lg font-medium hover:text-blue-600 transition-colors"
                         >
                             {item.Event}
@@ -99,8 +83,8 @@ export default function MapView({
 
     if (!L) {
         return (
-            <div className="h-screen border w-full flex items-center justify-center">
-                <div className="animate-pulse text-2xl">🗺️ Loading map...</div>
+            <div className="h-screen border w-full flex items-center justify-center" role="status" aria-label="Loading map">
+                <div className="animate-pulse text-2xl text-gray-500">Loading map...</div>
             </div>
         );
     }
@@ -202,20 +186,22 @@ export default function MapView({
                     <div className="flex flex-wrap gap-4 text-sm">
                     <a
                         className="flex flex-row gap-1 items-center text-black hover:text-blue-600"
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(group.locationAddress)}`} 
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(group.locationAddress)}`}
                         target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="View on Google Maps"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                     </a>
                     {group.locationUrl && (
                         <a
                         className="flex flex-row gap-1 items-center text-black hover:text-blue-600"
-                        href={group.locationUrl} 
+                        href={group.locationUrl}
                         target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Visit venue website"
                         >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>                        
-                        
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                         </a>
                     )}
                     {hasOnViewToday && (
@@ -224,9 +210,8 @@ export default function MapView({
                         locationHours={group.locationHours}
                         locationUrl={group.locationUrl}
                         >
-                        <button className="flex flex-row gap-1 items-center text-black hover:text-blue-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            
+                        <button className="flex flex-row gap-1 items-center text-black hover:text-blue-600" aria-label="View hours">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                         </button>
                         </HoursPopup>
                     )}

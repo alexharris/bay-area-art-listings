@@ -5,32 +5,16 @@ import getListings from './getListings';
 import getLocations from './getLocations';
 import 'leaflet/dist/leaflet.css';
 import { getFilteredListings } from '../../utils/filters';
-import { applySorting } from '../../utils/sort'; 
+import { applySorting } from '../../utils/sort';
 import { getCalendarTypeCounts } from '../../utils/filterCounts';
+import { formatDate } from '../../utils/shared';
 
 import MobileHeader from './MobileHeader';
 import MobileSidebarOverlay from './sidebar/mobileSidebarOverlay';
 import Listing from './listing';
 import MapView from './map/mapView';
 import Sidebar from './sidebar/sidebar';
-
-// Don't show year if its the current year
-function formatDate(dateString) {
-    const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    
-    const [year, month, day] = dateString.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
-    
-    // Check if the date is valid
-    if (isNaN(date.getTime())) {
-        throw new Error('Invalid date string');
-    }
-    
-    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
-}
+import LoadingSkeleton from './LoadingSkeleton';
 
 export default function DisplayListings({ newsletterSettings }) {
     // Get today's date in US West Coast (Pacific Time)
@@ -365,9 +349,7 @@ export default function DisplayListings({ newsletterSettings }) {
             {/* Main Col */}
             <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
                 {loading ? (
-                    <div className="animate-pulse text-5xl flex items-center justify-center w-full h-[70vh]">
-                        🎨
-                    </div>
+                    <LoadingSkeleton count={5} />
                 ) : (
                     <>  
 

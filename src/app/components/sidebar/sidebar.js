@@ -96,7 +96,7 @@ export default function Sidebar({
                 <p className="mb-4 hidden md:block">A directory of visual arts exhibitions in the Bay Area.</p>
                 <div className="flex flex-row lg:mt-0 items-center justify-between w-full">
                     <label htmlFor="searchTerm" className="pr-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="feather feather-search"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>                            
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="feather feather-search" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                     </label>
                     <Input 
                         type="text" 
@@ -319,7 +319,7 @@ export default function Sidebar({
                             </DialogHeader>
                             <AboutContent />
                             <DialogPrimitive.Close className="absolute right-4 top-4 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
                                     <path d="M18 6 6 18"/>
                                     <path d="m6 6 12 12"/>
                                 </svg>
@@ -328,7 +328,7 @@ export default function Sidebar({
                         </DialogPrimitive.Content>
                     </DialogPortal>
                 </Dialog>
-                
+
                 <Dialog open={newsletterDialogOpen} onOpenChange={setNewsletterDialogOpen}>
                     <DialogPortal>
                         <DialogOverlay className="z-[60]" />
@@ -350,9 +350,9 @@ export default function Sidebar({
                                     <label htmlFor="bd-email" className="text-sm font-medium">
                                         Enter your email
                                     </label>
-                                    <Input 
-                                        type="email" 
-                                        name="email" 
+                                    <Input
+                                        type="email"
+                                        name="email"
                                         id="bd-email"
                                         placeholder="you@example.com"
                                         required
@@ -363,7 +363,7 @@ export default function Sidebar({
                                 </Button>
                             </form>
                             <DialogPrimitive.Close className="absolute right-4 top-4 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
                                     <path d="M18 6 6 18"/>
                                     <path d="m6 6 12 12"/>
                                 </svg>

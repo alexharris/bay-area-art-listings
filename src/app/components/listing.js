@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Image from 'next/image';
 import CalendarLink from './CalendarLink';
 import NotesRenderer from './NotesRenderer';
 import DateNote from './DateNote';
@@ -6,14 +7,7 @@ import HoursPopup from './HoursPopup';
 import TodaysHoursStatus from './TodaysHoursStatus';
 import CityFromPlaceId from './CityFromPlaceId';
 import { Badge } from '@/components/ui/badge';
-
-// Generate URL-friendly slug from title
-function generateSlug(title) {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+import { generateSlug } from '../../utils/shared';
 
 export default function Listings({ 
   listings, 
@@ -38,7 +32,7 @@ export default function Listings({
   return (
     <ul id="list-view" className="w-full px-3 md:p-2 lg:p-0">
       {listings.map((item, index) => (
-        <li className="border-b min-h-40 border-dashed border-gray-400 pt-5 pb-6 w-full relative flex flex-col md:flex-row justify-between gap-2 lg:gap-4" key={index}>
+        <li className="border-b min-h-40 border-dashed border-gray-400 pt-5 pb-6 w-full relative flex flex-col md:flex-row justify-between gap-2 lg:gap-4" key={item._id || index}>
 
           
           {/* Left Column - Event and Note */}
@@ -46,12 +40,24 @@ export default function Listings({
             ? <div className="flex flex-col lg:flex-row lg:gap-4 justify-start mb-2 lg:mb-0 w-full lg:w-2/3">
               {/* Thumbnail Image */}
               {item.eventImageUrl && (
-                <div className=" flex-shrink-0 mb-3 lg:mb-0">
-                  <img 
-                    src={item.eventImageUrl} 
-                    alt={item.eventImageCaption || item.Event}
-                    className="max-h-56 w-auto lg:max-h-none lg:w-36 lg:h-36 object-cover"
-                  />
+                <div className="flex-shrink-0 mb-3 lg:mb-0">
+                  {item.eventImageUrl.includes('cdn.sanity.io') ? (
+                    <div className="relative w-full h-56 lg:w-36 lg:h-36">
+                      <Image
+                        src={item.eventImageUrl}
+                        alt={item.eventImageCaption || item.Event}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 1024px) 100vw, 144px"
+                      />
+                    </div>
+                  ) : (
+                    <img
+                      src={item.eventImageUrl}
+                      alt={item.eventImageCaption || item.Event}
+                      className="max-h-56 w-auto lg:max-h-none lg:w-36 lg:h-36 object-cover"
+                    />
+                  )}
                   {item.eventImageCaption && (
                     <p className="text-xs text-gray-600 mt-1">{item.eventImageCaption}</p>
                   )}
@@ -59,24 +65,25 @@ export default function Listings({
               )}         
               <div className="flex flex-col justify-between">
                 <div className="flex flex-col">
-                  <a 
+                  <a
                     href={item.EventUrl}
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="text-2xl lg:text-3xl mb-2 lg:mb-0"
                   >
                     <h2 className=""><span className="inline-block float-left">{item.Event}</span></h2>
                   </a>
                   {item.sfawUrl && (
-                    <a href={item.sfawUrl} className="text-sm underline  flex flex-row mt-2" target="_blank">
-                      SF Art Week <svg className="feather feather-external-link w-4 pb-1 ml-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" ><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>                      
+                    <a href={item.sfawUrl} className="text-sm underline flex flex-row mt-2" target="_blank" rel="noopener noreferrer">
+                      SF Art Week <svg className="feather feather-external-link w-4 pb-1 ml-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     </a>
                   )}                  
                   
                   <NotesRenderer notes={item.Notes} itemIndex={index} />
                 </div>
                 <div className="flex gap-3 items-center">
-                  <a className="self-start" href={item.EventUrl} target="_blank">
-                    <svg className="feather feather-external-link w-6 lg:w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>                      
+                  <a className="self-start" href={item.EventUrl} target="_blank" rel="noopener noreferrer" aria-label="Visit event website">
+                    <svg className="feather feather-external-link w-6 lg:w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                   </a>
                   {shouldShowOpenToday(item) && (
                     <Badge 
@@ -159,28 +166,30 @@ export default function Listings({
           {/* Right Column - Location Info */}
           <div className="w-full">              
             <div className="bg-gray-50 rounded p-4 mr-4 h-full flex flex-col justify-between">
-              {item.locationName.toLowerCase() === 'various' 
+              {item.locationName.toLowerCase() === 'various'
                 ? <div className="flex flex-row font-semibold">
                     {item.eventUrl
-                      ? <a 
+                      ? <a
                           href={item.eventUrl}
                           target="_blank"
+                          rel="noopener noreferrer"
                         >
                           {item.locationName}
                         </a>
                       : <span>{item.locationName}</span>
-                    }                     
+                    }
                   </div> 
                 : <>
                     <div className="flex flex-col items-start gap-1 mb-1 lg:mb-0">
                       <div>
-                        <a 
+                        <a
                           href={item.locationUrl}
                           target="_blank"
+                          rel="noopener noreferrer"
                           className="font-semibold"
                         >
                           {item.locationName}
-                        </a>              
+                        </a>
                       </div> 
  
                       <CityFromPlaceId 
@@ -204,16 +213,18 @@ export default function Listings({
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                         {/* {item.locationAddress} */}
                       </a>
             
-                      <a 
-                        className="underline flex flex-row gap-1 items-center" 
+                      <a
+                        className="underline flex flex-row gap-1 items-center"
                         href={item.locationUrl}
                         target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Visit venue website"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-globe w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>                        
+                        <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-globe w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                       </a>
                       
                       <div>
@@ -223,18 +234,18 @@ export default function Listings({
                             locationHours={item.locationHours}
                             locationUrl={item.locationUrl}
                           >
-                            <span 
-                              className="underline flex flex-row gap-1 items-center cursor-pointer" 
-                              title="View hours"
+                            <button
+                              className="underline flex flex-row gap-1 items-center cursor-pointer"
+                              aria-label="View hours"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
-                            </span>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            </button>
                           </HoursPopup>
                         ) : (
-                          <span className="flex flex-row gap-1 items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>                      
+                          <span className="flex flex-row gap-1 items-center" aria-label="Hours not available">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                           </span>
-                        )}                                   
+                        )}
                       </div>
                       
                       {item.locationInstagram && (
@@ -242,9 +253,10 @@ export default function Listings({
                           className="underline flex flex-row gap-1 items-center"
                           href={`https://instagram.com/${item.locationInstagram.replace(/^@/, '')}`}
                           target="_blank"
-                          title="Instagram"
+                          rel="noopener noreferrer"
+                          aria-label={`${item.locationName} on Instagram`}
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-instagram w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-instagram w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                             <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                             <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
                             <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>

@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 import { createClient } from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 import CalendarLink from '@/app/components/CalendarLink';
 import TodaysHoursStatus from '@/app/components/TodaysHoursStatus';
 import HoursPopup from '@/app/components/HoursPopup';
 import CityFromPlaceId from '@/app/components/CityFromPlaceId';
+import { generateSlug, formatDate } from '@/utils/shared';
 
 const client = createClient({
   projectId: 'ride9vgj',
@@ -20,25 +22,6 @@ const builder = imageUrlBuilder(client);
 
 function urlFor(source) {
   return builder.image(source);
-}
-
-// Generate URL-friendly slug from title
-function generateSlug(title) {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
-// Format date helper
-function formatDate(dateString) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    month: 'long', 
-    day: 'numeric', 
-    year: 'numeric' 
-  });
 }
 
 export default function ShowPage() {
@@ -139,7 +122,7 @@ export default function ShowPage() {
       <div className="max-w-6xl mx-auto">
         {/* Back button */}
         <a href="/" className="inline-flex items-center gap-2 mb-6 text-gray-600 hover:text-gray-900">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Back
@@ -148,11 +131,24 @@ export default function ShowPage() {
         {/* Event Image */}
         {listing.eventImageUrl && (
           <div className="mb-8">
-            <img 
-              src={listing.eventImageUrl} 
-              alt={listing.eventImageCaption || listing.Event}
-              className="w-full h-auto object-contain"
-            />
+            {listing.eventImageUrl.includes('cdn.sanity.io') ? (
+              <div className="relative w-full aspect-[4/3]">
+                <Image
+                  src={listing.eventImageUrl}
+                  alt={listing.eventImageCaption || listing.Event}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                  priority
+                />
+              </div>
+            ) : (
+              <img
+                src={listing.eventImageUrl}
+                alt={listing.eventImageCaption || listing.Event}
+                className="w-full h-auto object-contain"
+              />
+            )}
             {listing.eventImageCaption && (
               <p className="text-sm text-gray-600 mt-2">{listing.eventImageCaption}</p>
             )}
@@ -243,14 +239,14 @@ export default function ShowPage() {
             {/* Event URL */}
             {listing.EventUrl && (
             <div className="mb-6">
-                <a 
-                href={listing.EventUrl} 
-                target="_blank" 
+                <a
+                href={listing.EventUrl}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-blue-600 hover:underline"
                 >
                 Visit event page
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
                 </a>
