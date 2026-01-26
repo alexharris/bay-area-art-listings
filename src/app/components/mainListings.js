@@ -72,7 +72,6 @@ export default function DisplayListings({ newsletterSettings }) {
     const [filteredListings, setFilteredListings] = useState([]);
     const [highlightsOnly, setHighlightsOnly] = useState(false);
     const [onViewToday, setOnViewToday] = useState(false);
-    const [sfArtWeekOnly, setSfArtWeekOnly] = useState(false);
     const [endingSoonOnly, setEndingSoonOnly] = useState(false);
     const [openingTodayOnly, setOpeningTodayOnly] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -90,7 +89,6 @@ export default function DisplayListings({ newsletterSettings }) {
     const [calendarTypeCounts, setCalendarTypeCounts] = useState({});
     const [specialFilterCounts, setSpecialFilterCounts] = useState({
         onViewToday: 0,
-        sfArtWeekOnly: 0,
         endingSoonOnly: 0,
         openingTodayOnly: 0
     });
@@ -104,7 +102,6 @@ export default function DisplayListings({ newsletterSettings }) {
     const currentFilters = useMemo(() => ({
         highlightsOnly,
         onViewToday,
-        sfArtWeekOnly,
         endingSoonOnly,
         openingTodayOnly,
         searchTerm,
@@ -115,7 +112,6 @@ export default function DisplayListings({ newsletterSettings }) {
     }), [
         highlightsOnly, 
         onViewToday, 
-        sfArtWeekOnly, 
         endingSoonOnly, 
         openingTodayOnly, 
         searchTerm, 
@@ -161,7 +157,6 @@ export default function DisplayListings({ newsletterSettings }) {
             // Calculate special filter counts - showing how many items match each filter
             const newSpecialCounts = {
                 onViewToday: getFilteredListings({ ...currentFilters, onViewToday: true }, listings).length,
-                sfArtWeekOnly: getFilteredListings({ ...currentFilters, sfArtWeekOnly: true }, listings).length,
                 endingSoonOnly: getFilteredListings({ ...currentFilters, endingSoonOnly: true }, listings).length,
                 openingTodayOnly: getFilteredListings({ ...currentFilters, openingTodayOnly: true }, listings).length
             };
@@ -225,7 +220,6 @@ export default function DisplayListings({ newsletterSettings }) {
         setCalendarTypeFilter('onview');
         setHighlightsOnly(false);
         setOnViewToday(false);
-        setSfArtWeekOnly(false);
         setEndingSoonOnly(false);
         setOpeningTodayOnly(false);
         setSearchTerm('');
@@ -293,8 +287,6 @@ export default function DisplayListings({ newsletterSettings }) {
                     setHighlightsOnly={setHighlightsOnly}
                     onViewToday={onViewToday}
                     setOnViewToday={setOnViewToday}
-                    sfArtWeekOnly={sfArtWeekOnly}
-                    setSfArtWeekOnly={setSfArtWeekOnly}
                     endingSoonOnly={endingSoonOnly}
                     setEndingSoonOnly={setEndingSoonOnly}
                     openingTodayOnly={openingTodayOnly}
@@ -355,8 +347,6 @@ export default function DisplayListings({ newsletterSettings }) {
                         setHighlightsOnly={setHighlightsOnly}
                         onViewToday={onViewToday}
                         setOnViewToday={setOnViewToday}
-                        sfArtWeekOnly={sfArtWeekOnly}
-                        setSfArtWeekOnly={setSfArtWeekOnly}
                         endingSoonOnly={endingSoonOnly}
                         setEndingSoonOnly={setEndingSoonOnly}
                         openingTodayOnly={openingTodayOnly}
@@ -416,8 +406,6 @@ export default function DisplayListings({ newsletterSettings }) {
                                 formatDate={formatDate}
                                 onViewToday={onViewToday}
                                 setOnViewToday={setOnViewToday}
-                                sfArtWeekOnly={sfArtWeekOnly}
-                                setSfArtWeekOnly={setSfArtWeekOnly}
                                 endingSoonOnly={endingSoonOnly}
                                 setEndingSoonOnly={setEndingSoonOnly}
                                 openingTodayOnly={openingTodayOnly}

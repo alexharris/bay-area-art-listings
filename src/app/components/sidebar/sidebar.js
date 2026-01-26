@@ -37,7 +37,7 @@ export default function Sidebar({
     calendarTypeFilter,
     setCalendarTypeFilter,
     calendarTypeCounts,
-    specialFilterCounts = { onViewToday: 0, sfArtWeekOnly: 0, endingSoonOnly: 0, openingTodayOnly: 0 },
+    specialFilterCounts = { onViewToday: 0, endingSoonOnly: 0, openingTodayOnly: 0 },
     calendarDateRangeFilter,
     setCalendarDateRangeFilter,
     calendarDateRangePreset,
@@ -46,8 +46,6 @@ export default function Sidebar({
     setHighlightsOnly,
     onViewToday,
     setOnViewToday,
-    sfArtWeekOnly,
-    setSfArtWeekOnly,
     endingSoonOnly,
     setEndingSoonOnly,
     openingTodayOnly,
@@ -179,16 +177,6 @@ export default function Sidebar({
                             onClick={() => setOnViewToday(!onViewToday)}
                         >
                             On View Today <span className="ml-1 opacity-60">({specialFilterCounts.onViewToday})</span>
-                        </Badge>
-                        <Badge 
-                            className={`cursor-pointer transition-colors ${
-                                sfArtWeekOnly 
-                                    ? 'bg-yellow-300 hover:bg-yellow-400 text-black' 
-                                    : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-                            }`}
-                            onClick={() => setSfArtWeekOnly(!sfArtWeekOnly)}
-                        >
-                            SF Art Week <span className="ml-1 opacity-60">({specialFilterCounts.sfArtWeekOnly})</span>
                         </Badge>
                         <Badge 
                             className={`cursor-pointer transition-colors ${

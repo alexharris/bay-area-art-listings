@@ -14,8 +14,6 @@ export default function Listings({
   formatDate, 
   onViewToday,
   setOnViewToday,
-  sfArtWeekOnly,
-  setSfArtWeekOnly,
   endingSoonOnly,
   setEndingSoonOnly,
   openingTodayOnly,
@@ -73,11 +71,6 @@ export default function Listings({
                   >
                     <h2 className=""><span className="inline-block float-left">{item.Event}</span></h2>
                   </a>
-                  {item.sfawUrl && (
-                    <a href={item.sfawUrl} className="text-sm underline flex flex-row mt-2" target="_blank" rel="noopener noreferrer">
-                      SF Art Week <svg className="feather feather-external-link w-4 pb-1 ml-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                    </a>
-                  )}                  
                   
                   <NotesRenderer notes={item.Notes} itemIndex={index} />
                 </div>
@@ -91,14 +84,6 @@ export default function Listings({
                       onClick={() => setOnViewToday(!onViewToday)}
                     >
                       On View Today
-                    </Badge>
-                  )}                  
-                  {item.sfawUrl && (
-                    <Badge 
-                      className="bg-yellow-300 hover:bg-yellow-400 text-black cursor-pointer transition-colors"
-                      onClick={() => setSfArtWeekOnly(!sfArtWeekOnly)}
-                    >
-                      SF Art Week
                     </Badge>
                   )}
 
@@ -116,24 +101,14 @@ export default function Listings({
                   <h2>{item.Event}</h2>
                 </span>
                 <NotesRenderer notes={item.Notes} itemIndex={index} />
-                {(item.sfawUrl || shouldShowOpenToday(item)) && (
+                {shouldShowOpenToday(item) && (
                   <div className="mt-2 flex gap-3 items-center">
-                    {item.sfawUrl && (
-                      <Badge 
-                        className="bg-[#FFEB3B] hover:bg-[#FDD835] text-black cursor-pointer transition-colors"
-                        onClick={() => setSfArtWeekOnly(!sfArtWeekOnly)}
-                      >
-                        SF Art Week
-                      </Badge>
-                    )}
-                    {shouldShowOpenToday(item) && (
-                      <Badge 
-                        className="bg-green-400 hover:bg-green-500 text-black cursor-pointer transition-colors"
-                        onClick={() => setOnViewToday(!onViewToday)}
-                      >
-                        Open Today
-                      </Badge>
-                    )}
+                    <Badge 
+                      className="bg-green-400 hover:bg-green-500 text-black cursor-pointer transition-colors"
+                      onClick={() => setOnViewToday(!onViewToday)}
+                    >
+                      Open Today
+                    </Badge>
                   </div>
                 )}
               </div>
