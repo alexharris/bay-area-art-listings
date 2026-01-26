@@ -29,6 +29,7 @@ export default function Sidebar({
     showCustomCalendar,
     setShowCustomCalendar,
     newsletterSettings,
+    currentFilters,
     
     // Filter states
     searchTerm,
@@ -141,18 +142,7 @@ export default function Sidebar({
                             endOfMonth={endOfMonth}
                             startOfNextMonth={startOfNextMonth}
                             endOfNextMonth={endOfNextMonth}
-                            currentFilters={{
-                                highlightsOnly: highlightsOnly,
-                                onViewToday: onViewToday,
-                                sfArtWeekOnly: sfArtWeekOnly,
-                                endingSoonOnly: endingSoonOnly,
-                                openingTodayOnly: openingTodayOnly,
-                                searchTerm: searchTerm,
-                                selectedLocation: selectedLocation,
-                                selectedCounty: selectedCounty,
-                                calendarTypeFilter: calendarTypeFilter,
-                                calendarDateRangeFilter: calendarDateRangeFilter,
-                            }}
+                            currentFilters={currentFilters}
                             listings={listings}
                         />
                     </div>
@@ -173,21 +163,10 @@ export default function Sidebar({
                     <CountySelector 
                         onCountyChange={setSelectedCounty} 
                         selectedCountyProp={selectedCounty}
-                        currentFilters={{
-                            highlightsOnly: highlightsOnly,
-                            onViewToday: onViewToday,
-                            sfArtWeekOnly: sfArtWeekOnly,
-                            endingSoonOnly: endingSoonOnly,
-                            openingTodayOnly: openingTodayOnly,
-                            searchTerm: searchTerm,
-                            selectedLocation: selectedLocation,
-                            selectedCounty: selectedCounty,
-                            calendarTypeFilter: calendarTypeFilter,
-                            calendarDateRangeFilter: calendarDateRangeFilter,
-                        }}
+                        currentFilters={currentFilters}
                         listings={listings}
-                    />                                       
-                </div>   
+                    />
+                </div>
                 <div className="flex flex-col gap-2">
                     <label className="text-sm font-medium">Filters</label>
                     <div className="flex flex-wrap gap-2">

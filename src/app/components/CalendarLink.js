@@ -82,24 +82,24 @@ export default function CalendarLink(data) {
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <button aria-label="Add to calendar">
-                    <svg
-                        className="feather feather-calendar w-6 lg:w-5 cursor-pointer"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#000000"
-                        strokeWidth="1"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                    >
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                </button>
+                <svg
+                    className="feather feather-calendar w-6 lg:w-5 cursor-pointer"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#000000"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Add to calendar"
+                >
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
             </PopoverTrigger>
             <PopoverContent className="w-80" align="end">
                 <div className="space-y-3">

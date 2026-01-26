@@ -70,8 +70,10 @@ A prioritized list of potential improvements for Bay Area Art Listings.
 - Evaluate Leaflet bundle size (~300KB) - consider lighter alternatives or loading on demand
 
 ### State Management
-- Reduce prop drilling to Sidebar (40+ props) using React Context
-- Memoize `getFilteredListings` to prevent recalculation on unchanged filters
+- ~~Reduce prop drilling to Sidebar (40+ props) using React Context~~ *(partially - added memoized currentFilters prop)* ✓
+- ~~Memoize hook return values to prevent creating new references on every render~~ ✓
+- ~~Memoize callbacks to prevent component recreation~~ ✓
+- ~~Add comparison checks before updating state objects to prevent unnecessary updates~~ ✓
 - ~~Add unique `key` props using `item._id` instead of array index~~ ✓
 
 ### Data Fetching

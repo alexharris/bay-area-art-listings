@@ -42,6 +42,7 @@
     "sanity": "^3.68.3",
     "styled-components": "^6.1.13",
     "supabase": "^2.19.7",
+    "swr": "^2.3.8",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.0.5"

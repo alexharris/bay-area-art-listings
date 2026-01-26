@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import getListings from './getListings';
 import getLocations from './getLocations';
+import { useListings, useLocations } from '../../hooks/useListings';
 import 'leaflet/dist/leaflet.css';
 import { getFilteredListings } from '../../utils/filters';
 import { applySorting } from '../../utils/sort';
@@ -17,31 +18,57 @@ import Sidebar from './sidebar/sidebar';
 import LoadingSkeleton from './LoadingSkeleton';
 
 export default function DisplayListings({ newsletterSettings }) {
-    // Get today's date in US West Coast (Pacific Time)
-    const today = new Date(
-        new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
-    );
-    // Always use a fresh copy of today's date for calculations to avoid mutation issues
+    // Get today's date in US West Coast (Pacific Time) - memoized to prevent recreation
+    const today = useMemo(() => {
+        return new Date(
+            new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
+        );
+    }, []);
 
-    // Calculate start and end of week using a new Date instance
-    const startOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
-    const endOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 6);
+    // Calculate dates once - memoized to prevent infinite loops
+    const { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfNextMonth, endOfNextMonth } = useMemo(() => {
+        // Calculate start and end of week
+        const startOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+        const endOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 6);
 
-    // Calculate start and end of month
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        // Calculate start and end of month
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-    // Calculate start and end of next month
-    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-    const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+        // Calculate start and end of next month
+        const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+        const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+        
+        return { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfNextMonth, endOfNextMonth };
+    }, [today]);
 
 
-    // Initial data
-    const [listings, setListings] = useState([]);
-    const [locations, setLocations] = useState([]);    
+    // Fetch data with SWR caching (instant on repeat visits)
+    const { listings, isLoading: listingsLoading } = useListings();
+    const { locations, isLoading: locationsLoading } = useLocations();
+    const loading = listingsLoading || locationsLoading;
+
     // Filtering
     const [calendarTypeFilter, setCalendarTypeFilter] = useState('onview'); // onview, opening, closing
-    const [calendarDateRangeFilter, setCalendarDateRangeFilter] = useState([]); // actual date range to filter on    
+    const [calendarDateRangeFilterInternal, setCalendarDateRangeFilterInternal] = useState(null); // actual date range to filter on
+    
+    // Wrap the setter to prevent updates if dates haven't actually changed
+    const setCalendarDateRangeFilter = useCallback((newRange) => {
+        setCalendarDateRangeFilterInternal(prev => {
+            // If both are null/undefined, no update needed
+            if (!prev && !newRange) return prev;
+            // If one is null and the other isn't, update
+            if (!prev || !newRange) return newRange;
+            // Compare timestamps to see if dates actually changed
+            const fromSame = prev.from?.getTime() === newRange.from?.getTime();
+            const toSame = prev.to?.getTime() === newRange.to?.getTime();
+            // Only update if dates are different
+            return (fromSame && toSame) ? prev : newRange;
+        });
+    }, []);
+    
+    const calendarDateRangeFilter = calendarDateRangeFilterInternal;
+    
     const [filteredListings, setFilteredListings] = useState([]);
     const [highlightsOnly, setHighlightsOnly] = useState(false);
     const [onViewToday, setOnViewToday] = useState(false);
@@ -54,7 +81,6 @@ export default function DisplayListings({ newsletterSettings }) {
     //  Sorting
     // Display
     const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('custom');
-    const [loading, setLoading] = useState(true);
     const [isMapView, setIsMapView] = useState(false);
     const [displayedResults, setDisplayedResults] = useState(0); // number of results
     const [showMenu, setShowMenu] = useState(false);
@@ -70,53 +96,53 @@ export default function DisplayListings({ newsletterSettings }) {
     });
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
+    // Use ref to track if initial setup is complete
+    const isInitialized = useRef(false);
 
-    // Load initial data
+    // Memoize currentFilters to prevent unnecessary re-renders in child components
+    // Use stringified date values for proper comparison
+    const currentFilters = useMemo(() => ({
+        highlightsOnly,
+        onViewToday,
+        sfArtWeekOnly,
+        endingSoonOnly,
+        openingTodayOnly,
+        searchTerm,
+        selectedLocation,
+        selectedCounty,
+        calendarTypeFilter,
+        calendarDateRangeFilter,
+    }), [
+        highlightsOnly, 
+        onViewToday, 
+        sfArtWeekOnly, 
+        endingSoonOnly, 
+        openingTodayOnly, 
+        searchTerm, 
+        selectedLocation, 
+        JSON.stringify(selectedCounty), 
+        calendarTypeFilter, 
+        calendarDateRangeFilter?.from?.getTime(), 
+        calendarDateRangeFilter?.to?.getTime()
+    ]);
+
+    // Set initial calendar filter defaults
     useEffect(() => {
-        async function fetchData() {
-            try {
-                // Set Data
-                const data = await getListings();
-                setListings(data);
-                const locationData = await getLocations();
-                setLocations(locationData); 
-                // Set Filter Status
-                
-                // Only set calendar filters if the feature flag is enabled
-                // if (sidebarCalendarIsEnabled) {
-                // Set calendar date range to cover the next ten years
-                const tenYearsFromNow = new Date(startOfMonth);
-                tenYearsFromNow.setFullYear(tenYearsFromNow.getFullYear() + 10);
-                setCalendarDateRangeFilter({ from: startOfMonth, to: tenYearsFromNow });
-                setCalendarDateRangePreset('anytime');
-                // }
-            } catch (error) {
-                console.error('Data retrieval failed:', error);
-            } finally {
-                setLoading(false);
-            }
+        if (!isInitialized.current) {
+            const tenYearsFromNow = new Date(startOfMonth);
+            tenYearsFromNow.setFullYear(tenYearsFromNow.getFullYear() + 10);
+            setCalendarDateRangeFilter({ from: startOfMonth, to: tenYearsFromNow });
+            setCalendarDateRangePreset('anytime');
+            isInitialized.current = true;
         }
-        fetchData();
-    }, []);  
+    }, [startOfMonth, setCalendarDateRangeFilter]);  
 
     // Update filtered listings when filters change
     useEffect(() => {
-
-        // Create an object of all of the filter variables
-        const filters = {
-            highlightsOnly: highlightsOnly,
-            onViewToday: onViewToday,
-            sfArtWeekOnly: sfArtWeekOnly,
-            endingSoonOnly: endingSoonOnly,
-            openingTodayOnly: openingTodayOnly,
-            searchTerm: searchTerm,
-            selectedLocation: selectedLocation,
-            selectedCounty: selectedCounty,
-            calendarTypeFilter: calendarTypeFilter,
-            calendarDateRangeFilter: calendarDateRangeFilter,
-        };
-
-        const filteredListings = getFilteredListings(filters, listings);
+        // Don't run until initialized
+        if (!calendarDateRangeFilter) return;
+        
+        const filteredListings = getFilteredListings(currentFilters, listings);
         const sortedListings = applySorting(filteredListings, sortMethod);
         
         setFilteredListings(sortedListings);
@@ -124,40 +150,46 @@ export default function DisplayListings({ newsletterSettings }) {
 
         // Calculate calendar type counts for the "What" dropdown
         if (listings && listings.length > 0) {
-            const typeCounts = getCalendarTypeCounts(filters, listings);
-            setCalendarTypeCounts(typeCounts);
+            const typeCounts = getCalendarTypeCounts(currentFilters, listings);
+            
+            // Only update if counts actually changed
+            setCalendarTypeCounts(prev => {
+                if (JSON.stringify(prev) === JSON.stringify(typeCounts)) return prev;
+                return typeCounts;
+            });
             
             // Calculate special filter counts - showing how many items match each filter
-            setSpecialFilterCounts({
-                onViewToday: getFilteredListings({ ...filters, onViewToday: true }, listings).length,
-                sfArtWeekOnly: getFilteredListings({ ...filters, sfArtWeekOnly: true }, listings).length,
-                endingSoonOnly: getFilteredListings({ ...filters, endingSoonOnly: true }, listings).length,
-                openingTodayOnly: getFilteredListings({ ...filters, openingTodayOnly: true }, listings).length
+            const newSpecialCounts = {
+                onViewToday: getFilteredListings({ ...currentFilters, onViewToday: true }, listings).length,
+                sfArtWeekOnly: getFilteredListings({ ...currentFilters, sfArtWeekOnly: true }, listings).length,
+                endingSoonOnly: getFilteredListings({ ...currentFilters, endingSoonOnly: true }, listings).length,
+                openingTodayOnly: getFilteredListings({ ...currentFilters, openingTodayOnly: true }, listings).length
+            };
+            
+            // Only update if counts actually changed
+            setSpecialFilterCounts(prev => {
+                if (JSON.stringify(prev) === JSON.stringify(newSpecialCounts)) return prev;
+                return newSpecialCounts;
             });
         }
         
-    }, [calendarDateRangeFilter, calendarTypeFilter, highlightsOnly, onViewToday, sfArtWeekOnly, endingSoonOnly, openingTodayOnly, searchTerm, listings, selectedLocation, selectedCounty, sortMethod]);
+    }, [currentFilters, listings, sortMethod, calendarDateRangeFilter]);
 
     // Auto-adjust sort method based on calendar type filter
     useEffect(() => {
         if (calendarTypeFilter === 'opening') {
-            setSortMethod('openingSoon');
-        } else if (calendarTypeFilter === 'onview' && sortMethod === 'openingSoon') {
-            // Only switch back to closingSoon if we're currently on openingSoon
-            // This prevents overriding user's manual sort selection
-            setSortMethod('closingSoon');
+            setSortMethod(prev => prev === 'openingSoon' ? prev : 'openingSoon');
+        } else if (calendarTypeFilter === 'onview') {
+            setSortMethod(prev => prev === 'openingSoon' ? 'closingSoon' : prev);
         }
     }, [calendarTypeFilter]);
 
-
-
     // Toggle map view
-    function toggleMapView() {
-        const newMapView = !isMapView;
-        setIsMapView(newMapView);
-    }
+    const toggleMapView = useCallback(() => {
+        setIsMapView(prev => !prev);
+    }, []);
 
-    function updateCalendarDateRangeFilter(dateRange){
+    const updateCalendarDateRangeFilter = useCallback((dateRange) => {
         // Handle dates properly to avoid timezone issues
         let fromDate, toDate;
         
@@ -186,9 +218,9 @@ export default function DisplayListings({ newsletterSettings }) {
         
         setCalendarDateRangeFilter(adjustedFilter);
         setCalendarDateRangePreset('custom');
-    }
+    }, [setCalendarDateRangeFilter]);
 
-    function clearAllFilters() {
+    const clearAllFilters = useCallback(() => {
         // Reset all filters to their initial values
         setCalendarTypeFilter('onview');
         setHighlightsOnly(false);
@@ -209,25 +241,28 @@ export default function DisplayListings({ newsletterSettings }) {
         
         // Close custom calendar if open
         setShowCustomCalendar(false);
-    }
+    }, [startOfMonth, setCalendarDateRangeFilter]);
 
-    function closeMobileSidebar() {
+    const closeMobileSidebar = useCallback(() => {
         setMobileSidebarOpen(false);
-    }
+    }, []);
 
+    const toggleMobileSidebar = useCallback(() => {
+        setMobileSidebarOpen(prev => !prev);
+    }, []);
 
     return (
         <>
             {/* Mobile Header */}
             <MobileHeader 
-                onSidebarToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+                onSidebarToggle={toggleMobileSidebar}
                 sidebarOpen={mobileSidebarOpen}
             />
 
             {/* Mobile Sidebar Overlay */}
             <MobileSidebarOverlay 
                 isOpen={mobileSidebarOpen} 
-                onClose={() => setMobileSidebarOpen(false)}
+                onClose={closeMobileSidebar}
             >
                 <Sidebar                    
                     // Display states
@@ -241,6 +276,7 @@ export default function DisplayListings({ newsletterSettings }) {
                     showCustomCalendar={showCustomCalendar}
                     setShowCustomCalendar={setShowCustomCalendar}
                     newsletterSettings={newsletterSettings}
+                    currentFilters={currentFilters}
                     
                     // Filter states
                     searchTerm={searchTerm}
@@ -302,6 +338,7 @@ export default function DisplayListings({ newsletterSettings }) {
                         showCustomCalendar={showCustomCalendar}
                         setShowCustomCalendar={setShowCustomCalendar}
                         newsletterSettings={newsletterSettings}
+                        currentFilters={currentFilters}
                         
                         // Filter states
                         searchTerm={searchTerm}
