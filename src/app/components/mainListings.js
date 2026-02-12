@@ -16,6 +16,7 @@ import Listing from './listing';
 import MapView from './map/mapView';
 import Sidebar from './sidebar/sidebar';
 import LoadingSkeleton from './LoadingSkeleton';
+import ContentToolbar from './ContentToolbar';
 
 export default function DisplayListings({ newsletterSettings }) {
     // Get today's date in US West Coast (Pacific Time) - memoized to prevent recreation
@@ -258,23 +259,19 @@ export default function DisplayListings({ newsletterSettings }) {
                 isOpen={mobileSidebarOpen} 
                 onClose={closeMobileSidebar}
             >
-                <Sidebar                    
+                <Sidebar
                     // Display states
                     showLogo={false}
                     showMenu={showMenu}
                     setShowMenu={setShowMenu}
                     displayedResults={displayedResults}
                     listings={listings}
-                    isMapView={isMapView}
-                    setIsMapView={setIsMapView}
                     showCustomCalendar={showCustomCalendar}
                     setShowCustomCalendar={setShowCustomCalendar}
                     newsletterSettings={newsletterSettings}
                     currentFilters={currentFilters}
-                    
+
                     // Filter states
-                    searchTerm={searchTerm}
-                    setSearchTerm={setSearchTerm}
                     calendarTypeFilter={calendarTypeFilter}
                     setCalendarTypeFilter={setCalendarTypeFilter}
                     calendarTypeCounts={calendarTypeCounts}
@@ -295,9 +292,7 @@ export default function DisplayListings({ newsletterSettings }) {
                     setSelectedLocation={setSelectedLocation}
                     selectedCounty={selectedCounty}
                     setSelectedCounty={setSelectedCounty}
-                    sortMethod={sortMethod}
-                    setSortMethod={setSortMethod}
-                    
+
                     // Date ranges for presets
                     startOfWeek={startOfWeek}
                     endOfWeek={endOfWeek}
@@ -305,7 +300,7 @@ export default function DisplayListings({ newsletterSettings }) {
                     endOfMonth={endOfMonth}
                     startOfNextMonth={startOfNextMonth}
                     endOfNextMonth={endOfNextMonth}
-                    
+
                     // Functions
                     updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
                     clearAllFilters={clearAllFilters}
@@ -319,19 +314,17 @@ export default function DisplayListings({ newsletterSettings }) {
                 <div
                     className="w-[400px] sticky top-0 pt-4 hidden lg:block h-screen"
                 >         
-                    <Sidebar                    
+                    <Sidebar
                         // Display states
                         showMenu={showMenu}
                         setShowMenu={setShowMenu}
                         displayedResults={displayedResults}
                         listings={listings}
-                        isMapView={isMapView}
-                        setIsMapView={setIsMapView}
                         showCustomCalendar={showCustomCalendar}
                         setShowCustomCalendar={setShowCustomCalendar}
                         newsletterSettings={newsletterSettings}
                         currentFilters={currentFilters}
-                        
+
                         // Filter states
                         searchTerm={searchTerm}
                         setSearchTerm={setSearchTerm}
@@ -355,9 +348,7 @@ export default function DisplayListings({ newsletterSettings }) {
                         setSelectedLocation={setSelectedLocation}
                         selectedCounty={selectedCounty}
                         setSelectedCounty={setSelectedCounty}
-                        sortMethod={sortMethod}
-                        setSortMethod={setSortMethod}
-                        
+
                         // Date ranges for presets
                         startOfWeek={startOfWeek}
                         endOfWeek={endOfWeek}
@@ -365,32 +356,39 @@ export default function DisplayListings({ newsletterSettings }) {
                         endOfMonth={endOfMonth}
                         startOfNextMonth={startOfNextMonth}
                         endOfNextMonth={endOfNextMonth}
-                        
+
                         // Functions
                         updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
                         clearAllFilters={clearAllFilters}
-                        closeMobileSidebar={closeMobileSidebar}
                     />
                 </div>   
 
             {/* Main Col */}
             <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
+                <ContentToolbar
+                    sortMethod={sortMethod}
+                    setSortMethod={setSortMethod}
+                    isMapView={isMapView}
+                    setIsMapView={setIsMapView}
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                />
                 {loading ? (
                     <LoadingSkeleton count={5} />
                 ) : (
-                    <>  
+                    <>
 
-                        {displayedResults === 0 && 
+                        {displayedResults === 0 &&
                             <div className="text-center flex-grow flex flex-col justify-center text-2xl py-36">
                                 <p className="pb-4">No Results</p>
                                 <p className="pb-4">¯\_(ツ)_/¯</p>
                                 <p>Try changing your filters.</p>
                             </div>
-                        }            
+                        }
 
                         {displayedResults > 0 && isMapView ? (
                             <div className="h-full flex-1">
-                                <MapView 
+                                <MapView
                                     filteredListings={filteredListings}
                                     locations={locations}
                                     highlightsOnly={highlightsOnly}
@@ -399,10 +397,8 @@ export default function DisplayListings({ newsletterSettings }) {
                                 />
                             </div>
                         ) : displayedResults > 0 ? (
-                            <>
-                            <div className=" p-3 text-sm bg-gray-100 text-center md:hidden">A directory of visual arts exhibitions in the Bay Area</div>
-                            <Listing 
-                                listings={filteredListings} 
+                            <Listing
+                                listings={filteredListings}
                                 formatDate={formatDate}
                                 onViewToday={onViewToday}
                                 setOnViewToday={setOnViewToday}
@@ -410,8 +406,7 @@ export default function DisplayListings({ newsletterSettings }) {
                                 setEndingSoonOnly={setEndingSoonOnly}
                                 openingTodayOnly={openingTodayOnly}
                                 setOpeningTodayOnly={setOpeningTodayOnly}
-                            />                            
-                            </>
+                            />
                         ) : null}
                     </>
                 )}

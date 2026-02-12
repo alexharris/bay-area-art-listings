@@ -12,9 +12,9 @@ export default function SortSelector({ onSortChange, currentSort }) {
 
     return (
         <div className="flex flex-rows items-center relative w-full">
-            <label className="w-20 text-sm pr-2">Sort by</label>
+            <label className="shrink-0 text-sm pr-2">Sort by</label>
             <Select value={currentSort} onValueChange={onSortChange}>
-                <SelectTrigger>
+                <SelectTrigger className="h-8 text-xs">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

@@ -5,12 +5,10 @@ import "react-day-picker/style.css";
 import { useState } from "react";
 import CountySelector from './countySelector';
 import FilterPresets from '../filterPresets';
-import SortSelector from './sortSelector';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
@@ -24,16 +22,12 @@ export default function Sidebar({
     setShowMenu,
     displayedResults,
     listings,
-    isMapView,
-    setIsMapView,
     showCustomCalendar,
     setShowCustomCalendar,
     newsletterSettings,
     currentFilters,
-    
+
     // Filter states
-    searchTerm,
-    setSearchTerm,
     calendarTypeFilter,
     setCalendarTypeFilter,
     calendarTypeCounts,
@@ -54,9 +48,7 @@ export default function Sidebar({
     setSelectedLocation,
     selectedCounty,
     setSelectedCounty,
-    sortMethod,
-    setSortMethod,
-    
+
     // Date ranges for presets
     startOfWeek,
     endOfWeek,
@@ -64,7 +56,7 @@ export default function Sidebar({
     endOfMonth,
     startOfNextMonth,
     endOfNextMonth,
-    
+
     // Functions
     updateCalendarDateRangeFilter,
     clearAllFilters,
@@ -93,20 +85,6 @@ export default function Sidebar({
                     </div>
                 )}
                 <p className="mb-4 hidden md:block">A directory of visual arts exhibitions in the Bay Area.</p>
-                <div className="flex flex-row lg:mt-0 items-center justify-between w-full">
-                    <label htmlFor="searchTerm" className="pr-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="feather feather-search" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    </label>
-                    <Input 
-                        type="text" 
-                        id="searchTerm"
-                        className="flex-grow"
-                        value={searchTerm} 
-                        onChange={(e) => setSearchTerm(e.target.value)} 
-                        placeholder="Search exhibitions..."
-                    />
-                </div>    
-                
                 <div className="pb-0 flex flex-row items-center">
                     <label className="pr-2 w-20 text-sm">What</label>
                     <Select value={calendarTypeFilter} onValueChange={setCalendarTypeFilter}>
@@ -221,39 +199,6 @@ export default function Sidebar({
                 >
                     View {displayedResults} Results
                 </Button>
-                <hr className="my-2 border-dashed" />
-                {/* Sort Selector */}
-                <div className="flex flex-row items-center">
-                  <SortSelector 
-                      onSortChange={setSortMethod}
-                      currentSort={sortMethod}
-                  />
-                </div>
-                {/* Map/List View Toggle */}
-                <div className="flex flex-row items-center">
-                  <ToggleGroup 
-                    type="single" 
-                    value={isMapView ? "map" : "list"}
-                    onValueChange={(value) => {
-                      if (value) {
-                        setIsMapView(value === "map");
-                        // Close mobile sidebar when switching views
-                        if (closeMobileSidebar && window.innerWidth < 1024) {
-                          setTimeout(() => closeMobileSidebar(), 300);
-                        }
-                      }
-                    }}
-                    size="sm"
-                    variant="outline"
-                  >
-                    <ToggleGroupItem value="list">
-                      List
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="map">
-                      Map
-                    </ToggleGroupItem>
-                  </ToggleGroup>
-                </div>    
             </div>
             
             {/* Fixed bottom section with About and Newsletter */}
