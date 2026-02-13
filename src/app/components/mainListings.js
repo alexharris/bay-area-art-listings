@@ -11,7 +11,7 @@ import { getCalendarTypeCounts } from '../../utils/filterCounts';
 import { formatDate } from '../../utils/shared';
 
 import MobileHeader from './MobileHeader';
-import MobileSidebarOverlay from './sidebar/mobileSidebarOverlay';
+import MobileBottomBar from './MobileBottomBar';
 import Listing from './listing';
 import MapView from './map/mapView';
 import Sidebar from './sidebar/sidebar';
@@ -93,7 +93,6 @@ export default function DisplayListings({ newsletterSettings }) {
         endingSoonOnly: 0,
         openingTodayOnly: 0
     });
-    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
     // Use ref to track if initial setup is complete
     const isInitialized = useRef(false);
@@ -238,75 +237,51 @@ export default function DisplayListings({ newsletterSettings }) {
         setShowCustomCalendar(false);
     }, [startOfMonth, setCalendarDateRangeFilter]);
 
-    const closeMobileSidebar = useCallback(() => {
-        setMobileSidebarOpen(false);
-    }, []);
-
-    const toggleMobileSidebar = useCallback(() => {
-        setMobileSidebarOpen(prev => !prev);
-    }, []);
 
     return (
         <>
             {/* Mobile Header */}
-            <MobileHeader 
-                onSidebarToggle={toggleMobileSidebar}
-                sidebarOpen={mobileSidebarOpen}
+            <MobileHeader
+                isMapView={isMapView}
+                setIsMapView={setIsMapView}
             />
 
-            {/* Mobile Sidebar Overlay */}
-            <MobileSidebarOverlay 
-                isOpen={mobileSidebarOpen} 
-                onClose={closeMobileSidebar}
-            >
-                <Sidebar
-                    // Display states
-                    showLogo={false}
-                    showMenu={showMenu}
-                    setShowMenu={setShowMenu}
-                    displayedResults={displayedResults}
-                    listings={listings}
-                    showCustomCalendar={showCustomCalendar}
-                    setShowCustomCalendar={setShowCustomCalendar}
-                    newsletterSettings={newsletterSettings}
-                    currentFilters={currentFilters}
-
-                    // Filter states
-                    calendarTypeFilter={calendarTypeFilter}
-                    setCalendarTypeFilter={setCalendarTypeFilter}
-                    calendarTypeCounts={calendarTypeCounts}
-                    specialFilterCounts={specialFilterCounts}
-                    calendarDateRangeFilter={calendarDateRangeFilter}
-                    setCalendarDateRangeFilter={setCalendarDateRangeFilter}
-                    calendarDateRangePreset={calendarDateRangePreset}
-                    setCalendarDateRangePreset={setCalendarDateRangePreset}
-                    highlightsOnly={highlightsOnly}
-                    setHighlightsOnly={setHighlightsOnly}
-                    onViewToday={onViewToday}
-                    setOnViewToday={setOnViewToday}
-                    endingSoonOnly={endingSoonOnly}
-                    setEndingSoonOnly={setEndingSoonOnly}
-                    openingTodayOnly={openingTodayOnly}
-                    setOpeningTodayOnly={setOpeningTodayOnly}
-                    selectedLocation={selectedLocation}
-                    setSelectedLocation={setSelectedLocation}
-                    selectedCounty={selectedCounty}
-                    setSelectedCounty={setSelectedCounty}
-
-                    // Date ranges for presets
-                    startOfWeek={startOfWeek}
-                    endOfWeek={endOfWeek}
-                    startOfMonth={startOfMonth}
-                    endOfMonth={endOfMonth}
-                    startOfNextMonth={startOfNextMonth}
-                    endOfNextMonth={endOfNextMonth}
-
-                    // Functions
-                    updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
-                    clearAllFilters={clearAllFilters}
-                    closeMobileSidebar={closeMobileSidebar}
-                />
-            </MobileSidebarOverlay>
+            {/* Mobile Bottom Bar */}
+            <MobileBottomBar
+                calendarTypeFilter={calendarTypeFilter}
+                setCalendarTypeFilter={setCalendarTypeFilter}
+                calendarTypeCounts={calendarTypeCounts}
+                specialFilterCounts={specialFilterCounts}
+                calendarDateRangeFilter={calendarDateRangeFilter}
+                setCalendarDateRangeFilter={setCalendarDateRangeFilter}
+                calendarDateRangePreset={calendarDateRangePreset}
+                setCalendarDateRangePreset={setCalendarDateRangePreset}
+                onViewToday={onViewToday}
+                setOnViewToday={setOnViewToday}
+                endingSoonOnly={endingSoonOnly}
+                setEndingSoonOnly={setEndingSoonOnly}
+                openingTodayOnly={openingTodayOnly}
+                setOpeningTodayOnly={setOpeningTodayOnly}
+                selectedCounty={selectedCounty}
+                setSelectedCounty={setSelectedCounty}
+                showCustomCalendar={showCustomCalendar}
+                setShowCustomCalendar={setShowCustomCalendar}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                sortMethod={sortMethod}
+                setSortMethod={setSortMethod}
+                displayedResults={displayedResults}
+                listings={listings}
+                currentFilters={currentFilters}
+                startOfWeek={startOfWeek}
+                endOfWeek={endOfWeek}
+                startOfMonth={startOfMonth}
+                endOfMonth={endOfMonth}
+                startOfNextMonth={startOfNextMonth}
+                endOfNextMonth={endOfNextMonth}
+                updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
+                clearAllFilters={clearAllFilters}
+            />
           
             <div className={`flex flex-row w-full items-start lg:gap-4 ${isMapView ? 'h-screen' : ''}`}>
 
@@ -364,7 +339,7 @@ export default function DisplayListings({ newsletterSettings }) {
                 </div>   
 
             {/* Main Col */}
-            <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
+            <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink pb-16 lg:pb-0 ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
                 <ContentToolbar
                     sortMethod={sortMethod}
                     setSortMethod={setSortMethod}

@@ -1,25 +1,13 @@
 'use client'
 
 import SortSelector from './sidebar/sortSelector';
+import SearchInput from './SearchInput';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Input } from "@/components/ui/input";
 
 export default function ContentToolbar({ sortMethod, setSortMethod, isMapView, setIsMapView, searchTerm, setSearchTerm }) {
     return (
-        <div className="sticky top-[49px] lg:top-0 z-40 bg-white border-b border-gray-200 px-3 py-2 flex flex-row items-center justify-between gap-3">
-            <div className="flex flex-row items-center gap-2 flex-1 max-w-xs">
-                <label htmlFor="searchTerm" className="shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                </label>
-                <Input
-                    type="text"
-                    id="searchTerm"
-                    className="h-8 text-xs"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search exhibitions..."
-                />
-            </div>
+        <div className="hidden lg:flex sticky top-0 z-40 bg-white border-b border-gray-200 px-3 py-2 flex-row items-center justify-between gap-3">
+            <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
             <div className="flex flex-row items-center gap-3">
             {!isMapView && (
                 <div className="max-w-[200px] text-xs">
