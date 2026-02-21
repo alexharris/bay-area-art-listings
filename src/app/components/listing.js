@@ -9,9 +9,9 @@ import CityFromPlaceId from './CityFromPlaceId';
 import { Badge } from '@/components/ui/badge';
 import { generateSlug } from '../../utils/shared';
 
-export default function Listings({ 
-  listings, 
-  formatDate, 
+export default function Listings({
+  listings,
+  formatDate,
   onViewToday,
   setOnViewToday,
   endingSoonOnly,
@@ -32,7 +32,7 @@ export default function Listings({
       {listings.map((item, index) => (
         <li className="border-b min-h-40 border-dashed border-gray-400 pt-5 pb-6 w-full relative flex flex-col md:flex-row justify-between gap-2 lg:gap-4" key={item._id || index}>
 
-          
+
           {/* Left Column - Event and Note */}
           {item.EventUrl
             ? <div className="flex flex-col lg:flex-row lg:gap-4 justify-start mb-2 lg:mb-0 w-full lg:w-2/3">
@@ -60,7 +60,7 @@ export default function Listings({
                     <p className="text-xs text-gray-600 mt-1">{item.eventImageCaption}</p>
                   )}
                 </div>
-              )}         
+              )}
               <div className="flex flex-col justify-between">
                 <div className="flex flex-col">
                   <a
@@ -69,77 +69,93 @@ export default function Listings({
                     rel="noopener noreferrer"
                     className="text-2xl lg:text-3xl mb-2 lg:mb-0"
                   >
-                    <h2 className=""><span className="inline-block float-left">{item.Event}</span></h2>
+                    <h2 className="">{item.Event}<svg xmlns="http://www.w3.org/2000/svg" className="inline-block ml-1 w-4 h-4 lg:w-5 lg:h-5 align-baseline" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></h2>
                   </a>
-                  
+
                   <NotesRenderer notes={item.Notes} itemIndex={index} />
                 </div>
-                <div className="flex gap-3 items-center">
-                  <a className="self-start" href={item.EventUrl} target="_blank" rel="noopener noreferrer" aria-label="Visit event website">
-                    <svg className="feather feather-external-link w-6 lg:w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                  </a>
-                  {shouldShowOpenToday(item) && (
-                    <Badge 
-                      className="bg-green-300 hover:bg-green-400 text-black cursor-pointer transition-colors"
-                      onClick={() => setOnViewToday(!onViewToday)}
-                    >
-                      On View Today
-                    </Badge>
-                  )}
-
-                  {/* <a 
-                    href={`/show/${generateSlug(item.Event)}`}
-                    className="text-sm underline hover:no-underline"
-                  >
-                    View details
-                  </a> */}
-                </div>                      
+                {item.openings && item.openings
+                  .filter(o => o.date >= new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }))
+                  .sort((a, b) => a.date.localeCompare(b.date))
+                  .length > 0 && (
+                  <div className="flex flex-col gap-1 mt-1">
+                    {item.openings
+                      .filter(o => o.date >= new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }))
+                      .sort((a, b) => a.date.localeCompare(b.date))
+                      .map((opening, idx) => (
+                        <div key={opening._key || idx} className="text-sm">
+                          <span className="font-medium">{opening.title}</span>
+                          {' · '}
+                          {new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}
+                          {opening.time && ` · ${opening.time}`}
+                          {opening.note && <div className="text-gray-600">{opening.note}</div>}
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
-              </div>       
+              </div>
             : <div className="flex flex-col justify-between mb-2 lg:mb-0 w-full lg:w-1/2">
                 <span className="text-2xl lg:text-3xl mb-2 lg:mb-0">
                   <h2>{item.Event}</h2>
                 </span>
                 <NotesRenderer notes={item.Notes} itemIndex={index} />
-                {shouldShowOpenToday(item) && (
-                  <div className="mt-2 flex gap-3 items-center">
-                    <Badge 
-                      className="bg-green-400 hover:bg-green-500 text-black cursor-pointer transition-colors"
-                      onClick={() => setOnViewToday(!onViewToday)}
-                    >
-                      Open Today
-                    </Badge>
+                {item.openings && item.openings
+                  .filter(o => o.date >= new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }))
+                  .sort((a, b) => a.date.localeCompare(b.date))
+                  .length > 0 && (
+                  <div className="flex flex-col gap-1 mt-1">
+                    {item.openings
+                      .filter(o => o.date >= new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }))
+                      .sort((a, b) => a.date.localeCompare(b.date))
+                      .map((opening, idx) => (
+                        <div key={opening._key || idx} className="text-sm">
+                          <span className="font-medium">{opening.title}</span>
+                          {' · '}
+                          {new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}
+                          {opening.time && ` · ${opening.time}`}
+                          {opening.note && <div className="text-gray-600">{opening.note}</div>}
+                        </div>
+                      ))}
                   </div>
                 )}
               </div>
           }
-          
+
           {/* Right Side Container - Date and Location stacked */}
           <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-2 lg:gap-4 w-full lg:w-1/2">
-          
+
           {/* Middle Column - Date Info  */}
-          <div className="flex flex-col gap-2 w-full text-left items-start justify-start">      
+          <div className="flex flex-col gap-2 w-full text-left items-start justify-start">
             <div className="flex flex-col items-start gap-1">
               <div className="font-semibold">
                 {item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`}
-              </div>         
+              </div>
             </div>
 
-            <div className="flex flex-row gap-2 items-start">
+            <div className="flex flex-row flex-wrap gap-2 items-start">
               <CalendarLink listing={item} location="" />
-              <DateNote 
-                startDate={item.StartDate} 
+              <DateNote
+                startDate={item.StartDate}
                 endDate={item.EndDate}
                 endingSoonOnly={endingSoonOnly}
                 setEndingSoonOnly={setEndingSoonOnly}
                 openingTodayOnly={openingTodayOnly}
                 setOpeningTodayOnly={setOpeningTodayOnly}
               />
+              {shouldShowOpenToday(item) && (
+                <Badge
+                  className="bg-green-300 hover:bg-green-400 text-black cursor-pointer transition-colors"
+                  onClick={() => setOnViewToday(!onViewToday)}
+                >
+                  On View Today
+                </Badge>
+              )}
             </div>
           </div>
 
           {/* Right Column - Location Info */}
-          <div className="w-full">              
+          <div className="w-full">
             <div className="bg-gray-50 rounded p-4 mr-4 h-full flex flex-col justify-between">
               {item.locationName.toLowerCase() === 'various'
                 ? <div className="flex flex-row font-semibold">
@@ -153,7 +169,7 @@ export default function Listings({
                         </a>
                       : <span>{item.locationName}</span>
                     }
-                  </div> 
+                  </div>
                 : <>
                     <div className="flex flex-col items-start gap-1 mb-1 lg:mb-0">
                       <div>
@@ -165,25 +181,25 @@ export default function Listings({
                         >
                           {item.locationName}
                         </a>
-                      </div> 
- 
-                      <CityFromPlaceId 
-                        googlePlaceId={item.googlePlaceId} 
-                        fallbackAddress={item.locationAddress} 
+                      </div>
+
+                      <CityFromPlaceId
+                        googlePlaceId={item.googlePlaceId}
+                        fallbackAddress={item.locationAddress}
                       />
-                      
-                      <TodaysHoursStatus 
+
+                      <TodaysHoursStatus
                         locationHours={item.locationHours}
                         locationUrl={item.locationUrl}
                         locationName={item.locationName}
                       />
-                    </div>    
-                    
+                    </div>
+
                     <div className="flex flex-row items-center gap-2 mt-1">
                       <a
                         className="flex flex-row gap-1 items-center"
-                        href={item.googlePlaceId 
-                          ? `https://www.google.com/maps/place/?q=place_id:${item.googlePlaceId}` 
+                        href={item.googlePlaceId
+                          ? `https://www.google.com/maps/place/?q=place_id:${item.googlePlaceId}`
                           : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.locationName + ' ' + item.locationAddress)}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -191,7 +207,7 @@ export default function Listings({
                         <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                         {/* {item.locationAddress} */}
                       </a>
-            
+
                       <a
                         className="underline flex flex-row gap-1 items-center"
                         href={item.locationUrl}
@@ -201,7 +217,7 @@ export default function Listings({
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-globe w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                       </a>
-                      
+
                       <div>
                         {item.locationHours ? (
                           <HoursPopup
@@ -222,7 +238,7 @@ export default function Listings({
                           </span>
                         )}
                       </div>
-                      
+
                       {item.locationInstagram && (
                         <a
                           className="underline flex flex-row gap-1 items-center"
@@ -238,15 +254,15 @@ export default function Listings({
                           </svg>
                         </a>
                       )}
-                    </div>                             
-                  </>                  
-              }        
-            </div>                                        
+                    </div>
+                  </>
+              }
+            </div>
           </div>
-          
-          </div>       
 
-          {/*               
+          </div>
+
+          {/*
           <button className="text-gray-500 mt-2 w-full text-left" onClick={() => setShowDetails(prev => ({ ...prev, [index]: !prev[index] }))}>
             {showDetails[index] ? 'Hide Details' : 'Details'}
           </button> */}
@@ -262,11 +278,11 @@ export default function Listings({
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="feather feather-map-pin"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                   {item.locationAddress}
                 </a>
-      
-                <a className="underline flex flex-row gap-1 items-center" 
+
+                <a className="underline flex flex-row gap-1 items-center"
                   href={item.locationUrl}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="feather feather-globe"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>                        
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="feather feather-globe"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                   {item.locationUrl}
                 </a>
               </div>
