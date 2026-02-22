@@ -17,6 +17,12 @@ export default function CalendarTypeSelector({ calendarTypeFilter, setCalendarTy
                     <SelectItem value="opening">
                         Upcoming exhibitions {calendarTypeFilter !== 'opening' && calendarTypeCounts['opening'] !== undefined ? `(${calendarTypeCounts['opening']})` : ''}
                     </SelectItem>
+                    <SelectItem value="hasOpenings">
+                        <span className="inline-flex items-center gap-1">
+                            <span className="inline-block w-2 h-2 rounded-full bg-yellow-400"></span>
+                            Openings {calendarTypeFilter !== 'hasOpenings' && calendarTypeCounts['hasOpenings'] !== undefined ? `(${calendarTypeCounts['hasOpenings']})` : ''}
+                        </span>
+                    </SelectItem>
                 </SelectContent>
             </Select>
         </div>

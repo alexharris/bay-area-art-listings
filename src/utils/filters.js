@@ -166,6 +166,12 @@ export function getFilteredListings(filters, listings) {
         return startDate >= todayStart && startDate <= filters.calendarDateRangeFilter.to;
       } else if (filters.calendarTypeFilter === 'closing') {
         return endDate >= filters.calendarDateRangeFilter.from && endDate <= filters.calendarDateRangeFilter.to;
+      } else if (filters.calendarTypeFilter === 'hasOpenings') {
+        if (!item.openings || item.openings.length === 0) return false;
+        return item.openings.some(opening => {
+          const openingDate = new Date(opening.date + 'T00:00:00');
+          return openingDate >= todayStart;
+        });
       }
       return true;
   });

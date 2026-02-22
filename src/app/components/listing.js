@@ -84,11 +84,14 @@ export default function Listings({
                       .sort((a, b) => a.date.localeCompare(b.date))
                       .map((opening, idx) => (
                         <div key={opening._key || idx} className="text-sm">
-                          <span className="font-medium">{opening.title}</span>
-                          {' · '}
-                          {new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}
-                          {opening.time && ` · ${opening.time}`}
-                          {opening.note && <div className="text-gray-600">{opening.note}</div>}
+                          <div className="flex items-center">
+                            <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-1.5 flex-shrink-0"></span>
+                            <span className="font-medium">{opening.title}</span>
+                            {' · '}
+                            {new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}
+                            {opening.time && ` · ${opening.time}`}
+                          </div>
+                          {opening.note && <div className="text-gray-600 ml-3.5">{opening.note}</div>}
                         </div>
                       ))}
                   </div>
@@ -110,11 +113,14 @@ export default function Listings({
                       .sort((a, b) => a.date.localeCompare(b.date))
                       .map((opening, idx) => (
                         <div key={opening._key || idx} className="text-sm">
-                          <span className="font-medium">{opening.title}</span>
-                          {' · '}
-                          {new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}
-                          {opening.time && ` · ${opening.time}`}
-                          {opening.note && <div className="text-gray-600">{opening.note}</div>}
+                          <div className="flex items-center">
+                            <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-1.5 flex-shrink-0"></span>
+                            <span className="font-medium">{opening.title}</span>
+                            {' · '}
+                            {new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}
+                            {opening.time && ` · ${opening.time}`}
+                          </div>
+                          {opening.note && <div className="text-gray-600 ml-3.5">{opening.note}</div>}
                         </div>
                       ))}
                   </div>

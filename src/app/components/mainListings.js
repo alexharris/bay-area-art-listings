@@ -172,7 +172,7 @@ export default function DisplayListings({ newsletterSettings }) {
 
     // Auto-adjust sort method based on calendar type filter
     useEffect(() => {
-        if (calendarTypeFilter === 'opening') {
+        if (calendarTypeFilter === 'opening' || calendarTypeFilter === 'hasOpenings') {
             setSortMethod(prev => prev === 'openingSoon' ? prev : 'openingSoon');
         } else if (calendarTypeFilter === 'onview') {
             setSortMethod(prev => prev === 'openingSoon' ? 'closingSoon' : prev);
