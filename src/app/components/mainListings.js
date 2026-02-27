@@ -84,6 +84,7 @@ export default function DisplayListings({ newsletterSettings }) {
     const [onViewToday, setOnViewToday] = useState(false);
     const [endingSoonOnly, setEndingSoonOnly] = useState(false);
     const [openingTodayOnly, setOpeningTodayOnly] = useState(false);
+    const [openingTitleOnly, setOpeningTitleOnly] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [selectedCounty, setSelectedCounty] = useState([]);
@@ -118,6 +119,7 @@ export default function DisplayListings({ newsletterSettings }) {
         onViewToday,
         endingSoonOnly,
         openingTodayOnly,
+        openingTitleOnly,
         searchTerm,
         selectedLocation,
         selectedCounty,
@@ -128,6 +130,7 @@ export default function DisplayListings({ newsletterSettings }) {
         onViewToday,
         endingSoonOnly,
         openingTodayOnly,
+        openingTitleOnly,
         searchTerm,
         selectedLocation,
         JSON.stringify(selectedCounty),
@@ -236,6 +239,7 @@ export default function DisplayListings({ newsletterSettings }) {
         setOnViewToday(false);
         setEndingSoonOnly(false);
         setOpeningTodayOnly(false);
+        setOpeningTitleOnly(false);
         setSearchTerm('');
         setSelectedLocation('');
         setSelectedCounty([]);
@@ -288,6 +292,8 @@ export default function DisplayListings({ newsletterSettings }) {
                 startOfNextMonth={startOfNextMonth}
                 endOfNextMonth={endOfNextMonth}
                 updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
+                openingTitleOnly={openingTitleOnly}
+                setOpeningTitleOnly={setOpeningTitleOnly}
                 mobileSearchOpen={mobileSearchOpen}
                 setMobileSearchOpen={setMobileSearchOpen}
                 searchTerm={searchTerm}
@@ -378,7 +384,7 @@ export default function DisplayListings({ newsletterSettings }) {
                     <div className="lg:hidden flex items-center justify-between px-3 py-2 border-b border-gray-100">
                         <div className="flex items-center gap-1.5 text-sm">
                             <span className="font-medium text-gray-700">{displayedResults} exhibition{displayedResults !== 1 ? 's' : ''}</span>
-                            {(calendarTypeFilter !== 'onview' || calendarDateRangePreset !== 'anytime' || selectedCounty.length > 0 || onViewToday || endingSoonOnly || openingTodayOnly || searchTerm) && (
+                            {(calendarTypeFilter !== 'onview' || calendarDateRangePreset !== 'anytime' || selectedCounty.length > 0 || onViewToday || endingSoonOnly || openingTodayOnly || openingTitleOnly || searchTerm) && (
                                 <button
                                     onClick={clearAllFilters}
                                     className="text-gray-400 hover:text-gray-600"

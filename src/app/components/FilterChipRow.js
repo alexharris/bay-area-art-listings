@@ -6,7 +6,6 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import CalendarTypeSelector from './sidebar/CalendarTypeSelector';
 import FilterPresets from './filterPresets';
 import CountySelector from './sidebar/countySelector';
 
@@ -113,12 +112,13 @@ export default function FilterChipRow({
 
     updateCalendarDateRangeFilter,
 
+    openingTitleOnly,
+    setOpeningTitleOnly,
     mobileSearchOpen,
     setMobileSearchOpen,
     searchTerm,
     setSearchTerm,
 }) {
-    const [whatOpen, setWhatOpen] = useState(false);
     const [whenOpen, setWhenOpen] = useState(false);
     const [whereOpen, setWhereOpen] = useState(false);
 
@@ -130,7 +130,6 @@ export default function FilterChipRow({
         }
     }, [mobileSearchOpen]);
 
-    const whatActive = calendarTypeFilter !== 'onview';
     const whenActive = calendarDateRangePreset !== 'anytime';
     const whereActive = selectedCounty && selectedCounty.length > 0;
     const countyName = whereActive ? selectedCounty[0]?.county : null;
@@ -145,10 +144,6 @@ export default function FilterChipRow({
         setCalendarDateRangePreset('anytime');
         setShowCustomCalendar(false);
     };
-
-    const whatLabel = whatActive
-        ? whatLabels[calendarTypeFilter] || calendarTypeFilter
-        : 'All';
 
     const whenLabel = whenActive
         ? whenLabels[calendarDateRangePreset] || calendarDateRangePreset
@@ -187,16 +182,6 @@ export default function FilterChipRow({
                 </div>
             ) : (
             <div className="flex flex-row gap-2 px-3 py-2 overflow-x-auto scrollbar-none">
-                {/* What chip */}
-                <Chip
-                    emoji="🎨"
-                    label={whatLabel}
-                    active={whatActive}
-                    hasYellowDot={calendarTypeFilter === 'hasOpenings'}
-                    onOpen={() => setWhatOpen(true)}
-                    onClear={() => setCalendarTypeFilter('onview')}
-                />
-
                 {/* When chip */}
                 <Chip
                     emoji="📅"
@@ -216,6 +201,14 @@ export default function FilterChipRow({
                 />
 
                 {/* Badge chips */}
+                <BadgeChip
+                    emoji="☀️"
+                    label="Openings"
+                    active={openingTitleOnly}
+                    activeClass="bg-yellow-200 border-yellow-300 text-black hover:bg-yellow-300"
+                    inactiveClass="bg-gray-100 text-gray-600 border-gray-200"
+                    onToggle={() => setOpeningTitleOnly(!openingTitleOnly)}
+                />
                 {(onViewToday || specialFilterCounts?.onViewToday > 0) && (
                     <BadgeChip
                         emoji="👁️"
@@ -224,16 +217,6 @@ export default function FilterChipRow({
                         activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400"
                         inactiveClass="bg-gray-100 text-gray-600 border-gray-200"
                         onToggle={() => setOnViewToday(!onViewToday)}
-                    />
-                )}
-                {(openingTodayOnly || specialFilterCounts?.openingTodayOnly > 0) && (
-                    <BadgeChip
-                        emoji="🌟"
-                        label="Starting Today"
-                        active={openingTodayOnly}
-                        activeClass="bg-orange-200 border-orange-300 text-black hover:bg-orange-300"
-                        inactiveClass="bg-gray-100 text-gray-600 border-gray-200"
-                        onToggle={() => setOpeningTodayOnly(!openingTodayOnly)}
                     />
                 )}
                 {(endingSoonOnly || specialFilterCounts?.endingSoonOnly > 0) && (
@@ -248,25 +231,6 @@ export default function FilterChipRow({
                 )}
             </div>
             )}
-
-            {/* What mini-drawer */}
-            <Drawer open={whatOpen} onOpenChange={setWhatOpen}>
-                <DrawerContent className="px-4 pb-[env(safe-area-inset-bottom)]">
-                    <DrawerHeader className="pb-2">
-                        <DrawerTitle>What</DrawerTitle>
-                    </DrawerHeader>
-                    <div className="pb-4 space-y-3">
-                        <CalendarTypeSelector
-                            calendarTypeFilter={calendarTypeFilter}
-                            setCalendarTypeFilter={setCalendarTypeFilter}
-                            calendarTypeCounts={calendarTypeCounts}
-                        />
-                        <Button className="w-full" onClick={() => setWhatOpen(false)}>
-                            Done
-                        </Button>
-                    </div>
-                </DrawerContent>
-            </Drawer>
 
             {/* When mini-drawer */}
             <Drawer open={whenOpen} onOpenChange={setWhenOpen}>

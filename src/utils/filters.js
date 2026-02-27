@@ -133,6 +133,7 @@ export function getFilteredListings(filters, listings) {
     onViewToday: filters.onViewToday || false,
     endingSoonOnly: filters.endingSoonOnly || false,
     openingTodayOnly: filters.openingTodayOnly || false,
+    openingTitleOnly: filters.openingTitleOnly || false,
     searchTerm: filters.searchTerm || '',
     selectedLocation: filters.selectedLocation || '',
     selectedCounty: filters.selectedCounty || [],
@@ -144,6 +145,11 @@ export function getFilteredListings(filters, listings) {
   .filter(item =>filters.onViewToday ? determineOnViewTodayFilter(item) : true)
   .filter(item =>filters.endingSoonOnly ? determineEndingSoonFilter(item) : true)
   .filter(item =>filters.openingTodayOnly ? determineOpeningTodayFilter(item) : true)
+  .filter(item => {
+    if (!filters.openingTitleOnly) return true;
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+    return item.openings?.some(o => o.title?.toLowerCase().includes('opening') && o.date >= today);
+  })
   .filter(item => filters.selectedLocation ? item.locationName === filters.selectedLocation : true) // Selected Location
   .filter(item => 
     item.Event.toLowerCase().includes(filters.searchTerm.toLowerCase()) || 
