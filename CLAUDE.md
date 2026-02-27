@@ -53,6 +53,15 @@ Bay Area Art Listings is a Next.js 15 application that displays visual arts exhi
 - Location hours stored as day-of-week strings (e.g., "10am-6pm" or "Closed")
 - County filtering uses zip code matching from `src/data/bay-area-zipcodes.json`
 
+## Frontend Design
+
+A visual styleguide lives at `/styleguide` (`src/app/styleguide/page.js`). Reference it when making UI decisions — it documents the canonical color tokens, badge styles, filter chip states, typography, and surface/border patterns used throughout the app.
+
+When making frontend changes:
+- **Follow the styleguide** for routine additions — new components should use the existing color tokens, chip styles, badge variants, and typography scale.
+- **Update the styleguide** when a change intentionally establishes a new pattern (e.g. a new status color, a new chip variant, a new surface style). The styleguide should reflect what the app actually does, not what it used to do.
+- **Rewrite the styleguide rule** when a deliberate design decision overrides a previous convention — don't leave stale or contradictory rules in place.
+
 ## Git Commits
 
 - Do not add Co-Authored-By or any Claude/Anthropic attribution lines in commit messages
