@@ -74,6 +74,27 @@ export const listingType = defineType({
       ]      
     }),
     defineField({
+      name: 'openings',
+      title: 'Openings & Events',
+      type: 'array',
+      of: [{
+        type: 'object',
+        fields: [
+          defineField({ name: 'title', title: 'Title', type: 'string', validation: Rule => Rule.required() }),
+          defineField({ name: 'date', title: 'Date', type: 'date', options: { dateFormat: 'MMMM D, YYYY' }, validation: Rule => Rule.required() }),
+          defineField({ name: 'time', title: 'Time', type: 'string', description: 'e.g., "6-9pm"' }),
+          defineField({ name: 'note', title: 'Note', type: 'string' }),
+        ],
+        preview: {
+          select: { title: 'title', date: 'date', time: 'time' },
+          prepare({ title, date, time }) {
+            const d = date ? new Date(date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+            return { title: title || 'Untitled', subtitle: [d, time].filter(Boolean).join(' | ') };
+          },
+        },
+      }],
+    }),
+    defineField({
       name: 'InternalNotes',
       type: 'string',
       description: 'Notes just for internal use, not displayed on the site.',
