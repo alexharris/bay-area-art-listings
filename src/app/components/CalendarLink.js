@@ -83,12 +83,12 @@ export default function CalendarLink(data) {
         <Popover>
             <PopoverTrigger asChild>
                 <svg
-                    className="feather feather-calendar w-6 lg:w-5 cursor-pointer"
+                    className="feather feather-calendar-plus inline-block align-middle w-5 h-5 ml-1.5 cursor-pointer"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#000000"
-                    strokeWidth="1"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     role="button"
@@ -99,6 +99,8 @@ export default function CalendarLink(data) {
                     <line x1="16" y1="2" x2="16" y2="6"></line>
                     <line x1="8" y1="2" x2="8" y2="6"></line>
                     <line x1="3" y1="10" x2="21" y2="10"></line>
+                    <line x1="12" y1="14" x2="12" y2="20"></line>
+                    <line x1="9" y1="17" x2="15" y2="17"></line>
                 </svg>
             </PopoverTrigger>
             <PopoverContent className="w-80" align="end">
