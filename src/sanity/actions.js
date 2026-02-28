@@ -36,16 +36,31 @@ export function HelloWorldAction(props) {
           // Apply the fetched data to the document
           const {Name, Address, Url, Geolocation, Hours} = data.data
 
+          // Get current stored hours to detect changes
+          const currentHours = props.draft?.Hours || props.published?.Hours || {}
+
           const patches = [
             {setIfMissing: {_type: props.type}},
             {set: {Name}},
             {set: {Address}},
             {set: {Url}},
-            {set: {Geolocation}}
+            {set: {Geolocation}},
+            {set: {hoursLastSyncedAt: new Date().toISOString()}},
           ]
 
           // Handle Hours as an object field
           if (Hours) {
+            // Detect if hours changed
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+            const hoursChanged = days.some(day => currentHours[day] !== Hours[day])
+
+            if (hoursChanged) {
+              patches.push({set: {hoursPendingReview: true}})
+              patches.push({set: {hoursChangedAt: new Date().toISOString()}})
+            } else {
+              patches.push({set: {hoursPendingReview: false}})
+            }
+
             // Create separate patch operations for each day in Hours
             Object.entries(Hours).forEach(([day, value]) => {
               patches.push({set: {[`Hours.${day}`]: value}})
