@@ -11,7 +11,7 @@ export default function SearchInput({ searchTerm, setSearchTerm, inputRef }) {
             <Input
                 type="text"
                 id="searchTerm"
-                className="h-8 text-xs"
+                className="h-8 text-[16px]"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search exhibitions..."

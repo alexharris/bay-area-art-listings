@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, LayoutList, Map, Info } from 'lucide-react';
+import { Check, Info } from 'lucide-react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,43 +31,51 @@ export default function MobileBottomBar({
 
 }) {
 
-    const browseActive = !isMapView && !mobileAboutOpen;
-    const mapActive = isMapView && !mobileAboutOpen;
-
     return (
         <>
             {/* Bottom navigation bar */}
             <nav className="fixed bottom-0 inset-x-0 z-50 lg:hidden bg-white border-t border-gray-200 pb-[env(safe-area-inset-bottom)]">
-                <div className="flex flex-row items-center justify-around h-14">
-                    {/* Browse tab */}
-                    <button
-                        onClick={() => { setIsMapView(false); setMobileAboutOpen(false); }}
-                        className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${browseActive ? 'text-blue-600' : 'text-gray-500'}`}
-                        aria-label="Browse listings"
-                    >
-                        <LayoutList size={20} />
-                        <span className="text-[10px]">Browse</span>
-                    </button>
+                <div className="flex flex-row items-center justify-between px-4 h-14">
 
-                    {/* Map tab */}
-                    <button
-                        onClick={() => { setIsMapView(true); setMobileAboutOpen(false); }}
-                        className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${mapActive ? 'text-blue-600' : 'text-gray-500'}`}
-                        aria-label="Map view"
-                    >
-                        <Map size={20} />
-                        <span className="text-[10px]">Map</span>
-                    </button>
+                    {/* List / Map segmented pill toggle */}
+                    <div className="flex items-center bg-gray-100 p-0.5 rounded-full">
+                        <button
+                            onClick={() => { setIsMapView(false); setMobileAboutOpen(false); }}
+                            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                                !isMapView
+                                    ? 'bg-gray-900 text-white shadow-sm'
+                                    : 'text-gray-500'
+                            }`}
+                            aria-label="List view"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                            List
+                        </button>
+                        <button
+                            onClick={() => { setIsMapView(true); setMobileAboutOpen(false); }}
+                            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                                isMapView
+                                    ? 'bg-gray-900 text-white shadow-sm'
+                                    : 'text-gray-500'
+                            }`}
+                            aria-label="Map view"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+                            Map
+                        </button>
+                    </div>
 
-                    {/* About tab */}
+                    {/* About — secondary icon button */}
                     <button
                         onClick={() => setMobileAboutOpen(true)}
-                        className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${mobileAboutOpen ? 'text-blue-600' : 'text-gray-500'}`}
+                        className={`p-2 rounded-full transition-colors ${
+                            mobileAboutOpen ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'
+                        }`}
                         aria-label="About"
                     >
                         <Info size={20} />
-                        <span className="text-[10px]">About</span>
                     </button>
+
                 </div>
             </nav>
 
@@ -89,7 +97,7 @@ export default function MobileBottomBar({
                             >
                                 <span className="text-sm">{option.label}</span>
                                 {sortMethod === option.value && (
-                                    <Check size={18} className="text-blue-500" />
+                                    <Check size={18} className="text-gray-900" />
                                 )}
                             </button>
                         ))}

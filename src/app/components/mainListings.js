@@ -175,7 +175,8 @@ export default function DisplayListings({ newsletterSettings }) {
             const newSpecialCounts = {
                 onViewToday: getFilteredListings({ ...currentFilters, onViewToday: true }, listings).length,
                 endingSoonOnly: getFilteredListings({ ...currentFilters, endingSoonOnly: true }, listings).length,
-                openingTodayOnly: getFilteredListings({ ...currentFilters, openingTodayOnly: true }, listings).length
+                openingTodayOnly: getFilteredListings({ ...currentFilters, openingTodayOnly: true }, listings).length,
+                openingTitleOnly: getFilteredListings({ ...currentFilters, openingTitleOnly: true }, listings).length,
             };
 
             // Only update if counts actually changed

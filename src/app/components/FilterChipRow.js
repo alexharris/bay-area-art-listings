@@ -62,7 +62,7 @@ function Chip({ emoji, label, active, onOpen, onClear, hasYellowDot }) {
     );
 }
 
-function BadgeChip({ emoji, label, active, onToggle, activeClass, inactiveClass }) {
+function BadgeChip({ emoji, label, count, active, onToggle, activeClass, inactiveClass }) {
     return (
         <button
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm whitespace-nowrap flex-shrink-0 transition-colors ${
@@ -72,6 +72,7 @@ function BadgeChip({ emoji, label, active, onToggle, activeClass, inactiveClass 
         >
             <span>{emoji}</span>
             {label}
+            {!active && count != null && <span className="opacity-50">({count})</span>}
             {active && <span className="ml-0.5">×</span>}
         </button>
     );
@@ -204,18 +205,20 @@ export default function FilterChipRow({
                 <BadgeChip
                     emoji="☀️"
                     label="Openings"
+                    count={specialFilterCounts?.openingTitleOnly}
                     active={openingTitleOnly}
                     activeClass="bg-yellow-200 border-yellow-300 text-black hover:bg-yellow-300"
-                    inactiveClass="bg-gray-100 text-gray-600 border-gray-200"
+                    inactiveClass="bg-white text-gray-700 border-gray-300"
                     onToggle={() => setOpeningTitleOnly(!openingTitleOnly)}
                 />
                 {(onViewToday || specialFilterCounts?.onViewToday > 0) && (
                     <BadgeChip
                         emoji="👁️"
                         label="On View Today"
+                        count={specialFilterCounts?.onViewToday}
                         active={onViewToday}
                         activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400"
-                        inactiveClass="bg-gray-100 text-gray-600 border-gray-200"
+                        inactiveClass="bg-white text-gray-700 border-gray-300"
                         onToggle={() => setOnViewToday(!onViewToday)}
                     />
                 )}
@@ -223,9 +226,10 @@ export default function FilterChipRow({
                     <BadgeChip
                         emoji="⏳"
                         label="Ending Soon"
+                        count={specialFilterCounts?.endingSoonOnly}
                         active={endingSoonOnly}
                         activeClass="bg-red-300 border-red-400 text-black hover:bg-red-400"
-                        inactiveClass="bg-gray-100 text-gray-600 border-gray-200"
+                        inactiveClass="bg-white text-gray-700 border-gray-300"
                         onToggle={() => setEndingSoonOnly(!endingSoonOnly)}
                     />
                 )}
