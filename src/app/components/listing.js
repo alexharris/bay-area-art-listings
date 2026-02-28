@@ -25,7 +25,7 @@ export default function Listings({
   const shouldShowOpenToday = (item) => item.isOnViewToday === true;
 
   const renderVenueCard = (item, index, isMobile = false) => (
-    <div className={`${isMobile ? '' : 'bg-gray-50 rounded p-4 mr-4'} flex flex-col justify-between`}>
+    <div className={`${isMobile ? '' : 'bg-gray-50 rounded p-4'} flex flex-col justify-between`}>
       {item.locationName.toLowerCase() === 'various'
         ? <div className="flex flex-row font-semibold">
             {item.eventUrl
@@ -133,9 +133,9 @@ export default function Listings({
   };
 
   return (
-    <ul id="list-view" className="w-full px-3 md:p-2 lg:p-0">
+    <ul id="list-view" className="w-full px-3 md:p-2 lg:p-0 lg:pr-6">
       {listings.map((item, index) => (
-        <li className="border-b min-h-40 border-dashed border-gray-400 pt-5 pb-6 w-full relative flex flex-col md:flex-row justify-between gap-2 lg:gap-4" key={item._id || index}>
+        <li className="border-b min-h-40 border-dashed border-gray-400 py-6 w-full relative flex flex-col md:flex-row justify-between gap-2 lg:gap-4" key={item._id || index}>
 
           {/* Left Column - Title + image + (notes on desktop) */}
           <div className="flex flex-col md:flex-row lg:flex-row gap-3 w-full md:w-2/3">
@@ -166,7 +166,7 @@ export default function Listings({
               </div>
             )}
 
-            <div className="flex flex-col gap-2 flex-1">
+            <div className="flex flex-col gap-3 flex-1">
               {/* Mobile gallery well — above title on mobile */}
               {item.eventImageUrl && (
                 <div className="md:hidden w-full bg-gray-100 rounded overflow-hidden">
@@ -194,24 +194,24 @@ export default function Listings({
               )}
 
               {/* Title */}
-              <div>
+              <div className="md:-mt-1">
                 {item.EventUrl
                   ? <a
                       href={item.EventUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-2xl lg:text-3xl mb-2 lg:mb-0"
+                      className="text-2xl lg:text-3xl"
                     >
                       <h2>{item.Event}<svg xmlns="http://www.w3.org/2000/svg" className="inline-block ml-1 w-4 h-4 lg:w-5 lg:h-5 align-baseline" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></h2>
                     </a>
-                  : <span className="text-2xl lg:text-3xl mb-2 lg:mb-0">
+                  : <span className="text-2xl lg:text-3xl">
                       <h2>{item.Event}</h2>
                     </span>
                 }
               </div>
 
               {/* Notes + openings — desktop only */}
-              <div className="hidden md:flex flex-col">
+              <div className="hidden md:flex flex-col gap-2">
                 <NotesRenderer notes={item.Notes} itemIndex={index} />
                 {renderOpenings(item)}
               </div>
