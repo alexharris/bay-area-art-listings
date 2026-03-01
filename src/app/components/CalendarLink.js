@@ -4,10 +4,12 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  PopoverClose,
 } from "@/components/ui/popover";
 
 
-export default function CalendarLink(data) {
+export default function CalendarLink({ dateLabel, listing, location }) {
+    const data = { listing, location };
     const [selectedDate, setSelectedDate] = useState('start');
     const [icsEvent, setIcsEvent] = useState({});
 
@@ -41,8 +43,6 @@ export default function CalendarLink(data) {
             });
         }
     }, [selectedDate, data.listing]);
-
-    let listing = data.listing;
 
     const eventDetailsString = `Event: ${listing.Event}\nLocation: ${listing.locationName}\nAddress: ${listing.locationAddress}\nURL: ${listing.locationUrl}\n${listing.Notes ? `Notes: ${listing.Notes}` : ''}`;
 
@@ -82,28 +82,21 @@ export default function CalendarLink(data) {
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <svg
-                    className="feather feather-calendar w-6 lg:w-5 cursor-pointer"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#000000"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    role="button"
-                    tabIndex={0}
+                <button
+                    className="cursor-pointer underline decoration-dashed decoration-gray-400 underline-offset-2 text-left"
                     aria-label="Add to calendar"
                 >
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
+                    {dateLabel}
+                </button>
             </PopoverTrigger>
             <PopoverContent className="w-80" align="end">
                 <div className="space-y-3">
-                    <h4 className="font-semibold text-sm">Add to Calendar</h4>
+                    <div className="flex items-center justify-between">
+                        <h4 className="font-semibold text-sm">Add to Calendar</h4>
+                        <PopoverClose className="text-gray-400 hover:text-gray-600 p-0.5 -mr-1" aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </PopoverClose>
+                    </div>
                     <div className="text-sm font-medium">{data.listing.Event}</div>
                     <div className="text-sm">
                         <fieldset className="flex flex-col space-y-2 mb-3">

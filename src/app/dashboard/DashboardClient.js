@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ChartContainer } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, LineChart, Line } from 'recharts';
 
+
 const chartConfig = {
   count: {
     label: "Shows",
@@ -298,6 +299,7 @@ export default function DashboardClient({ stats }) {
           </div>
         </CardContent>
       </Card>
+
     </div>
   );
 }

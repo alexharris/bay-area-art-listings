@@ -4,14 +4,13 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { useState } from "react";
 import CountySelector from './countySelector';
+import CalendarTypeSelector from './CalendarTypeSelector';
+import FilterBadges from './FilterBadges';
 import FilterPresets from '../filterPresets';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
+import { Dialog, DialogHeader, DialogTitle, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import AboutContent from '../aboutContent';
 
@@ -60,7 +59,6 @@ export default function Sidebar({
     // Functions
     updateCalendarDateRangeFilter,
     clearAllFilters,
-    closeMobileSidebar
 }) {
     const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
     const [newsletterDialogOpen, setNewsletterDialogOpen] = useState(false);
@@ -85,25 +83,11 @@ export default function Sidebar({
                     </div>
                 )}
                 <p className="mb-4 hidden md:block">A directory of visual arts exhibitions in the Bay Area.</p>
-                <div className="pb-0 flex flex-row items-center">
-                    <label className="pr-2 w-20 text-sm">What</label>
-                    <Select value={calendarTypeFilter} onValueChange={setCalendarTypeFilter}>
-                        <SelectTrigger className="flex-grow">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="onview">
-                                All exhibitions {calendarTypeFilter !== 'onview' && calendarTypeCounts['onview'] !== undefined ? `(${calendarTypeCounts['onview']})` : ''}
-                            </SelectItem>
-                            <SelectItem value="opening">
-                                Upcoming exhibitions {calendarTypeFilter !== 'opening' && calendarTypeCounts['opening'] !== undefined ? `(${calendarTypeCounts['opening']})` : ''}
-                            </SelectItem>
-                            {/* <SelectItem value="closing">
-                                Closing exhibitions {calendarTypeFilter !== 'closing' && calendarTypeCounts['closing'] !== undefined ? `(${calendarTypeCounts['closing']})` : ''}
-                            </SelectItem> */}
-                        </SelectContent>
-                    </Select>
-                </div>
+                <CalendarTypeSelector
+                    calendarTypeFilter={calendarTypeFilter}
+                    setCalendarTypeFilter={setCalendarTypeFilter}
+                    calendarTypeCounts={calendarTypeCounts}
+                />
                 <div className="flex flex-col w-full">
                     <div id="filterResults">
                         <FilterPresets 
@@ -143,41 +127,15 @@ export default function Sidebar({
                         listings={listings}
                     />
                 </div>
-                <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium">Filters</label>
-                    <div className="flex flex-wrap gap-2">
-                        <Badge 
-                            className={`cursor-pointer transition-colors ${
-                                onViewToday 
-                                    ? 'bg-green-300 hover:bg-green-400 text-black' 
-                                    : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-                            }`}
-                            onClick={() => setOnViewToday(!onViewToday)}
-                        >
-                            On View Today <span className="ml-1 opacity-60">({specialFilterCounts.onViewToday})</span>
-                        </Badge>
-                        <Badge 
-                            className={`cursor-pointer transition-colors ${
-                                openingTodayOnly 
-                                    ? 'bg-orange-200 hover:bg-orange-300 text-black' 
-                                    : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-                            }`}
-                            onClick={() => setOpeningTodayOnly(!openingTodayOnly)}
-                        >
-                            Starting Today <span className="ml-1 opacity-60">({specialFilterCounts.openingTodayOnly})</span>
-                        </Badge>
-                        <Badge 
-                            className={`cursor-pointer transition-colors ${
-                                endingSoonOnly 
-                                    ? 'bg-red-300 hover:bg-red-400 text-black' 
-                                    : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-                            }`}
-                            onClick={() => setEndingSoonOnly(!endingSoonOnly)}
-                        >
-                            Ending Soon <span className="ml-1 opacity-60">({specialFilterCounts.endingSoonOnly})</span>
-                        </Badge>
-                    </div>
-                </div>
+                <FilterBadges
+                    onViewToday={onViewToday}
+                    setOnViewToday={setOnViewToday}
+                    endingSoonOnly={endingSoonOnly}
+                    setEndingSoonOnly={setEndingSoonOnly}
+                    openingTodayOnly={openingTodayOnly}
+                    setOpeningTodayOnly={setOpeningTodayOnly}
+                    specialFilterCounts={specialFilterCounts}
+                />
                 {/* Stats indicator showing total vs. filtered listings */}
                 <div className="flex flex-row gap-2 justify-end">
                     <div className="flex flex-row items-center text-sm">
@@ -192,13 +150,6 @@ export default function Sidebar({
                         Reset
                     </Button>                
                 </div>
-                <Button 
-                    variant="secondary"
-                    className="w-full md:hidden"
-                    onClick={closeMobileSidebar}
-                >
-                    View {displayedResults} Results
-                </Button>
             </div>
 
             {/* Fixed bottom section with About and Newsletter */}

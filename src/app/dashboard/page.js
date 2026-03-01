@@ -122,7 +122,7 @@ async function getDashboardStats() {
     totalLocations,
     showsWithNotes,
     openingsData,
-    availableYears
+    availableYears,
   };
 }
 

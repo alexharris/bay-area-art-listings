@@ -10,13 +10,22 @@ import { applySorting } from '../../utils/sort';
 import { getCalendarTypeCounts } from '../../utils/filterCounts';
 import { formatDate } from '../../utils/shared';
 
+import { X } from 'lucide-react';
 import MobileHeader from './MobileHeader';
-import MobileSidebarOverlay from './sidebar/mobileSidebarOverlay';
+import MobileBottomBar from './MobileBottomBar';
+import FilterChipRow from './FilterChipRow';
 import Listing from './listing';
 import MapView from './map/mapView';
 import Sidebar from './sidebar/sidebar';
 import LoadingSkeleton from './LoadingSkeleton';
 import ContentToolbar from './ContentToolbar';
+
+const sortLabels = {
+    closingSoon: 'End Date',
+    openingSoon: 'Start Date',
+    alphabetical: 'Alphabetical',
+    recentlyAdded: 'Recently Added',
+};
 
 export default function DisplayListings({ newsletterSettings }) {
     // Get today's date in US West Coast (Pacific Time) - memoized to prevent recreation
@@ -39,7 +48,7 @@ export default function DisplayListings({ newsletterSettings }) {
         // Calculate start and end of next month
         const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
         const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
-        
+
         return { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfNextMonth, endOfNextMonth };
     }, [today]);
 
@@ -52,7 +61,7 @@ export default function DisplayListings({ newsletterSettings }) {
     // Filtering
     const [calendarTypeFilter, setCalendarTypeFilter] = useState('onview'); // onview, opening, closing
     const [calendarDateRangeFilterInternal, setCalendarDateRangeFilterInternal] = useState(null); // actual date range to filter on
-    
+
     // Wrap the setter to prevent updates if dates haven't actually changed
     const setCalendarDateRangeFilter = useCallback((newRange) => {
         setCalendarDateRangeFilterInternal(prev => {
@@ -67,14 +76,15 @@ export default function DisplayListings({ newsletterSettings }) {
             return (fromSame && toSame) ? prev : newRange;
         });
     }, []);
-    
+
     const calendarDateRangeFilter = calendarDateRangeFilterInternal;
-    
+
     const [filteredListings, setFilteredListings] = useState([]);
     const [highlightsOnly, setHighlightsOnly] = useState(false);
     const [onViewToday, setOnViewToday] = useState(false);
     const [endingSoonOnly, setEndingSoonOnly] = useState(false);
     const [openingTodayOnly, setOpeningTodayOnly] = useState(false);
+    const [openingTitleOnly, setOpeningTitleOnly] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [selectedCounty, setSelectedCounty] = useState([]);
@@ -93,7 +103,11 @@ export default function DisplayListings({ newsletterSettings }) {
         endingSoonOnly: 0,
         openingTodayOnly: 0
     });
-    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+    // Mobile UI state
+    const [mobileSortOpen, setMobileSortOpen] = useState(false);
+    const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+    const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
 
     // Use ref to track if initial setup is complete
     const isInitialized = useRef(false);
@@ -105,21 +119,23 @@ export default function DisplayListings({ newsletterSettings }) {
         onViewToday,
         endingSoonOnly,
         openingTodayOnly,
+        openingTitleOnly,
         searchTerm,
         selectedLocation,
         selectedCounty,
         calendarTypeFilter,
         calendarDateRangeFilter,
     }), [
-        highlightsOnly, 
-        onViewToday, 
-        endingSoonOnly, 
-        openingTodayOnly, 
-        searchTerm, 
-        selectedLocation, 
-        JSON.stringify(selectedCounty), 
-        calendarTypeFilter, 
-        calendarDateRangeFilter?.from?.getTime(), 
+        highlightsOnly,
+        onViewToday,
+        endingSoonOnly,
+        openingTodayOnly,
+        openingTitleOnly,
+        searchTerm,
+        selectedLocation,
+        JSON.stringify(selectedCounty),
+        calendarTypeFilter,
+        calendarDateRangeFilter?.from?.getTime(),
         calendarDateRangeFilter?.to?.getTime()
     ]);
 
@@ -132,48 +148,49 @@ export default function DisplayListings({ newsletterSettings }) {
             setCalendarDateRangePreset('anytime');
             isInitialized.current = true;
         }
-    }, [startOfMonth, setCalendarDateRangeFilter]);  
+    }, [startOfMonth, setCalendarDateRangeFilter]);
 
     // Update filtered listings when filters change
     useEffect(() => {
         // Don't run until initialized
         if (!calendarDateRangeFilter) return;
-        
+
         const filteredListings = getFilteredListings(currentFilters, listings);
         const sortedListings = applySorting(filteredListings, sortMethod);
-        
+
         setFilteredListings(sortedListings);
         setDisplayedResults(filteredListings.length);
 
         // Calculate calendar type counts for the "What" dropdown
         if (listings && listings.length > 0) {
             const typeCounts = getCalendarTypeCounts(currentFilters, listings);
-            
+
             // Only update if counts actually changed
             setCalendarTypeCounts(prev => {
                 if (JSON.stringify(prev) === JSON.stringify(typeCounts)) return prev;
                 return typeCounts;
             });
-            
+
             // Calculate special filter counts - showing how many items match each filter
             const newSpecialCounts = {
                 onViewToday: getFilteredListings({ ...currentFilters, onViewToday: true }, listings).length,
                 endingSoonOnly: getFilteredListings({ ...currentFilters, endingSoonOnly: true }, listings).length,
-                openingTodayOnly: getFilteredListings({ ...currentFilters, openingTodayOnly: true }, listings).length
+                openingTodayOnly: getFilteredListings({ ...currentFilters, openingTodayOnly: true }, listings).length,
+                openingTitleOnly: getFilteredListings({ ...currentFilters, openingTitleOnly: true }, listings).length,
             };
-            
+
             // Only update if counts actually changed
             setSpecialFilterCounts(prev => {
                 if (JSON.stringify(prev) === JSON.stringify(newSpecialCounts)) return prev;
                 return newSpecialCounts;
             });
         }
-        
+
     }, [currentFilters, listings, sortMethod, calendarDateRangeFilter]);
 
     // Auto-adjust sort method based on calendar type filter
     useEffect(() => {
-        if (calendarTypeFilter === 'opening') {
+        if (calendarTypeFilter === 'opening' || calendarTypeFilter === 'hasOpenings') {
             setSortMethod(prev => prev === 'openingSoon' ? prev : 'openingSoon');
         } else if (calendarTypeFilter === 'onview') {
             setSortMethod(prev => prev === 'openingSoon' ? 'closingSoon' : prev);
@@ -188,7 +205,7 @@ export default function DisplayListings({ newsletterSettings }) {
     const updateCalendarDateRangeFilter = useCallback((dateRange) => {
         // Handle dates properly to avoid timezone issues
         let fromDate, toDate;
-        
+
         if (typeof dateRange.from === 'string') {
             // Parse date strings properly to maintain the correct day
             const [year, month, day] = dateRange.from.split('-').map(Number);
@@ -198,7 +215,7 @@ export default function DisplayListings({ newsletterSettings }) {
             fromDate = new Date(dateRange.from);
         }
         fromDate.setHours(0, 0, 0, 0);
-        
+
         if (typeof dateRange.to === 'string') {
             const [year, month, day] = dateRange.to.split('-').map(Number);
             toDate = new Date(year, month - 1, day);
@@ -206,12 +223,12 @@ export default function DisplayListings({ newsletterSettings }) {
             toDate = new Date(dateRange.to);
         }
         toDate.setHours(23, 59, 59, 999);
-        
+
         const adjustedFilter = {
             from: fromDate,
             to: toDate
         };
-        
+
         setCalendarDateRangeFilter(adjustedFilter);
         setCalendarDateRangePreset('custom');
     }, [setCalendarDateRangeFilter]);
@@ -223,97 +240,86 @@ export default function DisplayListings({ newsletterSettings }) {
         setOnViewToday(false);
         setEndingSoonOnly(false);
         setOpeningTodayOnly(false);
+        setOpeningTitleOnly(false);
         setSearchTerm('');
         setSelectedLocation('');
         setSelectedCounty([]);
         setSortMethod('closingSoon');
-        
+
         // Reset calendar date range to initial state (10 years from start of month)
         const tenYearsFromNow = new Date(startOfMonth);
         tenYearsFromNow.setFullYear(tenYearsFromNow.getFullYear() + 10);
         setCalendarDateRangeFilter({ from: startOfMonth, to: tenYearsFromNow });
         setCalendarDateRangePreset('anytime');
-        
+
         // Close custom calendar if open
         setShowCustomCalendar(false);
     }, [startOfMonth, setCalendarDateRangeFilter]);
 
-    const closeMobileSidebar = useCallback(() => {
-        setMobileSidebarOpen(false);
-    }, []);
-
-    const toggleMobileSidebar = useCallback(() => {
-        setMobileSidebarOpen(prev => !prev);
-    }, []);
 
     return (
         <>
             {/* Mobile Header */}
-            <MobileHeader 
-                onSidebarToggle={toggleMobileSidebar}
-                sidebarOpen={mobileSidebarOpen}
+            <MobileHeader
+                onSearchOpen={() => setMobileSearchOpen(true)}
             />
 
-            {/* Mobile Sidebar Overlay */}
-            <MobileSidebarOverlay 
-                isOpen={mobileSidebarOpen} 
-                onClose={closeMobileSidebar}
-            >
-                <Sidebar
-                    // Display states
-                    showLogo={false}
-                    showMenu={showMenu}
-                    setShowMenu={setShowMenu}
-                    displayedResults={displayedResults}
-                    listings={listings}
-                    showCustomCalendar={showCustomCalendar}
-                    setShowCustomCalendar={setShowCustomCalendar}
-                    newsletterSettings={newsletterSettings}
-                    currentFilters={currentFilters}
+            {/* Mobile Filter Chip Row */}
+            <FilterChipRow
+                calendarTypeFilter={calendarTypeFilter}
+                setCalendarTypeFilter={setCalendarTypeFilter}
+                calendarTypeCounts={calendarTypeCounts}
+                calendarDateRangePreset={calendarDateRangePreset}
+                setCalendarDateRangePreset={setCalendarDateRangePreset}
+                calendarDateRangeFilter={calendarDateRangeFilter}
+                setCalendarDateRangeFilter={setCalendarDateRangeFilter}
+                showCustomCalendar={showCustomCalendar}
+                setShowCustomCalendar={setShowCustomCalendar}
+                selectedCounty={selectedCounty}
+                setSelectedCounty={setSelectedCounty}
+                onViewToday={onViewToday}
+                setOnViewToday={setOnViewToday}
+                endingSoonOnly={endingSoonOnly}
+                setEndingSoonOnly={setEndingSoonOnly}
+                openingTodayOnly={openingTodayOnly}
+                setOpeningTodayOnly={setOpeningTodayOnly}
+                specialFilterCounts={specialFilterCounts}
+                currentFilters={currentFilters}
+                listings={listings}
+                startOfWeek={startOfWeek}
+                endOfWeek={endOfWeek}
+                startOfMonth={startOfMonth}
+                endOfMonth={endOfMonth}
+                startOfNextMonth={startOfNextMonth}
+                endOfNextMonth={endOfNextMonth}
+                updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
+                openingTitleOnly={openingTitleOnly}
+                setOpeningTitleOnly={setOpeningTitleOnly}
+                mobileSearchOpen={mobileSearchOpen}
+                setMobileSearchOpen={setMobileSearchOpen}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+            />
 
-                    // Filter states
-                    calendarTypeFilter={calendarTypeFilter}
-                    setCalendarTypeFilter={setCalendarTypeFilter}
-                    calendarTypeCounts={calendarTypeCounts}
-                    specialFilterCounts={specialFilterCounts}
-                    calendarDateRangeFilter={calendarDateRangeFilter}
-                    setCalendarDateRangeFilter={setCalendarDateRangeFilter}
-                    calendarDateRangePreset={calendarDateRangePreset}
-                    setCalendarDateRangePreset={setCalendarDateRangePreset}
-                    highlightsOnly={highlightsOnly}
-                    setHighlightsOnly={setHighlightsOnly}
-                    onViewToday={onViewToday}
-                    setOnViewToday={setOnViewToday}
-                    endingSoonOnly={endingSoonOnly}
-                    setEndingSoonOnly={setEndingSoonOnly}
-                    openingTodayOnly={openingTodayOnly}
-                    setOpeningTodayOnly={setOpeningTodayOnly}
-                    selectedLocation={selectedLocation}
-                    setSelectedLocation={setSelectedLocation}
-                    selectedCounty={selectedCounty}
-                    setSelectedCounty={setSelectedCounty}
+            {/* Mobile Bottom Bar */}
+            <MobileBottomBar
+                isMapView={isMapView}
+                setIsMapView={setIsMapView}
+                mobileAboutOpen={mobileAboutOpen}
+                setMobileAboutOpen={setMobileAboutOpen}
+                newsletterSettings={newsletterSettings}
+                mobileSortOpen={mobileSortOpen}
+                setMobileSortOpen={setMobileSortOpen}
+                sortMethod={sortMethod}
+                setSortMethod={setSortMethod}
+            />
 
-                    // Date ranges for presets
-                    startOfWeek={startOfWeek}
-                    endOfWeek={endOfWeek}
-                    startOfMonth={startOfMonth}
-                    endOfMonth={endOfMonth}
-                    startOfNextMonth={startOfNextMonth}
-                    endOfNextMonth={endOfNextMonth}
-
-                    // Functions
-                    updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
-                    clearAllFilters={clearAllFilters}
-                    closeMobileSidebar={closeMobileSidebar}
-                />
-            </MobileSidebarOverlay>
-          
             <div className={`flex flex-row w-full items-start lg:gap-4 ${isMapView ? 'h-screen' : ''}`}>
 
                 {/* Desktop Sidebar */ }
                 <div
                     className="w-[400px] sticky top-0 pt-4 hidden lg:block h-screen"
-                >         
+                >
                     <Sidebar
                         // Display states
                         showMenu={showMenu}
@@ -373,6 +379,32 @@ export default function DisplayListings({ newsletterSettings }) {
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}
                 />
+
+                {/* Mobile inline sort */}
+                {!isMapView && (
+                    <div className="lg:hidden flex items-center justify-between px-3 py-2 border-b border-gray-100">
+                        <div className="flex items-center gap-1.5 text-sm">
+                            <span className="font-medium text-gray-700">{displayedResults} exhibition{displayedResults !== 1 ? 's' : ''}</span>
+                            {(calendarTypeFilter !== 'onview' || calendarDateRangePreset !== 'anytime' || selectedCounty.length > 0 || onViewToday || endingSoonOnly || openingTodayOnly || openingTitleOnly || searchTerm) && (
+                                <button
+                                    onClick={clearAllFilters}
+                                    className="text-gray-400 hover:text-gray-600"
+                                    aria-label="Clear all filters"
+                                >
+                                    <X size={14} />
+                                </button>
+                            )}
+                        </div>
+                        <button
+                            onClick={() => setMobileSortOpen(true)}
+                            className="flex items-center gap-1 text-sm text-gray-500"
+                        >
+                            <span>{sortLabels[sortMethod] || sortMethod}</span>
+                            <span className="text-xs opacity-50">▾</span>
+                        </button>
+                    </div>
+                )}
+
                 {loading ? (
                     <LoadingSkeleton count={5} />
                 ) : (
@@ -411,11 +443,10 @@ export default function DisplayListings({ newsletterSettings }) {
                     </>
                 )}
 
-            
+
             </div>
         </div>
         </>
     );
-    
-}
 
+}

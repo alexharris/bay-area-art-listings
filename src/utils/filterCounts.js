@@ -43,7 +43,8 @@ export function getCalendarTypeCounts(currentFilters, listings) {
   return {
     onview: calculateFilterCount(currentFilters, listings, 'calendarType', 'onview'),
     opening: calculateFilterCount(currentFilters, listings, 'calendarType', 'opening'),
-    closing: calculateFilterCount(currentFilters, listings, 'calendarType', 'closing')
+    closing: calculateFilterCount(currentFilters, listings, 'calendarType', 'closing'),
+    hasOpenings: calculateFilterCount(currentFilters, listings, 'calendarType', 'hasOpenings')
   };
 }
 
