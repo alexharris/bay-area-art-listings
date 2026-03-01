@@ -56,6 +56,13 @@ export const locationType = defineType({
       group: 'info',
     }),
     defineField({
+      name: 'hoursManualOverride',
+      title: 'Manual Override',
+      type: 'boolean',
+      description: 'Check to prevent Google sync from overwriting these hours.',
+      group: 'hours',
+    }),
+    defineField({
       name: 'Hours',
       type: 'object',
       group: 'hours',
@@ -69,13 +76,6 @@ export const locationType = defineType({
         { name: 'Saturday', type: 'string' },
         { name: 'Sunday', type: 'string' },
       ],
-    }),
-    defineField({
-      name: 'hoursManualOverride',
-      title: 'Manual Override',
-      type: 'boolean',
-      description: 'Check to prevent Google sync from overwriting these hours.',
-      group: 'hours',
     }),
     defineField({
       name: 'OriginalName',

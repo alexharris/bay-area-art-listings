@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {SyncHoursButton} from '../components/SyncHoursButton'
 
 export const settingsType = defineType({
   name: 'settings',
@@ -71,6 +72,13 @@ export const settingsType = defineType({
           initialValue: 'green-300',
         }),
       ],
+    }),
+    defineField({
+      name: 'syncHours',
+      title: 'Sync Hours from Google',
+      type: 'string',
+      description: 'Manually trigger a sync of all venue hours from Google Places.',
+      components: {input: SyncHoursButton},
     }),
     defineField({
       name: 'newsletter',

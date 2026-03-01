@@ -1,6 +1,7 @@
 export const maxDuration = 300;
 
 import { createClient } from '@sanity/client';
+import postmark from 'postmark';
 
 const sanityClient = createClient({
   projectId: 'ride9vgj',
@@ -15,14 +16,38 @@ function delay(ms) {
 }
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const short = {Monday:'Mon',Tuesday:'Tue',Wednesday:'Wed',Thursday:'Thu',Friday:'Fri',Saturday:'Sat',Sunday:'Sun'};
-
-function formatSnapshot(hours) {
-  return days.map(d => `${short[d]}: ${hours?.[d] || 'Closed'}`).join('\n');
-}
 
 function hoursAreEqual(stored, fresh) {
   return days.every(day => (stored?.[day] ?? null) === (fresh?.[day] ?? null));
+}
+
+const NOTIFY_EMAILS = ['hello@alexharris.online', 'hi@artboard.info'];
+
+async function sendSummaryEmail(summary, changedVenues) {
+  const mailer = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN);
+  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  let body;
+  if (summary.changed === 0 && summary.errors === 0) {
+    body = `Hours sync ran on ${date}. All ${summary.refreshed} venues checked — no changes.`;
+  } else {
+    const lines = [`Hours sync ran on ${date}.`, ``];
+    lines.push(`Checked: ${summary.refreshed} of ${summary.total} venues`);
+    if (summary.changed > 0) lines.push(`Updated: ${summary.changed} (${changedVenues.join(', ')})`);
+    if (summary.overridden > 0) lines.push(`Skipped (override): ${summary.overridden}`);
+    if (summary.errors > 0) lines.push(`Errors: ${summary.errors}`);
+    body = lines.join('\n');
+  }
+
+  for (const to of NOTIFY_EMAILS) {
+    await mailer.sendEmail({
+      From: 'hello@alexharris.online',
+      To: to,
+      Subject: `Hours sync — ${date}`,
+      TextBody: body,
+      MessageStream: 'outbound',
+    });
+  }
 }
 
 export async function GET() {
@@ -34,6 +59,7 @@ export async function GET() {
   );
 
   const summary = { total: locations.length, refreshed: 0, changed: 0, overridden: 0, errors: 0 };
+  const changedVenues = [];
   const baseUrl = process.env.URL || 'http://localhost:3333';
 
   for (let i = 0; i < locations.length; i++) {
@@ -62,26 +88,28 @@ export async function GET() {
       }
 
       const googleHours = data.Hours;
-      const snapshot = googleHours ? formatSnapshot(googleHours) : '(No hours data from Google)';
       const hoursChanged = googleHours ? !hoursAreEqual(location.Hours, googleHours) : false;
       const manualOverride = location.hoursManualOverride ?? false;
 
-      const patch = sanityClient.patch(location._id).set({ googleHoursSnapshot: snapshot });
+      summary.refreshed++;
 
-      if (hoursChanged && !manualOverride) {
-        patch.set({ Hours: googleHours });
-        summary.changed++;
-      } else if (hoursChanged && manualOverride) {
+      if (!hoursChanged) continue;
+
+      if (manualOverride) {
         summary.overridden++;
+        continue;
       }
 
-      await patch.commit();
-      summary.refreshed++;
+      await sanityClient.patch(location._id).set({ Hours: googleHours }).commit();
+      summary.changed++;
+      changedVenues.push(location.Name);
     } catch (err) {
       console.error(`Error processing ${location.Name}:`, err);
       summary.errors++;
     }
   }
+
+  await sendSummaryEmail(summary, changedVenues);
 
   return Response.json(summary);
 }

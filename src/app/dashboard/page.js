@@ -76,9 +76,6 @@ async function getDashboardStats() {
   // Shows with notes
   const showsWithNotes = await client.fetch(`count(*[_type == "listing" && defined(Notes)])`);
 
-  // Hours sync stats
-  const venuesSynced = await client.fetch(`count(*[_type == "location" && defined(googleHoursSnapshot)])`);
-
   // Get all shows with their start dates for the openings chart
   const allShows = await client.fetch(`
     *[_type == "listing" && defined(StartDate)] {
@@ -126,7 +123,6 @@ async function getDashboardStats() {
     showsWithNotes,
     openingsData,
     availableYears,
-    venuesSynced,
   };
 }
 

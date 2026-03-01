@@ -5,61 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ChartContainer } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, LineChart, Line } from 'recharts';
 
-function HoursSyncSection({ venuesSynced, totalLocations }) {
-  const [refreshState, setRefreshState] = useState('idle'); // idle | loading | done | error
-  const [refreshResult, setRefreshResult] = useState(null);
-
-  async function handleRefresh() {
-    setRefreshState('loading');
-    setRefreshResult(null);
-    try {
-      const res = await fetch('/api/cron/refresh-hours', { method: 'POST' });
-      const data = await res.json();
-      setRefreshResult(data);
-      setRefreshState('done');
-    } catch (err) {
-      setRefreshState('error');
-    }
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Hours Sync Status</h2>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshState === 'loading'}
-          className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {refreshState === 'loading' ? 'Refreshing…' : 'Refresh All Hours'}
-        </button>
-      </div>
-
-      {refreshState === 'done' && refreshResult && (
-        <div className="text-sm p-3 bg-muted rounded-md">
-          Done — {refreshResult.refreshed} checked, {refreshResult.changed} updated, {refreshResult.overridden} overridden, {refreshResult.errors} errors (of {refreshResult.total} venues)
-        </div>
-      )}
-      {refreshState === 'error' && (
-        <div className="text-sm p-3 bg-destructive/10 text-destructive rounded-md">
-          Refresh failed. Check server logs.
-        </div>
-      )}
-
-      <div className="grid gap-4 md:grid-cols-1">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Venues with Hours Snapshot</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{venuesSynced}</div>
-            <p className="text-xs text-muted-foreground">of {totalLocations} total</p>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-}
 
 const chartConfig = {
   count: {
@@ -355,11 +300,6 @@ export default function DashboardClient({ stats }) {
         </CardContent>
       </Card>
 
-      {/* Hours Sync */}
-      <HoursSyncSection
-        venuesSynced={stats.venuesSynced}
-        totalLocations={stats.totalLocations}
-      />
     </div>
   );
 }
