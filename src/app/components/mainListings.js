@@ -361,10 +361,10 @@ export default function DisplayListings({ newsletterSettings }) {
                         updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
                         clearAllFilters={clearAllFilters}
                     />
-                </div>   
+                </div>
 
             {/* Main Col */}
-            <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
+            <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink pb-16 lg:pb-0 ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
                 <ContentToolbar
                     sortMethod={sortMethod}
                     setSortMethod={setSortMethod}

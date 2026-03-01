@@ -53,6 +53,10 @@ Bay Area Art Listings is a Next.js 15 application that displays visual arts exhi
 - Location hours stored as day-of-week strings (e.g., "10am-6pm" or "Closed")
 - County filtering uses zip code matching from `src/data/bay-area-zipcodes.json`
 
+## Memory
+
+Keep `memory/MEMORY.md` and topic files (e.g. `memory/email.md`) up to date as the project evolves. Update them when debugging reveals new insights, env var names change, routes are added/removed, or architectural decisions are made.
+
 ## Git Commits
 
 - Do not add Co-Authored-By or any Claude/Anthropic attribution lines in commit messages

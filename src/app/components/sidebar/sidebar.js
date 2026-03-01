@@ -200,7 +200,7 @@ export default function Sidebar({
                     View {displayedResults} Results
                 </Button>
             </div>
-            
+
             {/* Fixed bottom section with About and Newsletter */}
             <div className="px-4 py-2 border-t border-gray-200 bg-white">
                 <div className="flex flex-row gap-4">

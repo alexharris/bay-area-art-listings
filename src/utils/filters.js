@@ -131,6 +131,7 @@ export function getFilteredListings(filters, listings) {
   filters = {
     highlightsOnly: filters.highlightsOnly || false,
     onViewToday: filters.onViewToday || false,
+    sfArtWeekOnly: filters.sfArtWeekOnly || false,
     endingSoonOnly: filters.endingSoonOnly || false,
     openingTodayOnly: filters.openingTodayOnly || false,
     searchTerm: filters.searchTerm || '',
@@ -142,6 +143,7 @@ export function getFilteredListings(filters, listings) {
 
   let filteredListings = listings
   .filter(item =>filters.onViewToday ? determineOnViewTodayFilter(item) : true)
+  .filter(item =>filters.sfArtWeekOnly ? item.sfawUrl : true)
   .filter(item =>filters.endingSoonOnly ? determineEndingSoonFilter(item) : true)
   .filter(item =>filters.openingTodayOnly ? determineOpeningTodayFilter(item) : true)
   .filter(item => filters.selectedLocation ? item.locationName === filters.selectedLocation : true) // Selected Location
