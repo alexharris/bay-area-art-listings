@@ -1,7 +1,9 @@
 export const maxDuration = 300;
 
 import { createClient } from '@sanity/client';
-import postmark from 'postmark';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const postmark = require('postmark');
 
 const sanityClient = createClient({
   projectId: 'ride9vgj',
@@ -40,13 +42,14 @@ async function sendSummaryEmail(summary, changedVenues) {
   }
 
   for (const to of NOTIFY_EMAILS) {
-    await mailer.sendEmail({
+    const result = await mailer.sendEmail({
       From: 'hello@alexharris.online',
       To: to,
       Subject: `Hours sync — ${date}`,
       TextBody: body,
       MessageStream: 'outbound',
     });
+    console.log(`Hours sync email sent to ${to} — MessageID: ${result.MessageID}, ErrorCode: ${result.ErrorCode}`);
   }
 }
 
@@ -109,7 +112,11 @@ export async function GET() {
     }
   }
 
-  await sendSummaryEmail(summary, changedVenues);
+  try {
+    await sendSummaryEmail(summary, changedVenues);
+  } catch (err) {
+    console.error('Failed to send hours sync summary email:', err);
+  }
 
   return Response.json(summary);
 }
