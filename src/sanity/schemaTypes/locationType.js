@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {SyncHoursInput} from '../components/SyncHoursInput'
 
 export const locationType = defineType({
   name: 'location',
@@ -58,10 +59,7 @@ export const locationType = defineType({
       name: 'Hours',
       type: 'object',
       group: 'hours',
-      options: {
-        collapsible: true,
-        collapsed: true,
-      },
+      components: {input: SyncHoursInput},
       fields: [
         { name: 'Monday', type: 'string' },
         { name: 'Tuesday', type: 'string' },
@@ -73,26 +71,10 @@ export const locationType = defineType({
       ],
     }),
     defineField({
-      name: 'hoursLastSyncedAt',
-      title: 'Hours Last Synced',
-      type: 'datetime',
-      readOnly: true,
-      description: 'When hours were last fetched from Google.',
-      group: 'hours',
-    }),
-    defineField({
-      name: 'hoursPendingReview',
-      title: 'Hours Changed — Needs Review',
+      name: 'hoursManualOverride',
+      title: 'Manual Override',
       type: 'boolean',
-      description: 'True when Google returned hours that differ from what was stored.',
-      group: 'hours',
-    }),
-    defineField({
-      name: 'hoursChangedAt',
-      title: 'Hours Last Changed',
-      type: 'datetime',
-      readOnly: true,
-      description: 'When hours were last detected as different from Google data.',
+      description: 'Check to prevent Google sync from overwriting these hours.',
       group: 'hours',
     }),
     defineField({

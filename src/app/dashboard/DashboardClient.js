@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ChartContainer } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, LineChart, Line } from 'recharts';
 
-function HoursSyncSection({ venuesSynced, staleVenues, pendingReviewVenues, totalLocations }) {
+function HoursSyncSection({ venuesSynced, totalLocations }) {
   const [refreshState, setRefreshState] = useState('idle'); // idle | loading | done | error
   const [refreshResult, setRefreshResult] = useState(null);
 
@@ -31,13 +31,13 @@ function HoursSyncSection({ venuesSynced, staleVenues, pendingReviewVenues, tota
           disabled={refreshState === 'loading'}
           className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {refreshState === 'loading' ? 'Refreshing…' : 'Refresh Stale Hours'}
+          {refreshState === 'loading' ? 'Refreshing…' : 'Refresh All Hours'}
         </button>
       </div>
 
       {refreshState === 'done' && refreshResult && (
         <div className="text-sm p-3 bg-muted rounded-md">
-          Done — {refreshResult.refreshed} refreshed, {refreshResult.changed} changed, {refreshResult.errors} errors (of {refreshResult.total} stale venues)
+          Done — {refreshResult.refreshed} checked, {refreshResult.changed} updated, {refreshResult.overridden} overridden, {refreshResult.errors} errors (of {refreshResult.total} venues)
         </div>
       )}
       {refreshState === 'error' && (
@@ -46,115 +46,17 @@ function HoursSyncSection({ venuesSynced, staleVenues, pendingReviewVenues, tota
         </div>
       )}
 
-      {/* Stat cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-1">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Venues Synced</CardTitle>
+            <CardTitle className="text-sm font-medium">Venues with Hours Snapshot</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{venuesSynced}</div>
             <p className="text-xs text-muted-foreground">of {totalLocations} total</p>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Stale (&gt;30 days)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{staleVenues.length}</div>
-            <p className="text-xs text-muted-foreground">Need refresh</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{pendingReviewVenues.length}</div>
-            <p className="text-xs text-muted-foreground">Hours changed</p>
-          </CardContent>
-        </Card>
       </div>
-
-      {/* Pending review table */}
-      {pendingReviewVenues.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Pending Review</CardTitle>
-            <CardDescription>Hours changed since last sync — verify these venues</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <table className="w-full text-sm">
-              <thead className="border-b">
-                <tr>
-                  <th className="h-10 px-4 text-left font-medium text-muted-foreground">Venue</th>
-                  <th className="h-10 px-4 text-left font-medium text-muted-foreground">Address</th>
-                  <th className="h-10 px-4 text-left font-medium text-muted-foreground">Changed</th>
-                  <th className="h-10 px-4 text-left font-medium text-muted-foreground"></th>
-                </tr>
-              </thead>
-              <tbody className="[&_tr:last-child]:border-0">
-                {pendingReviewVenues.map(venue => (
-                  <tr key={venue._id} className="border-b hover:bg-muted/50">
-                    <td className="px-4 py-3 font-medium">{venue.Name}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{venue.Address}</td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {venue.hoursChangedAt
-                        ? new Date(venue.hoursChangedAt).toLocaleDateString()
-                        : '—'}
-                    </td>
-                    <td className="px-4 py-3">
-                      <a
-                        href={`/studio/intent/edit/id=${venue._id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-primary hover:underline"
-                      >
-                        Edit in Studio →
-                      </a>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Stale venues table */}
-      {staleVenues.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Stale Venues</CardTitle>
-            <CardDescription>Never synced or last synced more than 30 days ago</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <table className="w-full text-sm">
-              <thead className="border-b">
-                <tr>
-                  <th className="h-10 px-4 text-left font-medium text-muted-foreground">Venue</th>
-                  <th className="h-10 px-4 text-left font-medium text-muted-foreground">Last Synced</th>
-                </tr>
-              </thead>
-              <tbody className="[&_tr:last-child]:border-0">
-                {staleVenues.map(venue => (
-                  <tr key={venue._id} className="border-b hover:bg-muted/50">
-                    <td className="px-4 py-3 font-medium">{venue.Name}</td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {venue.hoursLastSyncedAt
-                        ? new Date(venue.hoursLastSyncedAt).toLocaleDateString()
-                        : 'Never'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
@@ -456,8 +358,6 @@ export default function DashboardClient({ stats }) {
       {/* Hours Sync */}
       <HoursSyncSection
         venuesSynced={stats.venuesSynced}
-        staleVenues={stats.staleVenues}
-        pendingReviewVenues={stats.pendingReviewVenues}
         totalLocations={stats.totalLocations}
       />
     </div>

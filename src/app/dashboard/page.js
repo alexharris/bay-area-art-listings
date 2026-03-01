@@ -77,22 +77,7 @@ async function getDashboardStats() {
   const showsWithNotes = await client.fetch(`count(*[_type == "listing" && defined(Notes)])`);
 
   // Hours sync stats
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-
-  const venuesSynced = await client.fetch(`count(*[_type == "location" && defined(hoursLastSyncedAt)])`);
-
-  const staleVenues = await client.fetch(
-    `*[_type == "location" && (!defined(hoursLastSyncedAt) || hoursLastSyncedAt < $cutoff)] {
-      _id, Name, Address, hoursLastSyncedAt
-    }`,
-    { cutoff: thirtyDaysAgo }
-  );
-
-  const pendingReviewVenues = await client.fetch(
-    `*[_type == "location" && hoursPendingReview == true] {
-      _id, Name, Address, hoursChangedAt
-    }`
-  );
+  const venuesSynced = await client.fetch(`count(*[_type == "location" && defined(googleHoursSnapshot)])`);
 
   // Get all shows with their start dates for the openings chart
   const allShows = await client.fetch(`
@@ -142,8 +127,6 @@ async function getDashboardStats() {
     openingsData,
     availableYears,
     venuesSynced,
-    staleVenues,
-    pendingReviewVenues,
   };
 }
 

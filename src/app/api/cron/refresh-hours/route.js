@@ -14,31 +14,31 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const short = {Monday:'Mon',Tuesday:'Tue',Wednesday:'Wed',Thursday:'Thu',Friday:'Fri',Saturday:'Sat',Sunday:'Sun'};
+
+function formatSnapshot(hours) {
+  return days.map(d => `${short[d]}: ${hours?.[d] || 'Closed'}`).join('\n');
+}
+
 function hoursAreEqual(stored, fresh) {
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   return days.every(day => (stored?.[day] ?? null) === (fresh?.[day] ?? null));
 }
 
 export async function GET() {
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-
-  // Query all locations with a GoogleID that are stale or never synced
-  const staleLocations = await sanityClient.fetch(
-    `*[_type == "location" && defined(GoogleID) && (
-      !defined(hoursLastSyncedAt) || hoursLastSyncedAt < $cutoff
-    )] {
-      _id, Name, GoogleID, Hours, hoursLastSyncedAt
-    }`,
-    { cutoff: thirtyDaysAgo }
+  // Query all locations with a GoogleID
+  const locations = await sanityClient.fetch(
+    `*[_type == "location" && defined(GoogleID)] {
+      _id, Name, GoogleID, Hours, hoursManualOverride
+    }`
   );
 
-  const summary = { total: staleLocations.length, refreshed: 0, changed: 0, errors: 0 };
+  const summary = { total: locations.length, refreshed: 0, changed: 0, overridden: 0, errors: 0 };
   const baseUrl = process.env.URL || 'http://localhost:3333';
 
-  for (let i = 0; i < staleLocations.length; i++) {
-    const location = staleLocations[i];
+  for (let i = 0; i < locations.length; i++) {
+    const location = locations[i];
 
-    // Small delay between calls to avoid rate limiting
     if (i > 0) await delay(200);
 
     try {
@@ -61,18 +61,18 @@ export async function GET() {
         continue;
       }
 
-      const now = new Date().toISOString();
-      const hoursChanged = !hoursAreEqual(location.Hours, data.Hours);
+      const googleHours = data.Hours;
+      const snapshot = googleHours ? formatSnapshot(googleHours) : '(No hours data from Google)';
+      const hoursChanged = googleHours ? !hoursAreEqual(location.Hours, googleHours) : false;
+      const manualOverride = location.hoursManualOverride ?? false;
 
-      const patch = sanityClient.patch(location._id).set({
-        Hours: data.Hours,
-        hoursLastSyncedAt: now,
-        hoursPendingReview: hoursChanged,
-      });
+      const patch = sanityClient.patch(location._id).set({ googleHoursSnapshot: snapshot });
 
-      if (hoursChanged) {
-        patch.set({ hoursChangedAt: now });
+      if (hoursChanged && !manualOverride) {
+        patch.set({ Hours: googleHours });
         summary.changed++;
+      } else if (hoursChanged && manualOverride) {
+        summary.overridden++;
       }
 
       await patch.commit();
