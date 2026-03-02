@@ -68,7 +68,7 @@ export async function GET() {
   for (let i = 0; i < locations.length; i++) {
     const location = locations[i];
 
-    if (i > 0) await delay(200);
+    if (i > 0) await delay(100);
 
     try {
       const response = await fetch(`${baseUrl}/api/google-place`, {
