@@ -23,7 +23,7 @@ function hoursAreEqual(stored, fresh) {
   return days.every(day => (stored?.[day] ?? null) === (fresh?.[day] ?? null));
 }
 
-const NOTIFY_EMAILS = ['hello@alexharris.online', 'hi@artboard.info'];
+const NOTIFY_EMAILS = ['hi@artboard.info'];
 
 async function sendSummaryEmail(summary, changedVenues) {
   const mailer = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN);
@@ -43,7 +43,7 @@ async function sendSummaryEmail(summary, changedVenues) {
 
   for (const to of NOTIFY_EMAILS) {
     const result = await mailer.sendEmail({
-      From: 'hello@alexharris.online',
+      From: 'hi@artboard.info',
       To: to,
       Subject: `Hours sync — ${date}`,
       TextBody: body,

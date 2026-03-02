@@ -105,7 +105,7 @@ export async function POST(req) {
     try {
         for (const email of emails) {
             const response = await client.sendEmailWithTemplate({
-                "From": "hello@alexharris.online",
+                "From": "hi@artboard.info",
                 "To": email,
                 "TemplateAlias": "main",
                 "MessageStream": "broadcast",
