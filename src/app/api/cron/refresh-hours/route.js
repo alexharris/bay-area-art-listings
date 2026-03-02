@@ -1,4 +1,4 @@
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 import { createClient } from '@sanity/client';
 import { createRequire } from 'module';
