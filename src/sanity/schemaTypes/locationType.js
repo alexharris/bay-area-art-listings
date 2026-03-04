@@ -1,5 +1,5 @@
 import {defineField, defineType} from 'sanity'
-import {SyncHoursInput} from '../components/SyncHoursInput'
+import {GoogleSyncPanel} from '../components/GoogleSyncPanel'
 
 export const locationType = defineType({
   name: 'location',
@@ -8,12 +8,13 @@ export const locationType = defineType({
   components: {
     input: (props) => props.renderDefault({
       ...props,
-      groups: props.groups?.filter(g => ['info', 'hours', 'archive'].includes(g.name)),
+      groups: props.groups?.filter(g => ['info', 'hours', 'sync', 'archive'].includes(g.name)),
     }),
   },
   groups: [
     { name: 'info', title: 'Info', default: true },
     { name: 'hours', title: 'Hours' },
+    { name: 'sync', title: 'Sync' },
     { name: 'archive', title: 'Archive' },
   ],
   fields: [
@@ -24,11 +25,6 @@ export const locationType = defineType({
     }),
     defineField({
       name: 'Address',
-      type: 'string',
-      group: 'info',
-    }),
-    defineField({
-      name: 'GoogleID',
       type: 'string',
       group: 'info',
     }),
@@ -59,14 +55,13 @@ export const locationType = defineType({
       name: 'hoursManualOverride',
       title: 'Manual Override',
       type: 'boolean',
-      description: 'Check to prevent Google sync from overwriting these hours.',
+      description: 'Check to prevent Google sync from overwriting name, address, or hours.',
       group: 'hours',
     }),
     defineField({
       name: 'Hours',
       type: 'object',
       group: 'hours',
-      components: {input: SyncHoursInput},
       fields: [
         { name: 'Monday', type: 'string' },
         { name: 'Tuesday', type: 'string' },
@@ -76,6 +71,14 @@ export const locationType = defineType({
         { name: 'Saturday', type: 'string' },
         { name: 'Sunday', type: 'string' },
       ],
+    }),
+    defineField({
+      name: 'GoogleID',
+      title: 'Google Place ID',
+      type: 'string',
+      group: 'sync',
+      description: 'Find this in Google Maps — search the venue, click Share, and copy the place ID from the link.',
+      components: {input: GoogleSyncPanel},
     }),
     defineField({
       name: 'OriginalName',

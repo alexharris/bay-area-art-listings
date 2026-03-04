@@ -57,7 +57,7 @@ export async function GET() {
   // Query all locations with a GoogleID
   const locations = await sanityClient.fetch(
     `*[_type == "location" && defined(GoogleID)] {
-      _id, Name, GoogleID, Hours, hoursManualOverride
+      _id, Name, Address, Geolocation, GoogleID, Hours, hoursManualOverride
     }`
   );
 
@@ -91,19 +91,36 @@ export async function GET() {
       }
 
       const googleHours = data.Hours;
+      const googleName = data.Name;
+      const googleAddress = data.Address;
+      const googleGeo = data.Geolocation;
+
       const hoursChanged = googleHours ? !hoursAreEqual(location.Hours, googleHours) : false;
+      const nameChanged = googleName ? googleName !== location.Name : false;
+      const addressChanged = googleAddress ? googleAddress !== location.Address : false;
+      const geoChanged = googleGeo
+        ? googleGeo.lat !== location.Geolocation?.lat || googleGeo.lng !== location.Geolocation?.lng
+        : false;
+      const anyChanged = hoursChanged || nameChanged || addressChanged || geoChanged;
+
       const manualOverride = location.hoursManualOverride ?? false;
 
       summary.refreshed++;
 
-      if (!hoursChanged) continue;
+      if (!anyChanged) continue;
 
       if (manualOverride) {
         summary.overridden++;
         continue;
       }
 
-      await sanityClient.patch(location._id).set({ Hours: googleHours }).commit();
+      const updates = {};
+      if (hoursChanged) updates.Hours = googleHours;
+      if (nameChanged) updates.Name = googleName;
+      if (addressChanged) updates.Address = googleAddress;
+      if (geoChanged) updates.Geolocation = {_type: 'geopoint', lat: googleGeo.lat, lng: googleGeo.lng};
+
+      await sanityClient.patch(location._id).set(updates).commit();
       summary.changed++;
       changedVenues.push(location.Name);
     } catch (err) {
