@@ -251,8 +251,13 @@ export default function DisplayListings({ newsletterSettings }) {
                 setSelectedCounty([]);
                 setLocationLoading(false);
             },
-            () => {
-                setLocationError('Location unavailable');
+            (err) => {
+                const msg =
+                    err.code === 1 ? 'Permission denied' :
+                    err.code === 2 ? 'Position unavailable' :
+                    err.code === 3 ? 'Request timed out' :
+                    'Location unavailable';
+                setLocationError(msg);
                 setLocationLoading(false);
             }
         );
