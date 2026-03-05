@@ -339,8 +339,8 @@ export default function DisplayListings({ newsletterSettings }) {
                         calendarDateRangePreset={calendarDateRangePreset}
                         setCalendarDateRangePreset={setCalendarDateRangePreset}
                         specialFilterCounts={specialFilterCounts}
-                        onViewToday={onViewToday}
-                        setOnViewToday={setOnViewToday}
+                        openingTodayOnly={openingTodayOnly}
+                        setOpeningTodayOnly={setOpeningTodayOnly}
                         endingSoonOnly={endingSoonOnly}
                         setEndingSoonOnly={setEndingSoonOnly}
                         openingTitleOnly={openingTitleOnly}
