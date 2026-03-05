@@ -4,8 +4,6 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { useState } from "react";
 import CountySelector from './countySelector';
-import CalendarTypeSelector from './CalendarTypeSelector';
-import FilterBadges from './FilterBadges';
 import FilterPresets from '../filterPresets';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -27,22 +25,17 @@ export default function Sidebar({
     currentFilters,
 
     // Filter states
-    calendarTypeFilter,
-    setCalendarTypeFilter,
-    calendarTypeCounts,
-    specialFilterCounts = { onViewToday: 0, endingSoonOnly: 0, openingTodayOnly: 0 },
+    specialFilterCounts = { onViewToday: 0, endingSoonOnly: 0, openingTodayOnly: 0, openingTitleOnly: 0 },
     calendarDateRangeFilter,
     setCalendarDateRangeFilter,
     calendarDateRangePreset,
     setCalendarDateRangePreset,
-    highlightsOnly,
-    setHighlightsOnly,
     onViewToday,
     setOnViewToday,
     endingSoonOnly,
     setEndingSoonOnly,
-    openingTodayOnly,
-    setOpeningTodayOnly,
+    openingTitleOnly,
+    setOpeningTitleOnly,
     selectedLocation,
     setSelectedLocation,
     selectedCounty,
@@ -83,11 +76,32 @@ export default function Sidebar({
                     </div>
                 )}
                 <p className="mb-4 hidden md:block">A directory of visual arts exhibitions in the Bay Area.</p>
-                <CalendarTypeSelector
-                    calendarTypeFilter={calendarTypeFilter}
-                    setCalendarTypeFilter={setCalendarTypeFilter}
-                    calendarTypeCounts={calendarTypeCounts}
-                />
+                <div className="flex flex-wrap gap-2">
+                    <button
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${openingTitleOnly ? 'bg-yellow-200 border-yellow-300 text-black' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}`}
+                        onClick={() => setOpeningTitleOnly(!openingTitleOnly)}
+                    >
+                        ☀️ Openings
+                        {!openingTitleOnly && specialFilterCounts.openingTitleOnly > 0 && <span className="opacity-50">({specialFilterCounts.openingTitleOnly})</span>}
+                        {openingTitleOnly && <span className="ml-0.5">×</span>}
+                    </button>
+                    <button
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${onViewToday ? 'bg-green-300 border-green-400 text-black' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}`}
+                        onClick={() => setOnViewToday(!onViewToday)}
+                    >
+                        👁️ On View Today
+                        {!onViewToday && specialFilterCounts.onViewToday > 0 && <span className="opacity-50">({specialFilterCounts.onViewToday})</span>}
+                        {onViewToday && <span className="ml-0.5">×</span>}
+                    </button>
+                    <button
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${endingSoonOnly ? 'bg-red-300 border-red-400 text-black' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}`}
+                        onClick={() => setEndingSoonOnly(!endingSoonOnly)}
+                    >
+                        ⏳ Ending Soon
+                        {!endingSoonOnly && specialFilterCounts.endingSoonOnly > 0 && <span className="opacity-50">({specialFilterCounts.endingSoonOnly})</span>}
+                        {endingSoonOnly && <span className="ml-0.5">×</span>}
+                    </button>
+                </div>
                 <div className="flex flex-col w-full">
                     <div id="filterResults">
                         <FilterPresets 
@@ -127,15 +141,6 @@ export default function Sidebar({
                         listings={listings}
                     />
                 </div>
-                <FilterBadges
-                    onViewToday={onViewToday}
-                    setOnViewToday={setOnViewToday}
-                    endingSoonOnly={endingSoonOnly}
-                    setEndingSoonOnly={setEndingSoonOnly}
-                    openingTodayOnly={openingTodayOnly}
-                    setOpeningTodayOnly={setOpeningTodayOnly}
-                    specialFilterCounts={specialFilterCounts}
-                />
                 {/* Stats indicator showing total vs. filtered listings */}
                 <div className="flex flex-row gap-2 justify-end">
                     <div className="flex flex-row items-center text-sm">

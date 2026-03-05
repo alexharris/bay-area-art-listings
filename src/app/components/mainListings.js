@@ -334,22 +334,17 @@ export default function DisplayListings({ newsletterSettings }) {
                         // Filter states
                         searchTerm={searchTerm}
                         setSearchTerm={setSearchTerm}
-                        calendarTypeFilter={calendarTypeFilter}
-                        setCalendarTypeFilter={setCalendarTypeFilter}
-                        calendarTypeCounts={calendarTypeCounts}
-                        specialFilterCounts={specialFilterCounts}
                         calendarDateRangeFilter={calendarDateRangeFilter}
                         setCalendarDateRangeFilter={setCalendarDateRangeFilter}
                         calendarDateRangePreset={calendarDateRangePreset}
                         setCalendarDateRangePreset={setCalendarDateRangePreset}
-                        highlightsOnly={highlightsOnly}
-                        setHighlightsOnly={setHighlightsOnly}
+                        specialFilterCounts={specialFilterCounts}
                         onViewToday={onViewToday}
                         setOnViewToday={setOnViewToday}
                         endingSoonOnly={endingSoonOnly}
                         setEndingSoonOnly={setEndingSoonOnly}
-                        openingTodayOnly={openingTodayOnly}
-                        setOpeningTodayOnly={setOpeningTodayOnly}
+                        openingTitleOnly={openingTitleOnly}
+                        setOpeningTitleOnly={setOpeningTitleOnly}
                         selectedLocation={selectedLocation}
                         setSelectedLocation={setSelectedLocation}
                         selectedCounty={selectedCounty}
