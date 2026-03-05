@@ -142,14 +142,14 @@ const CountySelector = ({
             <input
               type="range"
               min={1}
-              max={50}
+              max={20}
               value={nearbyRadius}
               onChange={(e) => setNearbyRadius(Number(e.target.value))}
               className="w-full h-1.5 accent-gray-700 cursor-pointer"
             />
             <div className="flex justify-between text-xs text-gray-400">
               <span>1 mi</span>
-              <span>50 mi</span>
+              <span>20 mi</span>
             </div>
           </div>
         ) : locationError ? (
