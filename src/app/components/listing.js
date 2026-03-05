@@ -114,18 +114,24 @@ export default function Listings({
     return (
       <div className="flex flex-col gap-1 mt-1">
         {upcoming.map((opening, idx) => (
-          <div key={opening._key || idx} className="text-sm">
+          <div key={opening._key || idx} className="text-sm border-b border-dashed border-gray-200 pb-1.5 last:border-0 last:pb-0">
             <div className="flex flex-col">
               <div className="flex items-center">
-                <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-1.5 flex-shrink-0"></span>
                 <span className="font-medium">{opening.title}</span>
               </div>
-              <div className="ml-3.5 text-gray-700">
-                {new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}
-                {opening.time && ` ${opening.time}`}
+              <div className="text-gray-700">
+                <CalendarLink
+                  dateLabel={`${new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}${opening.time ? ` ${opening.time}` : ''}`}
+                  singleEvent={{
+                    title: opening.title,
+                    date: opening.date,
+                    time: opening.time,
+                    locationName: item.locationName,
+                  }}
+                />
               </div>
             </div>
-            {opening.note && <div className="text-gray-600 ml-3.5">{opening.note}</div>}
+            {opening.note && <div className="text-gray-600">{opening.note}</div>}
           </div>
         ))}
       </div>
@@ -138,7 +144,7 @@ export default function Listings({
         <li className="border-b min-h-40 border-dashed border-gray-400 py-6 w-full relative flex flex-col md:flex-row justify-between gap-2 lg:gap-4" key={item._id || index}>
 
           {/* Left Column - Title + image + (notes on desktop) */}
-          <div className="flex flex-col md:flex-row lg:flex-row gap-3 w-full md:w-2/3">
+          <div className="flex flex-col md:flex-row lg:flex-row gap-3 w-full md:w-1/2">
 
             {/* Desktop gallery well — hidden on mobile */}
             {item.eventImageUrl && (
@@ -210,16 +216,15 @@ export default function Listings({
                 }
               </div>
 
-              {/* Notes + openings — desktop only */}
+              {/* Notes — desktop only */}
               <div className="hidden md:flex flex-col gap-2">
                 <NotesRenderer notes={item.Notes} itemIndex={index} />
-                {renderOpenings(item)}
               </div>
             </div>
           </div>
 
           {/* Right Side Container - Date and Location */}
-          <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-2 lg:gap-4 w-full md:w-auto lg:w-1/2">
+          <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-2 lg:gap-4 w-full md:w-1/2">
 
             {/* Date section */}
             <div className="flex flex-col gap-2 w-full text-left items-start justify-start">
@@ -246,6 +251,14 @@ export default function Listings({
                   </Badge>
                 )}
               </div>
+
+              {/* Subevents — desktop only, beneath dates */}
+              {renderOpenings(item) && (
+                <div className="hidden md:block">
+                  <div className="text-xs uppercase tracking-wider text-gray-400 mb-1">Events</div>
+                  {renderOpenings(item)}
+                </div>
+              )}
             </div>
 
             {/* Venue section — desktop only (mobile renders at bottom of li) */}
