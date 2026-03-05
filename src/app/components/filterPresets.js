@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getDateRangeCounts } from '../../utils/filterCounts';
-
-const PRESETS = [
-    { value: 'anytime', label: 'Anytime' },
-    { value: 'today', label: 'Today' },
-    { value: 'next7', label: 'Next 7 Days' },
-    { value: 'thismonth', label: 'This Month' },
-    { value: 'nextmonth', label: 'Next Month' },
-    { value: 'custom', label: 'Custom' },
-];
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function FilterPresets({
     setShowCustomCalendar,
@@ -93,28 +85,47 @@ export default function FilterPresets({
         }
     };
 
+    const isActive = calendarDateRangePreset !== 'anytime';
+
     return (
-        <div className="flex flex-wrap gap-2">
-            {PRESETS.map(({ value, label }) => {
-                const active = calendarDateRangePreset === value;
-                const count = !active && value !== 'anytime' && value !== 'custom'
-                    ? dateRangeCounts[value]
-                    : undefined;
-                return (
-                    <button
-                        key={value}
-                        onClick={() => handlePresetChange(value)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${
-                            active
-                                ? 'bg-gray-900 text-white border-gray-900'
-                                : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
-                        }`}
-                    >
-                        {label}
-                        {count != null && <span className="opacity-50">({count})</span>}
-                    </button>
-                );
-            })}
+        <div className="flex items-center gap-2">
+            <Select value={calendarDateRangePreset} onValueChange={handlePresetChange}>
+                <SelectTrigger className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm h-auto w-auto transition-colors [&>svg]:hidden ${
+                    isActive
+                        ? 'bg-gray-900 text-white border-gray-900'
+                        : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                }`}>
+                    📅 <SelectValue />
+                    <span className="opacity-40 text-xs ml-0.5">▾</span>
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="anytime">
+                        Anytime {calendarDateRangePreset !== 'anytime' && dateRangeCounts['anytime'] !== undefined ? `(${dateRangeCounts['anytime']})` : ''}
+                    </SelectItem>
+                    <SelectItem value="today">
+                        Today {calendarDateRangePreset !== 'today' && dateRangeCounts['today'] !== undefined ? `(${dateRangeCounts['today']})` : ''}
+                    </SelectItem>
+                    <SelectItem value="next7">
+                        Next 7 Days {calendarDateRangePreset !== 'next7' && dateRangeCounts['next7'] !== undefined ? `(${dateRangeCounts['next7']})` : ''}
+                    </SelectItem>
+                    <SelectItem value="thismonth">
+                        This Month {calendarDateRangePreset !== 'thismonth' && dateRangeCounts['thismonth'] !== undefined ? `(${dateRangeCounts['thismonth']})` : ''}
+                    </SelectItem>
+                    <SelectItem value="nextmonth">
+                        Next Month {calendarDateRangePreset !== 'nextmonth' && dateRangeCounts['nextmonth'] !== undefined ? `(${dateRangeCounts['nextmonth']})` : ''}
+                    </SelectItem>
+                    <SelectItem value="custom">Custom</SelectItem>
+                </SelectContent>
+            </Select>
+            {isActive && (
+                <button
+                    onClick={() => handlePresetChange('anytime')}
+                    className="text-gray-400 hover:text-gray-600 text-lg leading-none"
+                    aria-label="Clear date filter"
+                >
+                    ×
+                </button>
+            )}
         </div>
     );
 }
