@@ -88,6 +88,10 @@ export default function DisplayListings({ newsletterSettings }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [selectedCounty, setSelectedCounty] = useState([]);
+    const [userLocation, setUserLocation] = useState(null);
+    const [nearbyRadius, setNearbyRadius] = useState(10);
+    const [locationError, setLocationError] = useState(null);
+    const [locationLoading, setLocationLoading] = useState(false);
     //  Sorting
     // Display
     const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('custom');
@@ -125,6 +129,8 @@ export default function DisplayListings({ newsletterSettings }) {
         selectedCounty,
         calendarTypeFilter,
         calendarDateRangeFilter,
+        userLocation,
+        nearbyRadius,
     }), [
         highlightsOnly,
         onViewToday,
@@ -136,7 +142,10 @@ export default function DisplayListings({ newsletterSettings }) {
         JSON.stringify(selectedCounty),
         calendarTypeFilter,
         calendarDateRangeFilter?.from?.getTime(),
-        calendarDateRangeFilter?.to?.getTime()
+        calendarDateRangeFilter?.to?.getTime(),
+        userLocation?.lat,
+        userLocation?.lng,
+        nearbyRadius,
     ]);
 
     // Set initial calendar filter defaults
@@ -233,6 +242,36 @@ export default function DisplayListings({ newsletterSettings }) {
         setCalendarDateRangePreset('custom');
     }, [setCalendarDateRangeFilter]);
 
+    const getUserLocation = useCallback(() => {
+        setLocationLoading(true);
+        setLocationError(null);
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+                setSelectedCounty([]);
+                setLocationLoading(false);
+            },
+            () => {
+                setLocationError('Location unavailable');
+                setLocationLoading(false);
+            }
+        );
+    }, []);
+
+    const clearUserLocation = useCallback(() => {
+        setUserLocation(null);
+        setLocationError(null);
+    }, []);
+
+    // Wraps setSelectedCounty to clear Near Me when a county is chosen
+    const handleSetSelectedCounty = useCallback((county) => {
+        setSelectedCounty(county);
+        if (county && county.length > 0) {
+            setUserLocation(null);
+            setLocationError(null);
+        }
+    }, []);
+
     const clearAllFilters = useCallback(() => {
         // Reset all filters to their initial values
         setCalendarTypeFilter('onview');
@@ -244,6 +283,8 @@ export default function DisplayListings({ newsletterSettings }) {
         setSearchTerm('');
         setSelectedLocation('');
         setSelectedCounty([]);
+        setUserLocation(null);
+        setLocationError(null);
         setSortMethod('closingSoon');
 
         // Reset calendar date range to initial state (10 years from start of month)
@@ -276,7 +317,7 @@ export default function DisplayListings({ newsletterSettings }) {
                 showCustomCalendar={showCustomCalendar}
                 setShowCustomCalendar={setShowCustomCalendar}
                 selectedCounty={selectedCounty}
-                setSelectedCounty={setSelectedCounty}
+                setSelectedCounty={handleSetSelectedCounty}
                 onViewToday={onViewToday}
                 setOnViewToday={setOnViewToday}
                 endingSoonOnly={endingSoonOnly}
@@ -299,6 +340,13 @@ export default function DisplayListings({ newsletterSettings }) {
                 setMobileSearchOpen={setMobileSearchOpen}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
+                userLocation={userLocation}
+                nearbyRadius={nearbyRadius}
+                setNearbyRadius={setNearbyRadius}
+                locationError={locationError}
+                locationLoading={locationLoading}
+                getUserLocation={getUserLocation}
+                clearUserLocation={clearUserLocation}
             />
 
             {/* Mobile Bottom Bar */}
@@ -353,7 +401,14 @@ export default function DisplayListings({ newsletterSettings }) {
                         selectedLocation={selectedLocation}
                         setSelectedLocation={setSelectedLocation}
                         selectedCounty={selectedCounty}
-                        setSelectedCounty={setSelectedCounty}
+                        setSelectedCounty={handleSetSelectedCounty}
+                        userLocation={userLocation}
+                        nearbyRadius={nearbyRadius}
+                        setNearbyRadius={setNearbyRadius}
+                        locationError={locationError}
+                        locationLoading={locationLoading}
+                        getUserLocation={getUserLocation}
+                        clearUserLocation={clearUserLocation}
 
                         // Date ranges for presets
                         startOfWeek={startOfWeek}
@@ -425,7 +480,9 @@ export default function DisplayListings({ newsletterSettings }) {
                                     locations={locations}
                                     highlightsOnly={highlightsOnly}
                                     selectedLocation={selectedLocation}
+                                    selectedCounty={selectedCounty}
                                     searchTerm={searchTerm}
+                                    userLocation={userLocation}
                                 />
                             </div>
                         ) : displayedResults > 0 ? (

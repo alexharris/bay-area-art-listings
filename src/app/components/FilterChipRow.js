@@ -119,6 +119,13 @@ export default function FilterChipRow({
     setMobileSearchOpen,
     searchTerm,
     setSearchTerm,
+    userLocation,
+    nearbyRadius,
+    setNearbyRadius,
+    locationError,
+    locationLoading,
+    getUserLocation,
+    clearUserLocation,
 }) {
     const [whenOpen, setWhenOpen] = useState(false);
     const [whereOpen, setWhereOpen] = useState(false);
@@ -132,8 +139,8 @@ export default function FilterChipRow({
     }, [mobileSearchOpen]);
 
     const whenActive = calendarDateRangePreset !== 'anytime';
-    const whereActive = selectedCounty && selectedCounty.length > 0;
-    const countyName = whereActive ? selectedCounty[0]?.county : null;
+    const whereActive = (selectedCounty && selectedCounty.length > 0) || !!userLocation;
+    const countyName = selectedCounty?.length > 0 ? selectedCounty[0]?.county : null;
 
     const clearWhen = () => {
         const now = new Date();
@@ -150,7 +157,7 @@ export default function FilterChipRow({
         ? whenLabels[calendarDateRangePreset] || calendarDateRangePreset
         : 'Anytime';
 
-    const whereLabel = whereActive ? countyName : 'Anywhere';
+    const whereLabel = userLocation ? 'Near me' : (countyName ?? 'Anywhere');
 
     return (
         <div className="lg:hidden sticky top-14 z-40 bg-white border-b border-gray-200">
@@ -198,7 +205,7 @@ export default function FilterChipRow({
                     label={whereLabel}
                     active={whereActive}
                     onOpen={() => setWhereOpen(true)}
-                    onClear={() => setSelectedCounty([])}
+                    onClear={() => { setSelectedCounty([]); clearUserLocation?.(); }}
                 />
 
                 {/* Badge chips */}
@@ -285,6 +292,13 @@ export default function FilterChipRow({
                             selectedCountyProp={selectedCounty}
                             currentFilters={currentFilters}
                             listings={listings}
+                            userLocation={userLocation}
+                            nearbyRadius={nearbyRadius}
+                            setNearbyRadius={setNearbyRadius}
+                            locationError={locationError}
+                            locationLoading={locationLoading}
+                            getUserLocation={getUserLocation}
+                            clearUserLocation={clearUserLocation}
                         />
                         <Button className="w-full" onClick={() => setWhereOpen(false)}>
                             Done

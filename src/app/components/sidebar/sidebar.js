@@ -47,6 +47,13 @@ export default function Sidebar({
     setSelectedLocation,
     selectedCounty,
     setSelectedCounty,
+    userLocation,
+    nearbyRadius,
+    setNearbyRadius,
+    locationError,
+    locationLoading,
+    getUserLocation,
+    clearUserLocation,
 
     // Date ranges for presets
     startOfWeek,
@@ -120,11 +127,18 @@ export default function Sidebar({
                 }                                                
           
                 <div className="flex flex-col">
-                    <CountySelector 
-                        onCountyChange={setSelectedCounty} 
+                    <CountySelector
+                        onCountyChange={setSelectedCounty}
                         selectedCountyProp={selectedCounty}
                         currentFilters={currentFilters}
                         listings={listings}
+                        userLocation={userLocation}
+                        nearbyRadius={nearbyRadius}
+                        setNearbyRadius={setNearbyRadius}
+                        locationError={locationError}
+                        locationLoading={locationLoading}
+                        getUserLocation={getUserLocation}
+                        clearUserLocation={clearUserLocation}
                     />
                 </div>
                 <FilterBadges
