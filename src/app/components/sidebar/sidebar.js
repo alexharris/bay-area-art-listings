@@ -133,14 +133,13 @@ export default function Sidebar({
                     </div>
                 }                                                
           
-                <div className="flex flex-col">
-                    <CountySelector 
-                        onCountyChange={setSelectedCounty} 
-                        selectedCountyProp={selectedCounty}
-                        currentFilters={currentFilters}
-                        listings={listings}
-                    />
-                </div>
+                <CountySelector
+                    onCountyChange={setSelectedCounty}
+                    selectedCountyProp={selectedCounty}
+                    currentFilters={currentFilters}
+                    listings={listings}
+                    chipStyle={true}
+                />
                 {/* Stats indicator showing total vs. filtered listings */}
                 <div className="flex flex-row gap-2 justify-end">
                     <div className="flex flex-row items-center text-sm">
