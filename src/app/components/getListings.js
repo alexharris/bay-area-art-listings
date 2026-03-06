@@ -92,4 +92,44 @@ export default async function getListings() {
   }
 }
 
+export async function getListingsByIds(ids) {
+  if (!ids || ids.length === 0) return [];
+  try {
+    let data = await client.fetch(`
+      *[_type == "listing" && _id in $ids] {
+        ...,
+        _createdAt,
+        "locationName": Location->Name,
+        "locationAddress": Location->Address,
+        "locationUrl": Location->Url,
+        "locationGeolocation": Location->Geolocation,
+        "locationHours": Location->Hours,
+        "locationInstagram": Location->Instagram,
+      }
+    `, { ids });
+
+    data = data.map((listing) => {
+      let eventImageUrl = null;
+      let eventImageCaption = null;
+      if (listing.EventImageUpload) {
+        eventImageUrl = urlFor(listing.EventImageUpload).width(400).height(300).url();
+      } else if (listing.EventImageUrl) {
+        eventImageUrl = listing.EventImageUrl;
+        eventImageCaption = listing.EventImageCaption;
+      }
+      return {
+        ...listing,
+        eventImageUrl,
+        eventImageCaption,
+        isOnViewToday: computeIsOnViewToday(listing),
+      };
+    });
+
+    return data;
+  } catch (error) {
+    console.error('getListingsByIds failed:', error);
+    return [];
+  }
+}
+
 

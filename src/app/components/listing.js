@@ -6,6 +6,7 @@ import DateNote from './DateNote';
 import HoursPopup from './HoursPopup';
 import TodaysHoursStatus from './TodaysHoursStatus';
 import CityFromPlaceId from './CityFromPlaceId';
+import FavoriteButton from './FavoriteButton';
 import { Badge } from '@/components/ui/badge';
 import { generateSlug } from '../../utils/shared';
 
@@ -136,6 +137,8 @@ export default function Listings({
     <ul id="list-view" className="w-full px-3 md:p-2 lg:p-0 lg:pr-6">
       {listings.map((item, index) => (
         <li className="border-b min-h-40 border-dashed border-gray-400 py-6 w-full relative flex flex-col md:flex-row justify-between gap-2 lg:gap-4" key={item._id || index}>
+
+          <FavoriteButton listingId={item._id} />
 
           {/* Left Column - Title + image + (notes on desktop) */}
           <div className="flex flex-col md:flex-row lg:flex-row gap-3 w-full md:w-2/3">

@@ -11,6 +11,7 @@ import { getCalendarTypeCounts } from '../../utils/filterCounts';
 import { formatDate } from '../../utils/shared';
 
 import { X } from 'lucide-react';
+import { FavoritesProvider, useFavorites } from '@/context/FavoritesContext';
 import MobileHeader from './MobileHeader';
 import MobileBottomBar from './MobileBottomBar';
 import FilterChipRow from './FilterChipRow';
@@ -27,7 +28,7 @@ const sortLabels = {
     recentlyAdded: 'Recently Added',
 };
 
-export default function DisplayListings({ newsletterSettings }) {
+function DisplayListingsInner({ newsletterSettings }) {
     // Get today's date in US West Coast (Pacific Time) - memoized to prevent recreation
     const today = useMemo(() => {
         return new Date(
@@ -85,6 +86,12 @@ export default function DisplayListings({ newsletterSettings }) {
     const [endingSoonOnly, setEndingSoonOnly] = useState(false);
     const [openingTodayOnly, setOpeningTodayOnly] = useState(false);
     const [openingTitleOnly, setOpeningTitleOnly] = useState(false);
+    const [favoritesOnly, setFavoritesOnly] = useState(false);
+    const { items: favoriteIds } = useFavorites();
+    const favoriteCount = useMemo(
+        () => (listings ? listings.filter(l => favoriteIds.includes(l._id)).length : 0),
+        [listings, favoriteIds]
+    );
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [selectedCounty, setSelectedCounty] = useState([]);
@@ -120,6 +127,8 @@ export default function DisplayListings({ newsletterSettings }) {
         endingSoonOnly,
         openingTodayOnly,
         openingTitleOnly,
+        favoritesOnly,
+        favoriteIds,
         searchTerm,
         selectedLocation,
         selectedCounty,
@@ -131,6 +140,8 @@ export default function DisplayListings({ newsletterSettings }) {
         endingSoonOnly,
         openingTodayOnly,
         openingTitleOnly,
+        favoritesOnly,
+        JSON.stringify(favoriteIds),
         searchTerm,
         selectedLocation,
         JSON.stringify(selectedCounty),
@@ -241,6 +252,7 @@ export default function DisplayListings({ newsletterSettings }) {
         setEndingSoonOnly(false);
         setOpeningTodayOnly(false);
         setOpeningTitleOnly(false);
+        setFavoritesOnly(false);
         setSearchTerm('');
         setSelectedLocation('');
         setSelectedCounty([]);
@@ -345,6 +357,9 @@ export default function DisplayListings({ newsletterSettings }) {
                         setEndingSoonOnly={setEndingSoonOnly}
                         openingTitleOnly={openingTitleOnly}
                         setOpeningTitleOnly={setOpeningTitleOnly}
+                        favoritesOnly={favoritesOnly}
+                        setFavoritesOnly={setFavoritesOnly}
+                        favoriteCount={favoriteCount}
                         selectedLocation={selectedLocation}
                         setSelectedLocation={setSelectedLocation}
                         selectedCounty={selectedCounty}
@@ -444,4 +459,12 @@ export default function DisplayListings({ newsletterSettings }) {
         </>
     );
 
+}
+
+export default function DisplayListings({ newsletterSettings }) {
+    return (
+        <FavoritesProvider>
+            <DisplayListingsInner newsletterSettings={newsletterSettings} />
+        </FavoritesProvider>
+    );
 }
