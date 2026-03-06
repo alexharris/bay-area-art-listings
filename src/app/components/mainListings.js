@@ -202,6 +202,13 @@ export default function DisplayListings({ newsletterSettings }) {
         setIsMapView(prev => !prev);
     }, []);
 
+    // Scroll to top when entering map view so sticky sidebar aligns correctly
+    useEffect(() => {
+        if (isMapView) {
+            window.scrollTo(0, 0);
+        }
+    }, [isMapView]);
+
     const updateCalendarDateRangeFilter = useCallback((dateRange) => {
         // Handle dates properly to avoid timezone issues
         let fromDate, toDate;
@@ -314,11 +321,11 @@ export default function DisplayListings({ newsletterSettings }) {
                 setSortMethod={setSortMethod}
             />
 
-            <div className={`flex flex-row w-full items-start lg:gap-4 ${isMapView ? 'h-screen' : ''}`}>
+            <div className={`flex flex-row w-full items-start pt-24 lg:pt-0 ${isMapView ? 'h-screen' : ''}`}>
 
                 {/* Desktop Sidebar */ }
                 <div
-                    className="w-[400px] sticky top-0 pt-4 hidden lg:block h-screen"
+                    className="w-[400px] sticky top-0 pt-4 hidden lg:block h-screen border-r border-gray-200"
                 >
                     <Sidebar
                         // Display states

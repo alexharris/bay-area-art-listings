@@ -153,7 +153,7 @@ export default function FilterChipRow({
     const whereLabel = whereActive ? countyName : 'Anywhere';
 
     return (
-        <div className="lg:hidden sticky top-14 z-40 bg-white border-b border-gray-200">
+        <div className="lg:hidden fixed inset-x-0 top-12 z-40 bg-white border-b border-gray-200">
             {mobileSearchOpen ? (
                 <div className="flex items-center gap-2 px-3 py-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-gray-400" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>

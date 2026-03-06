@@ -62,10 +62,10 @@ export default function Sidebar({
             className="flex flex-col max-h-full"
         >
             {/* Scrollable content area */}
-            <div className="flex-1 overflow-y-auto px-4 space-y-4 pb-4">
+            <div className="flex-1 overflow-y-auto px-4 space-y-3 pb-4">
                 {/* Logo at the top of the sidebar */}
                 {showLogo && (
-                    <div className="flex flex-col justify-center items-center w-full mb-4">
+                    <div className="flex flex-col justify-center items-center w-full">
                         <Link href="/">
                             <img 
                                 src="/art-board-logo.png" 
@@ -76,7 +76,7 @@ export default function Sidebar({
                     </div>
                 )}
                 <p className="hidden md:block">A directory of visual arts exhibitions in the Bay Area.</p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-1">
                         <button
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${openingTitleOnly ? 'bg-yellow-200 border-yellow-300 text-black' : !openingTitleOnly && specialFilterCounts.openingTitleOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
