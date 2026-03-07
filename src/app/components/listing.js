@@ -170,7 +170,7 @@ export default function Listings({
               {/* Mobile gallery well — above title on mobile */}
               {item.eventImageUrl && (
                 <div className="md:hidden w-full bg-gray-100 rounded overflow-hidden">
-                  <div className="relative w-full aspect-[4/3]">
+                  <div className="relative w-full aspect-square">
                     {item.eventImageUrl.includes('cdn.sanity.io') ? (
                       <Image
                         src={item.eventImageUrl}
