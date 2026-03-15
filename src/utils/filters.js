@@ -163,7 +163,7 @@ export function getFilteredListings(filters, listings) {
     extractPortableTextContent(item.Notes).toLowerCase().includes(filters.searchTerm.toLowerCase()) || 
     (item.locationUrl ? item.locationUrl.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false)
   )
-  .filter(item => filters.selectedCounty[0] ? filters.selectedCounty[0].zipcodes.some(zipcode => item.locationAddress && item.locationAddress.includes(zipcode)) : true) // Selected County
+  .filter(item => filters.selectedCounty.length > 0 ? filters.selectedCounty.some(countyObj => countyObj.zipcodes.some(zipcode => item.locationAddress && item.locationAddress.includes(zipcode))) : true) // Selected County
   .filter(item => {
     if (!filters.userLocation || !item.locationGeolocation) return true;
     const dist = haversineDistance(

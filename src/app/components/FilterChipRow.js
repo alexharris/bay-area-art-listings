@@ -140,7 +140,7 @@ export default function FilterChipRow({
 
     const whenActive = calendarDateRangePreset !== 'anytime';
     const whereActive = (selectedCounty && selectedCounty.length > 0) || !!userLocation;
-    const countyName = selectedCounty?.length > 0 ? selectedCounty[0]?.county : null;
+
 
     const clearWhen = () => {
         const now = new Date();
@@ -157,7 +157,11 @@ export default function FilterChipRow({
         ? whenLabels[calendarDateRangePreset] || calendarDateRangePreset
         : 'Anytime';
 
-    const whereLabel = userLocation ? 'Near me' : (countyName ?? 'Anywhere');
+    const countyNames = selectedCounty?.map(obj => obj.county) ?? [];
+    const whereLabel = userLocation ? 'Near me'
+        : countyNames.length === 1 ? countyNames[0]
+        : countyNames.length > 1 ? `${countyNames.length} counties`
+        : 'Anywhere';
 
     return (
         <div className="lg:hidden sticky top-14 z-40 bg-white border-b border-gray-200">
@@ -299,6 +303,8 @@ export default function FilterChipRow({
                             locationLoading={locationLoading}
                             getUserLocation={getUserLocation}
                             clearUserLocation={clearUserLocation}
+                            listMode
+                            onSelect={() => setWhereOpen(false)}
                         />
                         <Button className="w-full" onClick={() => setWhereOpen(false)}>
                             Done
