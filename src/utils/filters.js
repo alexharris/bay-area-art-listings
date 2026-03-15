@@ -165,7 +165,8 @@ export function getFilteredListings(filters, listings) {
   )
   .filter(item => filters.selectedCounty.length > 0 ? filters.selectedCounty.some(countyObj => countyObj.zipcodes.some(zipcode => item.locationAddress && item.locationAddress.includes(zipcode))) : true) // Selected County
   .filter(item => {
-    if (!filters.userLocation || !item.locationGeolocation) return true;
+    if (!filters.userLocation) return true;
+    if (!item.locationGeolocation) return false;
     const dist = haversineDistance(
       filters.userLocation.lat, filters.userLocation.lng,
       item.locationGeolocation.lat, item.locationGeolocation.lng
