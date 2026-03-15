@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import FilterPresets from './filterPresets';
 import CountySelector from './sidebar/countySelector';
@@ -250,9 +250,6 @@ export default function FilterChipRow({
             {/* When mini-drawer */}
             <Drawer open={whenOpen} onOpenChange={setWhenOpen}>
                 <DrawerContent className="px-4 pb-[env(safe-area-inset-bottom)]">
-                    <DrawerHeader className="pb-2">
-                        <DrawerTitle>When</DrawerTitle>
-                    </DrawerHeader>
                     <div className="pb-4 space-y-3">
                         <FilterPresets
                             setShowCustomCalendar={setShowCustomCalendar}
@@ -287,9 +284,6 @@ export default function FilterChipRow({
             {/* Where mini-drawer */}
             <Drawer open={whereOpen} onOpenChange={setWhereOpen}>
                 <DrawerContent className="px-4 pb-[env(safe-area-inset-bottom)]">
-                    <DrawerHeader className="pb-2">
-                        <DrawerTitle>Where</DrawerTitle>
-                    </DrawerHeader>
                     <div className="pb-4 space-y-3">
                         <CountySelector
                             onCountyChange={setSelectedCounty}

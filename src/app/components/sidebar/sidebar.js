@@ -168,6 +168,7 @@ export default function Sidebar({
                     locationLoading={locationLoading}
                     getUserLocation={getUserLocation}
                     clearUserLocation={clearUserLocation}
+                    chipStyle
                 />
                 {/* Stats indicator showing total vs. filtered listings */}
                 <div className="border-t border-gray-100 pt-3 flex flex-row items-center justify-between">

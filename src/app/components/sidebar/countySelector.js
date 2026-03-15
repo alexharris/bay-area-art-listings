@@ -32,6 +32,7 @@ const CountySelector = ({
 
   const [selectedCounty, setSelectedCounty] = useState('All');
   const [countyCounts, setCountyCounts] = useState({});
+  const [whereTab, setWhereTab] = useState('county');
 
   useEffect(() => {
     // Reset local state when parent component passes an empty array (meaning "All" is selected)
@@ -86,11 +87,14 @@ const CountySelector = ({
     const selectedNames = (selectedCountyProp || []).map(obj => obj.county);
     const nearMeActive = !!(userLocation || locationLoading);
 
-    const handleNearMeToggle = () => {
-      if (nearMeActive) {
+    const activeTab = nearMeActive ? 'nearme' : whereTab;
+
+    const handleTabChange = (tab) => {
+      setWhereTab(tab);
+      if (tab === 'county') {
         if (clearUserLocation) clearUserLocation();
       } else {
-        if (getUserLocation) getUserLocation();
+        onCountyChange([]);
       }
     };
 
@@ -100,86 +104,97 @@ const CountySelector = ({
         ? selectedNames.filter(n => n !== countyName)
         : [...selectedNames, countyName];
       onCountyChange(newNames.flatMap(n => getZipcodesByCounty(n)));
-      if (clearUserLocation) clearUserLocation();
     };
 
     return (
       <div className="flex flex-col">
-        {/* Near Me toggle */}
-        <div className="px-4 pt-1 pb-4 border-b border-gray-200">
-          <button
-            onClick={handleNearMeToggle}
-            className={`w-full flex items-center gap-3 py-2.5 px-4 rounded-xl border text-sm font-medium transition-colors ${
-              nearMeActive
-                ? 'bg-gray-900 border-gray-900 text-white'
-                : 'bg-white border-gray-200 text-gray-700'
-            }`}
-          >
-            <span>📍</span>
-            <span className="flex-1 text-left">
-              {locationLoading ? 'Locating…' : 'Near me'}
-            </span>
-            {nearMeActive && !locationLoading && (
-              <span className="text-xs opacity-60">tap to clear</span>
-            )}
-          </button>
-          {userLocation && (
-            <div className="flex flex-col gap-2 pt-3 px-1">
-              <div className="flex justify-between text-xs text-gray-500">
-                <span>Within {nearbyRadius} mi</span>
-              </div>
-              <input
-                type="range" min={1} max={20} value={nearbyRadius}
-                onChange={(e) => setNearbyRadius(Number(e.target.value))}
-                className="w-full h-1.5 accent-gray-700 cursor-pointer"
-              />
-              <div className="flex justify-between text-xs text-gray-400">
-                <span>1 mi</span>
-                <span>20 mi</span>
-              </div>
-            </div>
-          )}
-          {locationError && !userLocation && !locationLoading && (
-            <div className="flex items-center gap-2 pt-2">
-              <span className="text-xs text-red-500">{locationError}</span>
-              <button onClick={getUserLocation} className="text-xs text-gray-500 underline">Retry</button>
-            </div>
-          )}
+        {/* Segmented control */}
+        <div className="px-4 pt-2 pb-3">
+          <div className="flex bg-gray-100 rounded-xl p-1">
+            <button
+              onClick={() => handleTabChange('nearme')}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+                activeTab === 'nearme'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500'
+              }`}
+            >
+              📍 Near me
+            </button>
+            <button
+              onClick={() => handleTabChange('county')}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+                activeTab === 'county'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500'
+              }`}
+            >
+              By county
+            </button>
+          </div>
         </div>
 
-        {/* County list */}
-        <div className="flex items-center justify-between px-4 py-2.5">
-          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">County</span>
-          {selectedNames.length > 0 && (
-            <button
-              onClick={() => onCountyChange([])}
-              className="text-xs text-gray-500 underline"
-            >
-              Clear
-            </button>
-          )}
-        </div>
-        {COUNTIES.map(county => {
-          const isSelected = selectedNames.includes(county);
-          const count = !isSelected && countyCounts[county] !== undefined ? countyCounts[county] : null;
-          return (
-            <button
-              key={county}
-              onClick={() => toggleCounty(county)}
-              className={`flex items-center gap-3 w-full px-4 py-3 text-left text-sm border-t border-gray-100 ${isSelected ? 'text-gray-900' : 'text-gray-600'}`}
-            >
-              <span className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center ${isSelected ? 'bg-gray-900 border-gray-900' : 'border-gray-300 bg-white'}`}>
-                {isSelected && (
-                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                    <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                )}
-              </span>
-              <span className="flex-1">{county}</span>
-              {count != null && <span className="text-xs text-gray-400">({count})</span>}
-            </button>
-          );
-        })}
+        {activeTab === 'nearme' ? (
+          <div className="px-4 pb-4">
+            {locationLoading ? (
+              <p className="text-sm text-gray-500 text-center py-2">Locating…</p>
+            ) : userLocation ? (
+              <div className="flex flex-col gap-2">
+                <span className="text-sm text-gray-700">Within {nearbyRadius} mi</span>
+                <input
+                  type="range" min={1} max={10} value={nearbyRadius}
+                  onChange={(e) => setNearbyRadius(Number(e.target.value))}
+                  className="w-full h-1.5 accent-gray-700 cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-gray-400">
+                  <span>1 mi</span>
+                  <span>10 mi</span>
+                </div>
+              </div>
+            ) : locationError ? (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-red-500">{locationError}</span>
+                <button onClick={getUserLocation} className="text-xs text-gray-500 underline">Retry</button>
+              </div>
+            ) : (
+              <button
+                onClick={() => { if (getUserLocation) getUserLocation(); }}
+                className="w-full py-3 text-sm text-gray-600 border border-gray-200 rounded-xl hover:border-gray-300 transition-colors"
+              >
+                Tap to use my location
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col">
+            <div className="flex items-center justify-between px-4 py-2">
+              {selectedNames.length > 0 && (
+                <button onClick={() => onCountyChange([])} className="text-xs text-gray-500 underline ml-auto">Clear</button>
+              )}
+            </div>
+            {COUNTIES.map(county => {
+              const isSelected = selectedNames.includes(county);
+              const count = !isSelected && countyCounts[county] !== undefined ? countyCounts[county] : null;
+              return (
+                <button
+                  key={county}
+                  onClick={() => toggleCounty(county)}
+                  className={`flex items-center gap-3 w-full px-4 py-3 text-left text-sm border-t border-gray-100 ${isSelected ? 'text-gray-900' : 'text-gray-600'}`}
+                >
+                  <span className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center ${isSelected ? 'bg-gray-900 border-gray-900' : 'border-gray-300 bg-white'}`}>
+                    {isSelected && (
+                      <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                        <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </span>
+                  <span className="flex-1">{county}</span>
+                  {count != null && <span className="text-xs text-gray-400">({count})</span>}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }
@@ -226,27 +241,50 @@ const CountySelector = ({
   );
 
   if (chipStyle) {
+    const chipActive = selectValue !== 'All';
     return (
-      <div className="flex items-center gap-2">
-        <Select value={selectedCounty} onValueChange={handleCountyChange}>
-          <SelectTrigger className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm h-auto w-auto transition-colors [&>svg]:hidden ${
-            selectedCounty !== 'All'
-              ? 'bg-gray-900 text-white border-gray-900'
-              : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
-          }`}>
-            📍 <SelectValue />
-            <span className="opacity-40 text-xs ml-0.5">▾</span>
-          </SelectTrigger>
-          {selectContent}
-        </Select>
-        {selectedCounty !== 'All' && (
-          <button
-            onClick={() => handleCountyChange('All')}
-            className="text-gray-400 hover:text-gray-600 text-lg leading-none"
-            aria-label="Clear location filter"
-          >
-            ×
-          </button>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <Select value={selectValue} onValueChange={handleCountyChange}>
+            <SelectTrigger className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm h-auto w-auto transition-colors [&>svg]:hidden ${
+              chipActive
+                ? 'bg-gray-900 text-white border-gray-900'
+                : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+            }`}>
+              📍 <SelectValue />
+              <span className="opacity-40 text-xs ml-0.5">▾</span>
+            </SelectTrigger>
+            {selectContent}
+          </Select>
+          {chipActive && (
+            <button
+              onClick={() => { handleCountyChange('All'); if (clearUserLocation) clearUserLocation(); }}
+              className="text-gray-400 hover:text-gray-600 text-lg leading-none"
+              aria-label="Clear location filter"
+            >
+              ×
+            </button>
+          )}
+        </div>
+        {userLocation && (
+          <div className="flex flex-col gap-1.5">
+            <span className="text-sm text-gray-700">Within {nearbyRadius} mi</span>
+            <input
+              type="range" min={1} max={10} value={nearbyRadius}
+              onChange={(e) => setNearbyRadius(Number(e.target.value))}
+              className="w-full h-1.5 accent-gray-700 cursor-pointer"
+            />
+            <div className="flex justify-between text-xs text-gray-400">
+              <span>1 mi</span>
+              <span>10 mi</span>
+            </div>
+          </div>
+        )}
+        {locationError && !userLocation && !locationLoading && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-red-500">{locationError}</span>
+            <button onClick={getUserLocation} className="text-xs text-gray-500 hover:text-gray-700 underline">Retry</button>
+          </div>
         )}
       </div>
     );
@@ -284,14 +322,14 @@ const CountySelector = ({
           <input
             type="range"
             min={1}
-            max={20}
+            max={10}
             value={nearbyRadius}
             onChange={(e) => setNearbyRadius(Number(e.target.value))}
             className="w-full h-1.5 accent-gray-700 cursor-pointer"
           />
           <div className="flex justify-between text-xs text-gray-400">
             <span>1 mi</span>
-            <span>20 mi</span>
+            <span>10 mi</span>
           </div>
         </div>
       )}
