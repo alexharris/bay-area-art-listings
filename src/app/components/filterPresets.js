@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { getDateRangeCounts } from '../../utils/filterCounts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export default function FilterPresets({ 
-    setShowCustomCalendar, 
-    calendarDateRangePreset, 
-    setCalendarDateRangeFilter, 
+export default function FilterPresets({
+    setShowCustomCalendar,
+    calendarDateRangePreset,
+    setCalendarDateRangeFilter,
     setCalendarDateRangePreset,
     startOfWeek,
     endOfWeek,
@@ -18,17 +18,9 @@ export default function FilterPresets({
 }) {
     const [dateRangeCounts, setDateRangeCounts] = useState({});
 
-    // Calculate counts when filters or listings change
     useEffect(() => {
         if (currentFilters && listings && listings.length > 0) {
-            const dateRanges = {
-                startOfWeek,
-                endOfWeek,
-                startOfMonth,
-                endOfMonth,
-                startOfNextMonth,
-                endOfNextMonth
-            };
+            const dateRanges = { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfNextMonth, endOfNextMonth };
             const counts = getDateRangeCounts(currentFilters, listings, dateRanges);
             setDateRangeCounts(counts);
         }
@@ -38,63 +30,73 @@ export default function FilterPresets({
         setCalendarDateRangePreset(presetValue);
 
         switch(presetValue) {
-            case 'today':
-                setShowCustomCalendar(false); 
+            case 'today': {
+                setShowCustomCalendar(false);
                 const todayFrom = new Date();
                 todayFrom.setHours(0, 0, 0, 0);
                 const todayTo = new Date();
                 todayTo.setHours(23, 59, 59, 999);
-                setCalendarDateRangeFilter({ from: todayFrom, to: todayTo }); 
+                setCalendarDateRangeFilter({ from: todayFrom, to: todayTo });
                 break;
-            case 'next7':
-                setShowCustomCalendar(false); 
+            }
+            case 'next7': {
+                setShowCustomCalendar(false);
                 const weekFrom = new Date();
                 weekFrom.setHours(0, 0, 0, 0);
                 const weekTo = new Date(weekFrom);
                 weekTo.setDate(weekTo.getDate() + 7);
                 weekTo.setHours(23, 59, 59, 999);
-                setCalendarDateRangeFilter({ from: weekFrom, to: weekTo }); 
+                setCalendarDateRangeFilter({ from: weekFrom, to: weekTo });
                 break;
-            case 'thismonth':
-                setShowCustomCalendar(false); 
+            }
+            case 'thismonth': {
+                setShowCustomCalendar(false);
                 const monthFrom = new Date(startOfMonth);
                 monthFrom.setHours(0, 0, 0, 0);
                 const monthTo = new Date(endOfMonth);
                 monthTo.setHours(23, 59, 59, 999);
-                setCalendarDateRangeFilter({ from: monthFrom, to: monthTo }); 
+                setCalendarDateRangeFilter({ from: monthFrom, to: monthTo });
                 break;
-            case 'nextmonth':
-                setShowCustomCalendar(false); 
+            }
+            case 'nextmonth': {
+                setShowCustomCalendar(false);
                 const nextMonthFrom = new Date(startOfNextMonth);
                 nextMonthFrom.setHours(0, 0, 0, 0);
                 const nextMonthTo = new Date(endOfNextMonth);
                 nextMonthTo.setHours(23, 59, 59, 999);
-                setCalendarDateRangeFilter({ from: nextMonthFrom, to: nextMonthTo }); 
+                setCalendarDateRangeFilter({ from: nextMonthFrom, to: nextMonthTo });
                 break;
-            case 'anytime':
+            }
+            case 'anytime': {
                 setShowCustomCalendar(false);
                 const now = new Date();
                 now.setHours(0, 0, 0, 0);
-                // Set end date far in the future to capture all upcoming events
                 const futureDate = new Date();
                 futureDate.setFullYear(futureDate.getFullYear() + 10);
                 futureDate.setHours(23, 59, 59, 999);
                 setCalendarDateRangeFilter({ from: now, to: futureDate });
                 break;
+            }
             case 'custom':
-                setShowCustomCalendar(true); 
+                setShowCustomCalendar(true);
                 break;
             default:
                 break;
         }
     };
 
+    const isActive = calendarDateRangePreset !== 'anytime';
+
     return (
-        <div className="flex flex-row items-center relative">
-            <label className="pr-2 w-20 text-sm">When</label>
+        <div className="flex items-center gap-2">
             <Select value={calendarDateRangePreset} onValueChange={handlePresetChange}>
-                <SelectTrigger className="flex-grow">
-                    <SelectValue />
+                <SelectTrigger className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm h-auto w-auto transition-colors [&>svg]:hidden ${
+                    isActive
+                        ? 'bg-gray-900 text-white border-gray-900'
+                        : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                }`}>
+                    📅 <SelectValue />
+                    <span className="opacity-40 text-xs ml-0.5">▾</span>
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="anytime">
@@ -115,6 +117,15 @@ export default function FilterPresets({
                     <SelectItem value="custom">Custom</SelectItem>
                 </SelectContent>
             </Select>
+            {isActive && (
+                <button
+                    onClick={() => handlePresetChange('anytime')}
+                    className="text-gray-400 hover:text-gray-600 text-lg leading-none"
+                    aria-label="Clear date filter"
+                >
+                    ×
+                </button>
+            )}
         </div>
     );
 }
