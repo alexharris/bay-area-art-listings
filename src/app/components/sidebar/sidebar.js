@@ -103,7 +103,7 @@ export default function Sidebar({
                             onClick={() => (specialFilterCounts.openingTodayOnly > 0 || openingTodayOnly) && setOpeningTodayOnly(!openingTodayOnly)}
                             disabled={!openingTodayOnly && specialFilterCounts.openingTodayOnly === 0}
                         >
-                            👁️ Opening Today
+                            👁️ Starting Today
                             {!openingTodayOnly && specialFilterCounts.openingTodayOnly > 0 && <span className="opacity-50">({specialFilterCounts.openingTodayOnly})</span>}
                         </button>
                         {openingTodayOnly && (
