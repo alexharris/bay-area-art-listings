@@ -9,8 +9,10 @@
   }
 } */
 
-body {
-  overflow-y: scroll; /* Force scrollbar to always be visible to prevent layout shift */
+@media (min-width: 1024px) {
+  body {
+    overflow-y: scroll; /* Force scrollbar to always be visible to prevent layout shift */
+  }
 }
 
 .icon-link {

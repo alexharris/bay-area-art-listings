@@ -61,7 +61,7 @@ export default function ShowPage() {
         let eventImageCaption = null;
         
         if (foundListing.EventImageUpload) {
-          eventImageUrl = urlFor(foundListing.EventImageUpload).width(800).height(600).url();
+          eventImageUrl = urlFor(foundListing.EventImageUpload).width(800).height(800).fit('crop').url();
         } else if (foundListing.EventImageUrl) {
           eventImageUrl = foundListing.EventImageUrl;
           eventImageCaption = foundListing.EventImageCaption;
@@ -132,7 +132,7 @@ export default function ShowPage() {
         {listing.eventImageUrl && (
           <div className="mb-8">
             {listing.eventImageUrl.includes('cdn.sanity.io') ? (
-              <div className="relative w-full aspect-[4/3]">
+              <div className="relative w-full aspect-square">
                 <Image
                   src={listing.eventImageUrl}
                   alt={listing.eventImageCaption || listing.Event}

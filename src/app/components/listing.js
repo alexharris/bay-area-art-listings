@@ -25,7 +25,7 @@ export default function Listings({
   const shouldShowOpenToday = (item) => item.isOnViewToday === true;
 
   const renderVenueCard = (item, index, isMobile = false) => (
-    <div className={`${isMobile ? '' : 'bg-gray-50 rounded p-4'} flex flex-col justify-between`}>
+    <div className={`${isMobile ? '' : 'bg-gray-50 rounded p-4'} flex flex-col gap-3`}>
       {item.locationName.toLowerCase() === 'various'
         ? <div className="flex flex-row font-semibold">
             {item.eventUrl
@@ -34,7 +34,7 @@ export default function Listings({
             }
           </div>
         : <>
-            <div className="flex flex-row items-center gap-2 mb-1 lg:mb-0">
+            <div className="flex flex-row items-center gap-2">
               {/* Mobile: name + inline chevron as toggle */}
               <button
                 className="md:hidden flex items-center gap-1 font-semibold text-left"
@@ -57,7 +57,7 @@ export default function Listings({
               <TodaysHoursStatus locationHours={item.locationHours} locationUrl={item.locationUrl} locationName={item.locationName} />
             </div>
 
-            <div className={`${venueOpen[index] ? 'flex' : 'hidden'} md:flex flex-row items-center gap-2 mt-1`}>
+            <div className={`${venueOpen[index] ? 'flex' : 'hidden'} md:flex flex-row items-center gap-2`}>
               <a
                 className="flex flex-row gap-1 items-center"
                 href={item.googlePlaceId
@@ -141,9 +141,9 @@ export default function Listings({
   };
 
   return (
-    <ul id="list-view" className="w-full px-3 md:p-2 lg:p-0 lg:pr-6">
+    <ul id="list-view" className="w-full px-3 md:p-2 lg:px-4">
       {listings.map((item, index) => (
-        <li className="border-b min-h-40 border-dashed border-gray-400 py-6 w-full relative flex flex-col md:flex-row justify-between gap-2 lg:gap-4" key={item._id || index}>
+        <li className="border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col md:flex-row justify-between gap-4" key={item._id || index}>
 
           {/* Left Column - Title + image + (notes on desktop) */}
           <div className="flex flex-col md:flex-row lg:flex-row gap-4 w-full md:w-1/2 lg:w-2/3 xl:w-1/2">

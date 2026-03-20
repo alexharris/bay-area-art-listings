@@ -91,6 +91,9 @@ export function applySorting(listings, method) {
         case 'recentlyAdded':
             sortedListings.sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt));
             break;
+        case 'oldestAdded':
+            sortedListings.sort((a, b) => new Date(a._createdAt) - new Date(b._createdAt));
+            break;
         default:
             // Default to closingSoon if no sort method specified
             sortedListings.sort((a, b) => new Date(a.EndDate) - new Date(b.EndDate));

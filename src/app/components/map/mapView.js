@@ -14,6 +14,37 @@ const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLaye
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
+// MapController fits the map to visible marker positions when a county is selected or flies to user location
+const MapController = dynamic(
+    () => Promise.all([import('react-leaflet'), import('leaflet')]).then(([rl, L]) => {
+        const useMap = rl.useMap;
+        function Controller({ selectedCounty, markerPositions, userLocation }) {
+            const map = useMap();
+            useEffect(() => {
+                if (userLocation) {
+                    map.flyTo([userLocation.lat, userLocation.lng], 13, { duration: 0.8 });
+                    return;
+                }
+                const hasCounty = selectedCounty?.length > 0;
+                if (!hasCounty) {
+                    map.flyTo([37.7749, -122.4194], 10, { duration: 0.8 });
+                    return;
+                }
+                if (markerPositions.length === 0) return;
+                if (markerPositions.length === 1) {
+                    map.flyTo(markerPositions[0], 14, { duration: 0.8 });
+                    return;
+                }
+                const bounds = L.latLngBounds(markerPositions);
+                map.flyToBounds(bounds, { padding: [60, 60], maxZoom: 14, duration: 1.2 });
+            }, [selectedCounty?.length, markerPositions.length, userLocation?.lat, userLocation?.lng]);
+            return null;
+        }
+        return Controller;
+    }),
+    { ssr: false }
+);
+
 // ShowCard component for displaying individual show details
 function ShowCard({ item, compact = false }) {
     const description = item.Notes ? extractPortableTextContent(item.Notes) : '';
@@ -64,12 +95,14 @@ function ShowCard({ item, compact = false }) {
     );
 }
 
-export default function MapView({ 
-    filteredListings, 
-    locations, 
-    highlightsOnly, 
-    selectedLocation, 
-    searchTerm 
+export default function MapView({
+    filteredListings,
+    locations,
+    highlightsOnly,
+    selectedLocation,
+    selectedCounty,
+    searchTerm,
+    userLocation,
 }) {
     const [L, setL] = useState(null);
     const [carouselIndices, setCarouselIndices] = useState({});
@@ -125,6 +158,28 @@ export default function MapView({
             locationGroups[key].items.push(item);
         }
     });
+
+    const markerPositions = Object.values(locationGroups).map(g => g.position);
+
+    // Blue dot icon for user's position
+    const userLocationIconUrl = `data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='9' fill='%234A90D9' stroke='white' stroke-width='2'/%3E%3Ccircle cx='10' cy='10' r='4' fill='white'/%3E%3C/svg%3E`;
+
+    const userMarker = userLocation ? (
+        <Marker
+            key="user-location"
+            position={[userLocation.lat, userLocation.lng]}
+            icon={L.icon({
+                iconUrl: userLocationIconUrl,
+                iconSize: [20, 20],
+                iconAnchor: [10, 10],
+                popupAnchor: [0, -12]
+            })}
+        >
+            <Popup>
+                <span className="text-sm font-medium">Your location</span>
+            </Popup>
+        </Marker>
+    ) : null;
 
     const toggleShow = (key, direction) => {
         setCarouselIndices(prev => {
@@ -264,7 +319,9 @@ export default function MapView({
                         attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
                         url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png"
                     />
+                    <MapController selectedCounty={selectedCounty} markerPositions={markerPositions} userLocation={userLocation} />
                     {markers}
+                    {userMarker}
                 </MapContainer>
             </div>
         </div>

@@ -43,6 +43,7 @@
 // };
 
 import { extractPortableTextContent } from './helpers.js';
+import { haversineDistance } from './distance.js';
 
 
 
@@ -140,6 +141,8 @@ export function getFilteredListings(filters, listings) {
     selectedCounty: filters.selectedCounty || [],
     calendarTypeFilter: filters.calendarTypeFilter || '',
     calendarDateRangeFilter: filters.calendarDateRangeFilter || { from: startOfWeek, to: endOfWeek },
+    userLocation: filters.userLocation || null,
+    nearbyRadius: filters.nearbyRadius ?? 10,
   };
 
   let filteredListings = listings
@@ -160,8 +163,16 @@ export function getFilteredListings(filters, listings) {
     extractPortableTextContent(item.Notes).toLowerCase().includes(filters.searchTerm.toLowerCase()) || 
     (item.locationUrl ? item.locationUrl.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false)
   )
-  .filter(item => filters.selectedCounty[0] ? filters.selectedCounty[0].zipcodes.some(zipcode => item.locationAddress && item.locationAddress.includes(zipcode)) : true) // Selected County
-
+  .filter(item => filters.selectedCounty.length > 0 ? filters.selectedCounty.some(countyObj => countyObj.zipcodes.some(zipcode => item.locationAddress && item.locationAddress.includes(zipcode))) : true) // Selected County
+  .filter(item => {
+    if (!filters.userLocation) return true;
+    if (!item.locationGeolocation) return false;
+    const dist = haversineDistance(
+      filters.userLocation.lat, filters.userLocation.lng,
+      item.locationGeolocation.lat, item.locationGeolocation.lng
+    );
+    return dist <= filters.nearbyRadius;
+  })
   .filter(item => {
       const startDate = new Date(item.StartDate + 'T00:00:00');
       const endDate = new Date(item.EndDate + 'T23:59:59Z');

@@ -4,8 +4,6 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { useState } from "react";
 import CountySelector from './countySelector';
-import CalendarTypeSelector from './CalendarTypeSelector';
-import FilterBadges from './FilterBadges';
 import FilterPresets from '../filterPresets';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -27,26 +25,28 @@ export default function Sidebar({
     currentFilters,
 
     // Filter states
-    calendarTypeFilter,
-    setCalendarTypeFilter,
-    calendarTypeCounts,
-    specialFilterCounts = { onViewToday: 0, endingSoonOnly: 0, openingTodayOnly: 0 },
+    specialFilterCounts = { onViewToday: 0, endingSoonOnly: 0, openingTodayOnly: 0, openingTitleOnly: 0 },
     calendarDateRangeFilter,
     setCalendarDateRangeFilter,
     calendarDateRangePreset,
     setCalendarDateRangePreset,
-    highlightsOnly,
-    setHighlightsOnly,
-    onViewToday,
-    setOnViewToday,
-    endingSoonOnly,
-    setEndingSoonOnly,
     openingTodayOnly,
     setOpeningTodayOnly,
+    endingSoonOnly,
+    setEndingSoonOnly,
+    openingTitleOnly,
+    setOpeningTitleOnly,
     selectedLocation,
     setSelectedLocation,
     selectedCounty,
     setSelectedCounty,
+    userLocation,
+    nearbyRadius,
+    setNearbyRadius,
+    locationError,
+    locationLoading,
+    getUserLocation,
+    clearUserLocation,
 
     // Date ranges for presets
     startOfWeek,
@@ -69,10 +69,10 @@ export default function Sidebar({
             className="flex flex-col max-h-full"
         >
             {/* Scrollable content area */}
-            <div className="flex-1 overflow-y-auto px-4 space-y-4 pb-4">
+            <div className="flex-1 overflow-y-auto px-4 space-y-3 pb-4">
                 {/* Logo at the top of the sidebar */}
                 {showLogo && (
-                    <div className="flex flex-col justify-center items-center w-full mb-4">
+                    <div className="flex flex-col justify-center items-center w-full">
                         <Link href="/">
                             <img 
                                 src="/art-board-logo.png" 
@@ -82,12 +82,49 @@ export default function Sidebar({
                         </Link>
                     </div>
                 )}
-                <p className="mb-4 hidden md:block">A directory of visual arts exhibitions in the Bay Area.</p>
-                <CalendarTypeSelector
-                    calendarTypeFilter={calendarTypeFilter}
-                    setCalendarTypeFilter={setCalendarTypeFilter}
-                    calendarTypeCounts={calendarTypeCounts}
-                />
+                <p className="hidden md:block">A directory of visual arts exhibitions in the Bay Area.</p>
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-1">
+                        <button
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${openingTitleOnly ? 'bg-yellow-200 border-yellow-300 text-black' : !openingTitleOnly && specialFilterCounts.openingTitleOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            onClick={() => (specialFilterCounts.openingTitleOnly > 0 || openingTitleOnly) && setOpeningTitleOnly(!openingTitleOnly)}
+                            disabled={!openingTitleOnly && specialFilterCounts.openingTitleOnly === 0}
+                        >
+                            ☀️ Has Events
+                            {!openingTitleOnly && specialFilterCounts.openingTitleOnly > 0 && <span className="opacity-50">({specialFilterCounts.openingTitleOnly})</span>}
+                        </button>
+                        {openingTitleOnly && (
+                            <button onClick={() => setOpeningTitleOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear openings filter">×</button>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <button
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${openingTodayOnly ? 'bg-green-300 border-green-400 text-black' : !openingTodayOnly && specialFilterCounts.openingTodayOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            onClick={() => (specialFilterCounts.openingTodayOnly > 0 || openingTodayOnly) && setOpeningTodayOnly(!openingTodayOnly)}
+                            disabled={!openingTodayOnly && specialFilterCounts.openingTodayOnly === 0}
+                        >
+                            👁️ Starting Today
+                            {!openingTodayOnly && specialFilterCounts.openingTodayOnly > 0 && <span className="opacity-50">({specialFilterCounts.openingTodayOnly})</span>}
+                        </button>
+                        {openingTodayOnly && (
+                            <button onClick={() => setOpeningTodayOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear opening today filter">×</button>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <button
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${endingSoonOnly ? 'bg-red-300 border-red-400 text-black' : !endingSoonOnly && specialFilterCounts.endingSoonOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            onClick={() => (specialFilterCounts.endingSoonOnly > 0 || endingSoonOnly) && setEndingSoonOnly(!endingSoonOnly)}
+                            disabled={!endingSoonOnly && specialFilterCounts.endingSoonOnly === 0}
+                        >
+                            ⏳ Ending Soon
+                            {!endingSoonOnly && specialFilterCounts.endingSoonOnly > 0 && <span className="opacity-50">({specialFilterCounts.endingSoonOnly})</span>}
+                        </button>
+                        {endingSoonOnly && (
+                            <button onClick={() => setEndingSoonOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear ending soon filter">×</button>
+                        )}
+                    </div>
+                </div>
+                <div className="border-t border-gray-100"></div>
                 <div className="flex flex-col w-full">
                     <div id="filterResults">
                         <FilterPresets 
@@ -119,57 +156,52 @@ export default function Sidebar({
                     </div>
                 }                                                
           
-                <div className="flex flex-col">
-                    <CountySelector 
-                        onCountyChange={setSelectedCounty} 
-                        selectedCountyProp={selectedCounty}
-                        currentFilters={currentFilters}
-                        listings={listings}
-                    />
-                </div>
-                <FilterBadges
-                    onViewToday={onViewToday}
-                    setOnViewToday={setOnViewToday}
-                    endingSoonOnly={endingSoonOnly}
-                    setEndingSoonOnly={setEndingSoonOnly}
-                    openingTodayOnly={openingTodayOnly}
-                    setOpeningTodayOnly={setOpeningTodayOnly}
-                    specialFilterCounts={specialFilterCounts}
+                <CountySelector
+                    onCountyChange={setSelectedCounty}
+                    selectedCountyProp={selectedCounty}
+                    currentFilters={currentFilters}
+                    listings={listings}
+                    userLocation={userLocation}
+                    nearbyRadius={nearbyRadius}
+                    setNearbyRadius={setNearbyRadius}
+                    locationError={locationError}
+                    locationLoading={locationLoading}
+                    getUserLocation={getUserLocation}
+                    clearUserLocation={clearUserLocation}
+                    chipStyle
                 />
                 {/* Stats indicator showing total vs. filtered listings */}
-                <div className="flex flex-row gap-2 justify-end">
-                    <div className="flex flex-row items-center text-sm">
+                <div className="border-t border-gray-100 pt-3 flex flex-row items-center justify-between">
+                    <span className="text-sm text-gray-500">
                         {displayedResults} of {listings.length} listings
-                    </div>                 
-                    <Button 
+                    </span>
+                    <button
                         onClick={clearAllFilters}
-                        variant="outline"
-                        size="sm"
-                        className="self-start"
+                        className="text-sm text-gray-400 underline hover:text-gray-600 transition-colors"
                     >
                         Reset
-                    </Button>                
+                    </button>
                 </div>
             </div>
 
             {/* Fixed bottom section with About and Newsletter */}
-            <div className="px-4 py-2 border-t border-gray-200 bg-white">
-                <div className="flex flex-row gap-4">
-                    <button 
-                        className="underline text-left" 
+            <div className="mx-4 py-4 border-t border-gray-200 bg-white">
+                <div className="flex flex-col gap-2">
+                    <button
+                        className="underline text-left"
                         onClick={() => setAboutDialogOpen(true)}
                     >
                         About
                     </button>
-                    <button 
-                        className="underline text-left" 
+                    <button
+                        className="underline text-left"
                         onClick={() => setNewsletterDialogOpen(true)}
                     >
                         Newsletter
                     </button>
                 </div>
             </div>
-            
+
             {/* Dialogs */}
             <Dialog open={aboutDialogOpen} onOpenChange={setAboutDialogOpen}>
                     <DialogPortal>
