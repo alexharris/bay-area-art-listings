@@ -53,9 +53,7 @@ export default function Listings({
             </div>
 
             <div className={`${venueOpen[index] ? 'flex' : 'hidden'} md:flex flex-col gap-1`}>
-              <div className="hidden md:block">
-                <CityFromPlaceId googlePlaceId={item.googlePlaceId} fallbackAddress={item.locationAddress} />
-              </div>
+              <CityFromPlaceId googlePlaceId={item.googlePlaceId} fallbackAddress={item.locationAddress} />
               <TodaysHoursStatus locationHours={item.locationHours} locationUrl={item.locationUrl} locationName={item.locationName} />
             </div>
 
@@ -113,10 +111,13 @@ export default function Listings({
     if (!upcoming.length) return null;
     return (
       <div className="flex flex-col gap-1 mt-1">
-        {upcoming.map((opening, idx) => (
-          <div key={opening._key || idx} className="text-sm border-b border-dashed border-gray-200 pb-1.5 last:border-0 last:pb-0">
+        {upcoming.map((opening, idx) => {
+          const isToday = opening.date === today;
+          return (
+          <div key={opening._key || idx} className="text-sm border-b border-dashed border-gray-100 pb-1.5 last:border-0 last:pb-0">
             <div className="flex flex-col">
               <div className="flex items-center">
+                <span className={`inline-block w-2 h-2 rounded-full mr-1.5 flex-shrink-0 ${isToday ? 'bg-green-400' : 'bg-yellow-400'}`}></span>
                 <span className="font-medium">{opening.title}</span>
               </div>
               <div className="text-gray-700">
@@ -133,7 +134,8 @@ export default function Listings({
             </div>
             {opening.note && <div className="text-gray-600">{opening.note}</div>}
           </div>
-        ))}
+          );
+        })}
       </div>
     );
   };
@@ -144,7 +146,7 @@ export default function Listings({
         <li className="border-b min-h-40 border-dashed border-gray-400 py-6 w-full relative flex flex-col md:flex-row justify-between gap-2 lg:gap-4" key={item._id || index}>
 
           {/* Left Column - Title + image + (notes on desktop) */}
-          <div className="flex flex-col md:flex-row lg:flex-row gap-3 w-full md:w-1/2">
+          <div className="flex flex-col md:flex-row lg:flex-row gap-4 w-full md:w-1/2 lg:w-2/3 xl:w-1/2">
 
             {/* Desktop gallery well — hidden on mobile */}
             {item.eventImageUrl && (
@@ -172,10 +174,10 @@ export default function Listings({
               </div>
             )}
 
-            <div className="flex flex-col gap-3 flex-1">
+            <div className="flex flex-col flex-1">
               {/* Mobile gallery well — above title on mobile */}
               {item.eventImageUrl && (
-                <div className="md:hidden w-full bg-gray-100 rounded overflow-hidden">
+                <div className="md:hidden w-full bg-gray-100 rounded overflow-hidden mb-3">
                   <div className="relative w-full aspect-[4/3]">
                     {item.eventImageUrl.includes('cdn.sanity.io') ? (
                       <Image
@@ -200,7 +202,7 @@ export default function Listings({
               )}
 
               {/* Title */}
-              <div className="md:-mt-1">
+              <div className="md:-mt-1 mb-2">
                 {item.EventUrl
                   ? <a
                       href={item.EventUrl}
@@ -216,6 +218,11 @@ export default function Listings({
                 }
               </div>
 
+              {/* Date */}
+              <div className="font-semibold mb-2">
+                <CalendarLink listing={item} location="" dateLabel={item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`} />
+              </div>
+
               {/* Notes — desktop only */}
               <div className="hidden md:flex flex-col gap-2">
                 <NotesRenderer notes={item.Notes} itemIndex={index} />
@@ -223,40 +230,36 @@ export default function Listings({
             </div>
           </div>
 
-          {/* Right Side Container - Date and Location */}
-          <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-2 lg:gap-4 w-full md:w-1/2">
+          {/* Right Side Container - Subevents and Location */}
+          <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row items-start gap-2 lg:gap-4 w-full md:w-1/2 lg:w-1/3 xl:w-1/2">
 
-            {/* Date section */}
-            <div className="flex flex-col gap-2 w-full text-left items-start justify-start">
-              <div className="font-semibold">
-                <CalendarLink listing={item} location="" dateLabel={item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`} />
-              </div>
-
-              <div className="flex flex-row flex-wrap gap-2 items-start">
-                <DateNote
-                  startDate={item.StartDate}
-                  endDate={item.EndDate}
-                  endingSoonOnly={endingSoonOnly}
-                  setEndingSoonOnly={setEndingSoonOnly}
-                  openingTodayOnly={openingTodayOnly}
-                  setOpeningTodayOnly={setOpeningTodayOnly}
-                />
-                {shouldShowOpenToday(item) && (
-                  <Badge
-                    variant="outline"
-                    className="!border-green-300 text-black hover:bg-green-50 cursor-pointer transition-colors"
-                    onClick={() => setOnViewToday(!onViewToday)}
-                  >
-                    On View Today
-                  </Badge>
-                )}
-              </div>
-
-              {/* Subevents — desktop only, beneath dates */}
+            {/* Badges + subevents — desktop only, always reserve space */}
+            <div className="hidden md:flex flex-col gap-2 w-full">
               {renderOpenings(item) && (
-                <div className="hidden md:block">
-                  <div className="text-xs uppercase tracking-wider text-gray-400 mb-1">Events</div>
+                <>
+                  <div className="text-xs uppercase tracking-wider text-gray-400">Events</div>
                   {renderOpenings(item)}
+                </>
+              )}
+              {(shouldShowOpenToday(item) || item.StartDate || item.EndDate) && (
+                <div className="flex flex-row flex-wrap gap-2">
+                  <DateNote
+                    startDate={item.StartDate}
+                    endDate={item.EndDate}
+                    endingSoonOnly={endingSoonOnly}
+                    setEndingSoonOnly={setEndingSoonOnly}
+                    openingTodayOnly={openingTodayOnly}
+                    setOpeningTodayOnly={setOpeningTodayOnly}
+                  />
+                  {shouldShowOpenToday(item) && (
+                    <Badge
+                      variant="outline"
+                      className="!border-green-300 text-black hover:bg-green-50 cursor-pointer transition-colors"
+                      onClick={() => setOnViewToday(!onViewToday)}
+                    >
+                      On View Today
+                    </Badge>
+                  )}
                 </div>
               )}
             </div>
@@ -268,8 +271,27 @@ export default function Listings({
 
           </div>
 
-          {/* Notes + openings — mobile only */}
-          <div className="md:hidden flex flex-col">
+          {/* Notes + badges + openings — mobile only */}
+          <div className="md:hidden flex flex-col gap-2">
+            <div className="flex flex-row flex-wrap gap-2">
+              <DateNote
+                startDate={item.StartDate}
+                endDate={item.EndDate}
+                endingSoonOnly={endingSoonOnly}
+                setEndingSoonOnly={setEndingSoonOnly}
+                openingTodayOnly={openingTodayOnly}
+                setOpeningTodayOnly={setOpeningTodayOnly}
+              />
+              {shouldShowOpenToday(item) && (
+                <Badge
+                  variant="outline"
+                  className="!border-green-300 text-black hover:bg-green-50 cursor-pointer transition-colors"
+                  onClick={() => setOnViewToday(!onViewToday)}
+                >
+                  On View Today
+                </Badge>
+              )}
+            </div>
             <NotesRenderer notes={item.Notes} itemIndex={index} />
             {renderOpenings(item)}
           </div>
