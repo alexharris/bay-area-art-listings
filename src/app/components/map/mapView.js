@@ -136,7 +136,7 @@ function ShowCard({ item, formatDate }) {
 
             {/* Badges */}
             <div className="flex flex-row flex-wrap gap-2">
-                <DateNote startDate={item.StartDate} endDate={item.EndDate} />
+                <DateNote startDate={item.StartDate} endDate={item.EndDate} endingSoonOnly={false} setEndingSoonOnly={() => {}} openingTodayOnly={false} setOpeningTodayOnly={() => {}} />
                 {item.isOnViewToday && (
                     <Badge variant="outline" className="!border-green-300 text-black">On View Today</Badge>
                 )}
@@ -298,9 +298,6 @@ export default function MapView({
                 popupAnchor: [0, -12]
             })}
         >
-            <Popup>
-                <span className="text-sm font-medium">Your location</span>
-            </Popup>
         </Marker>
     ) : null;
 
