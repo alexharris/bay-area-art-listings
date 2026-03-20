@@ -4,8 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { DayPicker } from "react-day-picker";
-import "react-day-picker/style.css";
 import CountySelector from './sidebar/countySelector';
 
 
@@ -223,6 +221,7 @@ export default function FilterChipRow({
             {/* When mini-drawer */}
             <Drawer open={whenOpen} onOpenChange={setWhenOpen}>
                 <DrawerContent className="pb-[env(safe-area-inset-bottom)]">
+                    <p className="px-4 pt-3 pb-1 text-sm text-gray-500">Find shows that are running in a certain date range</p>
                     {/* Segmented control */}
                     <div className="px-4 pt-2 pb-3">
                         <div className="flex bg-gray-100 rounded-xl p-1">
@@ -241,6 +240,7 @@ export default function FilterChipRow({
                         </div>
                     </div>
 
+                    <div className="h-64 overflow-y-auto">
                     {whenTab === 'presets' ? (
                         <div className="flex flex-col pb-4">
                             {[
@@ -293,22 +293,47 @@ export default function FilterChipRow({
                             })}
                         </div>
                     ) : (
-                        <div className="px-4 pb-4">
-                            <DayPicker
-                                mode="range"
-                                onSelect={(dateRange) => {
-                                    if (dateRange) {
-                                        setCalendarDateRangeFilter(dateRange);
+                        <div className="px-4 pb-4 flex flex-col gap-4">
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-sm text-gray-500">Start date</label>
+                                <input
+                                    type="date"
+                                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900"
+                                    value={calendarDateRangeFilter?.from ? calendarDateRangeFilter.from.toISOString().split('T')[0] : ''}
+                                    onChange={(e) => {
+                                        if (!e.target.value) return;
+                                        const from = new Date(e.target.value + 'T00:00:00');
+                                        const to = calendarDateRangeFilter?.to && calendarDateRangeFilter.to >= from
+                                            ? calendarDateRangeFilter.to
+                                            : new Date(e.target.value + 'T23:59:59');
+                                        setCalendarDateRangeFilter({ from, to });
                                         setCalendarDateRangePreset('custom');
                                         setShowCustomCalendar(true);
-                                    }
-                                }}
-                                selected={calendarDateRangeFilter}
-                                showOutsideDays
-                            />
-                            <Button className="w-full mt-2" onClick={() => setWhenOpen(false)}>Done</Button>
+                                    }}
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-sm text-gray-500">End date</label>
+                                <input
+                                    type="date"
+                                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900"
+                                    value={calendarDateRangeFilter?.to ? calendarDateRangeFilter.to.toISOString().split('T')[0] : ''}
+                                    onChange={(e) => {
+                                        if (!e.target.value) return;
+                                        const to = new Date(e.target.value + 'T23:59:59');
+                                        const from = calendarDateRangeFilter?.from && calendarDateRangeFilter.from <= to
+                                            ? calendarDateRangeFilter.from
+                                            : new Date(e.target.value + 'T00:00:00');
+                                        setCalendarDateRangeFilter({ from, to });
+                                        setCalendarDateRangePreset('custom');
+                                        setShowCustomCalendar(true);
+                                    }}
+                                />
+                            </div>
+                            <Button className="w-full" onClick={() => setWhenOpen(false)}>Done</Button>
                         </div>
                     )}
+                    </div>
                 </DrawerContent>
             </Drawer>
 
