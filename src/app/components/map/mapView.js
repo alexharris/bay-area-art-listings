@@ -18,7 +18,6 @@ import { Badge } from '@/components/ui/badge';
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
-const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
 // MapController fits the map to visible marker positions when a county is selected or flies to user location
 const MapController = dynamic(
@@ -120,7 +119,7 @@ function ShowCard({ item, formatDate }) {
             )}
 
             {/* Title */}
-            <div>
+            <div className="mb-1">
                 {item.EventUrl ? (
                     <a href={item.EventUrl} target="_blank" rel="noopener noreferrer" className="text-2xl">
                         <h3>{item.Event}<svg xmlns="http://www.w3.org/2000/svg" className="inline-block ml-1 w-4 h-4 align-baseline" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></h3>
@@ -131,7 +130,7 @@ function ShowCard({ item, formatDate }) {
             </div>
 
             {/* Date */}
-            <div className="font-semibold">
+            <div className="font-semibold mb-1">
                 <CalendarLink listing={item} location="" dateLabel={item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`} />
             </div>
 
@@ -165,19 +164,19 @@ function LocationSheet({ group, formatDate }) {
                 <h2 className="text-lg font-semibold mb-2">{locationName}</h2>
                 <div className="flex gap-4 text-sm">
                     <a
-                        className="flex items-center gap-1.5 text-gray-600 hover:text-black"
+                        className="flex items-start gap-1.5 text-gray-600 hover:text-black underline decoration-dashed"
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationAddress)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                         {locationAddress}
                     </a>
                 </div>
                 <div className="flex gap-4 mt-2 text-sm">
                     {locationUrl && (
                         <a
-                            className="flex items-center gap-1.5 text-gray-600 hover:text-black"
+                            className="flex items-center gap-1.5 text-gray-600 hover:text-black underline decoration-dashed"
                             href={locationUrl}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -192,7 +191,7 @@ function LocationSheet({ group, formatDate }) {
                             locationHours={locationHours}
                             locationUrl={locationUrl}
                         >
-                            <button className="flex items-center gap-1.5 text-gray-600 hover:text-black text-sm">
+                            <button className="flex items-center gap-1.5 text-gray-600 hover:text-black text-sm underline decoration-dashed">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                 Hours
                             </button>
@@ -221,7 +220,6 @@ export default function MapView({
     userLocation,
 }) {
     const [L, setL] = useState(null);
-    const [carouselIndices, setCarouselIndices] = useState({});
     const [isMobile, setIsMobile] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState(null);
 
@@ -241,7 +239,7 @@ export default function MapView({
 
     if (!L) {
         return (
-            <div className="h-screen border w-full flex items-center justify-center" role="status" aria-label="Loading map">
+            <div className="h-full border w-full flex items-center justify-center" role="status" aria-label="Loading map">
                 <div className="animate-pulse text-2xl text-gray-500">Loading map...</div>
             </div>
         );
@@ -306,19 +304,6 @@ export default function MapView({
         </Marker>
     ) : null;
 
-    const toggleShow = (key, direction) => {
-        setCarouselIndices(prev => {
-            const currentIndex = prev[key] || 0;
-            const totalItems = locationGroups[key].items.length;
-            const newIndex = direction === 'next'
-                ? (currentIndex + 1) % totalItems
-                : (currentIndex - 1 + totalItems) % totalItems;
-            return {
-                ...prev,
-                [key]: newIndex
-            };
-        });
-    };
 
     const markers = Object.entries(locationGroups).map(([key, group]) => {
         const totalItems = group.items.length;
@@ -358,95 +343,17 @@ export default function MapView({
                     popupAnchor: [0, -23]
                 })}
                 eventHandlers={{
-                    click: () => {
-                        if (isMobile) setSelectedGroup(group);
-                    }
+                    click: () => setSelectedGroup(group)
                 }}
             >
-            {!isMobile && (
-            <Popup className="location-popup" maxWidth={400}>
-                <div className="popup-content">
-                {/* Header bar with location info */}
-                <div className="pb-3 mb-4">
-                    <h2 className="text-xl font-semibold mb-1">{group.locationName}</h2>
-                    <div className="flex flex-wrap gap-4 text-sm">
-                    <a
-                        className="flex flex-row gap-1 items-center text-black hover:text-blue-600"
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(group.locationAddress)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="View on Google Maps"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    </a>
-                    {group.locationUrl && (
-                        <a
-                        className="flex flex-row gap-1 items-center text-black hover:text-blue-600"
-                        href={group.locationUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="Visit venue website"
-                        >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                        </a>
-                    )}
-                    {hasOnViewToday && (
-                        <HoursPopup
-                        locationName={group.locationName}
-                        locationHours={group.locationHours}
-                        locationUrl={group.locationUrl}
-                        >
-                        <button className="flex flex-row gap-1 items-center text-black hover:text-blue-600" aria-label="View hours">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        </button>
-                        </HoursPopup>
-                    )}
-                    </div>
-                </div>
-
-                {/* Shows section */}
-                <div>
-                    {totalItems === 1 ? (
-                    // Single show - display directly
-                    <ShowCard item={group.items[0]} formatDate={formatDate} />
-                    ) : (
-                    // Multiple shows - carousel
-                    <div className="space-y-4">
-                        <ShowCard item={group.items[carouselIndices[key] || 0]} formatDate={formatDate} />
-
-                        <div className="flex flex-row justify-end items-center gap-3">
-                        <button
-                            onClick={() => toggleShow(key, 'prev')}
-                            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                            aria-label="Previous show"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                        </button>
-                        <span className="text-sm text-gray-500 font-medium min-w-[3rem] text-center">
-                            {(carouselIndices[key] || 0) + 1} of {totalItems}
-                        </span>
-                        <button
-                            onClick={() => toggleShow(key, 'next')}
-                            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                            aria-label="Next show"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                        </button>
-                        </div>
-                    </div>
-                    )}
-                </div>
-                </div>
-            </Popup>
-            )}
             </Marker>
         );
     });
 
     return (
-        <div id="map-view" className="w-full">
-            <div className="h-screen w-full">
-                <MapContainer center={[37.7749, -122.4194]} zoom={10} scrollWheelZoom={true} className="h-screen w-full z-0">
+        <div id="map-view" className="w-full h-full relative">
+            <div className="h-full w-full">
+                <MapContainer center={[37.7749, -122.4194]} zoom={10} scrollWheelZoom={true} className="h-full w-full z-0">
                     <TileLayer
                         attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
                         url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png"
@@ -457,8 +364,24 @@ export default function MapView({
                 </MapContainer>
             </div>
 
+            {/* Desktop side panel */}
+            <div className={`hidden lg:flex flex-col absolute top-0 bottom-0 right-0 w-96 bg-white shadow-xl z-[1000] transition-transform duration-300 ease-in-out ${selectedGroup ? 'translate-x-0' : 'translate-x-full'}`}>
+                {selectedGroup && (
+                    <>
+                        <button
+                            onClick={() => setSelectedGroup(null)}
+                            className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
+                            aria-label="Close panel"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                        <LocationSheet group={selectedGroup} formatDate={formatDate} />
+                    </>
+                )}
+            </div>
+
             {/* Mobile bottom sheet */}
-            <Drawer open={!!selectedGroup} onOpenChange={(open) => { if (!open) setSelectedGroup(null); }}>
+            <Drawer open={isMobile && !!selectedGroup} onOpenChange={(open) => { if (!open) setSelectedGroup(null); }}>
                 <DrawerContent className="flex flex-col max-h-[70vh]">
                     <LocationSheet group={selectedGroup} formatDate={formatDate} />
                 </DrawerContent>
