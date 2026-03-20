@@ -7,6 +7,12 @@ import { extractPortableTextContent } from '../../../utils/helpers';
 import TodaysHoursStatus from '../TodaysHoursStatus';
 import HoursPopup from '../HoursPopup';
 import { formatDate } from '../../../utils/shared';
+import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import Image from 'next/image';
+import CalendarLink from '../CalendarLink';
+import NotesRenderer from '../NotesRenderer';
+import DateNote from '../DateNote';
+import { Badge } from '@/components/ui/badge';
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
@@ -45,51 +51,161 @@ const MapController = dynamic(
     { ssr: false }
 );
 
-// ShowCard component for displaying individual show details
-function ShowCard({ item, compact = false }) {
-    const description = item.Notes ? extractPortableTextContent(item.Notes) : '';
-    
+// Render sub-events (openings) matching the list view style
+function renderOpenings(item) {
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+    const upcoming = item.openings
+        ?.filter(o => o.date >= today)
+        .sort((a, b) => a.date.localeCompare(b.date)) || [];
+    if (!upcoming.length) return null;
     return (
-        <div className="flex flex-col border border-gray-100 p-3 rounded-md">
-            <div className="flex gap-3">
-                {item.eventImageUrl && (
-                    <div className="flex-shrink-0">
-                        <img 
-                            src={item.eventImageUrl} 
-                            alt={item.eventImageCaption || item.Event}
-                            className="w-24 h-24 object-cover rounded"
-                        />
-                        {item.eventImageCaption && (
-                            <p className="text-xs text-gray-500 mt-1 italic w-24">{item.eventImageCaption}</p>
+        <div className="flex flex-col gap-1 mt-1">
+            {upcoming.map((opening, idx) => {
+                const isToday = opening.date === today;
+                return (
+                    <div key={opening._key || idx} className="text-sm border-b border-dashed border-gray-100 pb-1.5 last:border-0 last:pb-0">
+                        <div className="flex flex-col">
+                            <div className="flex items-center">
+                                <span className={`inline-block w-2 h-2 rounded-full mr-1.5 flex-shrink-0 ${isToday ? 'bg-green-400' : 'bg-yellow-400'}`}></span>
+                                <span className="font-medium">{opening.title}</span>
+                            </div>
+                            <div className="text-gray-700">
+                                <CalendarLink
+                                    dateLabel={`${new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}${opening.time ? ` ${opening.time}` : ''}`}
+                                    singleEvent={{
+                                        title: opening.title,
+                                        date: opening.date,
+                                        time: opening.time,
+                                        locationName: item.locationName,
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        {opening.note && <div className="text-gray-600">{opening.note}</div>}
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
+// ShowCard mirrors the mobile list view layout
+function ShowCard({ item, formatDate }) {
+    return (
+        <div className="border-b border-dashed border-gray-300 py-4 last:border-0 flex flex-col gap-2">
+            {/* Image */}
+            {item.eventImageUrl && (
+                <div className="w-full bg-gray-100 rounded overflow-hidden mb-1">
+                    <div className="relative w-full aspect-[4/3]">
+                        {item.eventImageUrl.includes('cdn.sanity.io') ? (
+                            <Image
+                                src={item.eventImageUrl}
+                                alt={item.eventImageCaption || item.Event}
+                                fill
+                                className="object-cover"
+                                sizes="100vw"
+                            />
+                        ) : (
+                            <img
+                                src={item.eventImageUrl}
+                                alt={item.eventImageCaption || item.Event}
+                                className="w-full h-full object-cover"
+                            />
                         )}
                     </div>
-                )}
-                
-                <div className="flex flex-col flex-1 min-w-0">
-                    {item.EventUrl ? (
-                        <a
-                            href={item.EventUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-lg font-medium hover:text-blue-600 transition-colors"
-                        >
-                            {item.Event}
-                        </a>
-                    ) : (
-                        <span className="text-lg font-medium">
-                            {item.Event}
-                        </span>
-                    )}
-                    <span className="text-sm text-gray-600 mb-2">
-                        {item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`}
-                    </span>
-                    
-                    {description && (
-                        <div className="max-h-36 overflow-y-scroll text-sm text-gray-700 leading-relaxed">
-                            {description}
-                        </div>
+                    {item.eventImageCaption && (
+                        <p className="text-xs text-gray-400 px-2.5 py-2 leading-snug">{item.eventImageCaption}</p>
                     )}
                 </div>
+            )}
+
+            {/* Title */}
+            <div>
+                {item.EventUrl ? (
+                    <a href={item.EventUrl} target="_blank" rel="noopener noreferrer" className="text-2xl">
+                        <h3>{item.Event}<svg xmlns="http://www.w3.org/2000/svg" className="inline-block ml-1 w-4 h-4 align-baseline" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></h3>
+                    </a>
+                ) : (
+                    <span className="text-2xl"><h3>{item.Event}</h3></span>
+                )}
+            </div>
+
+            {/* Date */}
+            <div className="font-semibold">
+                <CalendarLink listing={item} location="" dateLabel={item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`} />
+            </div>
+
+            {/* Badges */}
+            <div className="flex flex-row flex-wrap gap-2">
+                <DateNote startDate={item.StartDate} endDate={item.EndDate} />
+                {item.isOnViewToday && (
+                    <Badge variant="outline" className="!border-green-300 text-black">On View Today</Badge>
+                )}
+            </div>
+
+            {/* Notes */}
+            <NotesRenderer notes={item.Notes} itemIndex={item._id} />
+
+            {/* Sub-events */}
+            {renderOpenings(item)}
+        </div>
+    );
+}
+
+// Mobile bottom sheet content for a location group
+function LocationSheet({ group, formatDate }) {
+    if (!group) return null;
+    const { locationName, locationAddress, locationUrl, locationHours, items } = group;
+    const hasOnViewToday = items.some(item => item.isOnViewToday === true);
+
+    return (
+        <div className="flex flex-col min-h-0 flex-1">
+            {/* Sticky header */}
+            <div className="px-4 pt-2 pb-3 border-b border-gray-100">
+                <h2 className="text-lg font-semibold mb-2">{locationName}</h2>
+                <div className="flex gap-4 text-sm">
+                    <a
+                        className="flex items-center gap-1.5 text-gray-600 hover:text-black"
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationAddress)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        {locationAddress}
+                    </a>
+                </div>
+                <div className="flex gap-4 mt-2 text-sm">
+                    {locationUrl && (
+                        <a
+                            className="flex items-center gap-1.5 text-gray-600 hover:text-black"
+                            href={locationUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            Website
+                        </a>
+                    )}
+                    {hasOnViewToday && (
+                        <HoursPopup
+                            locationName={locationName}
+                            locationHours={locationHours}
+                            locationUrl={locationUrl}
+                        >
+                            <button className="flex items-center gap-1.5 text-gray-600 hover:text-black text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                Hours
+                            </button>
+                        </HoursPopup>
+                    )}
+                </div>
+            </div>
+
+            {/* Scrollable show list */}
+            <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3 pb-[env(safe-area-inset-bottom)]">
+                {items.map((item, i) => (
+                    <ShowCard key={i} item={item} formatDate={formatDate} />
+                ))}
             </div>
         </div>
     );
@@ -106,12 +222,21 @@ export default function MapView({
 }) {
     const [L, setL] = useState(null);
     const [carouselIndices, setCarouselIndices] = useState({});
+    const [isMobile, setIsMobile] = useState(false);
+    const [selectedGroup, setSelectedGroup] = useState(null);
 
     // Load Leaflet when component mounts
     useEffect(() => {
         import('leaflet').then(L => {
             setL(L);
         });
+    }, []);
+
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 1024);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
     }, []);
 
     if (!L) {
@@ -124,22 +249,22 @@ export default function MapView({
 
     // Filter listings for map display
     const filteredItems = filteredListings
-        .filter(item => highlightsOnly ? item.Highlight : true)                                        
+        .filter(item => highlightsOnly ? item.Highlight : true)
         .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
         .filter(item => item.locationName.toLowerCase() !== 'various')
         .filter(item => {
             const searchLower = searchTerm.toLowerCase();
-            
-            return item.Event.toLowerCase().includes(searchLower) || 
-                   item.locationName.toLowerCase().includes(searchLower) || 
+
+            return item.Event.toLowerCase().includes(searchLower) ||
+                   item.locationName.toLowerCase().includes(searchLower) ||
                    (item.locationAddress ? item.locationAddress.toLowerCase().includes(searchLower) : false) ||
                    extractPortableTextContent(item.Notes).toLowerCase().includes(searchLower) ||
                    (item.locationUrl ? item.locationUrl.toLowerCase().includes(searchLower) : false);
         });
-    
+
     // Group listings by location coordinates
     const locationGroups = {};
-    
+
     filteredItems.forEach(item => {
         const location = locations.find(loc => loc.Name === item.locationName);
         if (location && location.Geolocation) {
@@ -197,7 +322,7 @@ export default function MapView({
 
     const markers = Object.entries(locationGroups).map(([key, group]) => {
         const totalItems = group.items.length;
-        
+
         // Check if any item in the group is "on view today" using the pre-computed flag
         // (accounts for both show dates AND venue hours)
         const hasOnViewToday = group.items.some(item => item.isOnViewToday === true);
@@ -221,7 +346,7 @@ export default function MapView({
             }
             return hasOnViewToday ? singlePinOpenIcon : singlePinClosedIcon;
         };
-        
+
         return (
             <Marker
                 key={key}
@@ -232,7 +357,13 @@ export default function MapView({
                     iconAnchor: [12, 23],
                     popupAnchor: [0, -23]
                 })}
+                eventHandlers={{
+                    click: () => {
+                        if (isMobile) setSelectedGroup(group);
+                    }
+                }}
             >
+            {!isMobile && (
             <Popup className="location-popup" maxWidth={400}>
                 <div className="popup-content">
                 {/* Header bar with location info */}
@@ -272,19 +403,19 @@ export default function MapView({
                     )}
                     </div>
                 </div>
-                
+
                 {/* Shows section */}
                 <div>
                     {totalItems === 1 ? (
                     // Single show - display directly
-                    <ShowCard item={group.items[0]} />
+                    <ShowCard item={group.items[0]} formatDate={formatDate} />
                     ) : (
                     // Multiple shows - carousel
                     <div className="space-y-4">
-                        <ShowCard item={group.items[carouselIndices[key] || 0]} />
-                        
+                        <ShowCard item={group.items[carouselIndices[key] || 0]} formatDate={formatDate} />
+
                         <div className="flex flex-row justify-end items-center gap-3">
-                        <button 
+                        <button
                             onClick={() => toggleShow(key, 'prev')}
                             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                             aria-label="Previous show"
@@ -294,7 +425,7 @@ export default function MapView({
                         <span className="text-sm text-gray-500 font-medium min-w-[3rem] text-center">
                             {(carouselIndices[key] || 0) + 1} of {totalItems}
                         </span>
-                        <button 
+                        <button
                             onClick={() => toggleShow(key, 'next')}
                             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                             aria-label="Next show"
@@ -307,6 +438,7 @@ export default function MapView({
                 </div>
                 </div>
             </Popup>
+            )}
             </Marker>
         );
     });
@@ -324,6 +456,13 @@ export default function MapView({
                     {userMarker}
                 </MapContainer>
             </div>
+
+            {/* Mobile bottom sheet */}
+            <Drawer open={!!selectedGroup} onOpenChange={(open) => { if (!open) setSelectedGroup(null); }}>
+                <DrawerContent className="flex flex-col max-h-[70vh]">
+                    <LocationSheet group={selectedGroup} formatDate={formatDate} />
+                </DrawerContent>
+            </Drawer>
         </div>
     );
 }
