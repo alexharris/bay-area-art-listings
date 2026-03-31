@@ -57,6 +57,10 @@ Bay Area Art Listings is a Next.js 15 application that displays visual arts exhi
 
 Keep `memory/MEMORY.md` and topic files (e.g. `memory/email.md`) up to date as the project evolves. Update them when debugging reveals new insights, env var names change, routes are added/removed, or architectural decisions are made.
 
+## Filter Parity
+
+Mobile (`FilterChipRow.js`) and desktop (`sidebar/sidebar.js`) filter chips must always match. When adding, removing, or changing a filter on one, apply the same change to the other. All chips should always be visible; use `cursor-not-allowed` disabled styling when count is 0.
+
 ## Frontend Design
 
 A visual styleguide lives at `/styleguide` (`src/app/styleguide/page.js`). Reference it when making UI decisions — it documents the canonical color tokens, badge styles, filter chip states, typography, and surface/border patterns used throughout the app.

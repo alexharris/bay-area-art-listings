@@ -193,17 +193,15 @@ export default function FilterChipRow({
                     inactiveClass={!openingTitleOnly && !specialFilterCounts?.openingTitleOnly ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"}
                     onToggle={() => (specialFilterCounts?.openingTitleOnly > 0 || openingTitleOnly) && setOpeningTitleOnly(!openingTitleOnly)}
                 />
-                {(onViewToday || specialFilterCounts?.onViewToday > 0) && (
-                    <BadgeChip
-                        emoji="👁️"
-                        label="On View Today"
-                        count={specialFilterCounts?.onViewToday}
-                        active={onViewToday}
-                        activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400"
-                        inactiveClass="bg-white text-gray-600 border-gray-200 hover:border-gray-300"
-                        onToggle={() => setOnViewToday(!onViewToday)}
-                    />
-                )}
+                <BadgeChip
+                    emoji="🟢"
+                    label="On View Today"
+                    count={specialFilterCounts?.onViewToday}
+                    active={onViewToday}
+                    activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400"
+                    inactiveClass={!onViewToday && !specialFilterCounts?.onViewToday ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"}
+                    onToggle={() => (specialFilterCounts?.onViewToday > 0 || onViewToday) && setOnViewToday(!onViewToday)}
+                />
                 {(endingSoonOnly || specialFilterCounts?.endingSoonOnly > 0) && (
                     <BadgeChip
                         emoji="⏳"
