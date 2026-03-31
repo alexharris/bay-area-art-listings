@@ -245,7 +245,6 @@ export default function FilterChipRow({
                         <div className="flex flex-col pb-4">
                             {[
                                 { value: 'anytime', label: 'Anytime' },
-                                { value: 'today', label: 'Today' },
                                 { value: 'next7', label: 'Next 7 Days' },
                                 { value: 'thismonth', label: 'This Month' },
                                 { value: 'nextmonth', label: 'Next Month' },
