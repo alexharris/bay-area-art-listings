@@ -30,6 +30,8 @@ export default function Sidebar({
     setCalendarDateRangeFilter,
     calendarDateRangePreset,
     setCalendarDateRangePreset,
+    onViewToday,
+    setOnViewToday,
     openingTodayOnly,
     setOpeningTodayOnly,
     endingSoonOnly,
@@ -95,6 +97,19 @@ export default function Sidebar({
                         </button>
                         {openingTitleOnly && (
                             <button onClick={() => setOpeningTitleOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear openings filter">×</button>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <button
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${onViewToday ? 'bg-green-300 border-green-400 text-black' : !onViewToday && specialFilterCounts.onViewToday === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            onClick={() => (specialFilterCounts.onViewToday > 0 || onViewToday) && setOnViewToday(!onViewToday)}
+                            disabled={!onViewToday && specialFilterCounts.onViewToday === 0}
+                        >
+                            🟢 On View Today
+                            {!onViewToday && specialFilterCounts.onViewToday > 0 && <span className="opacity-50">({specialFilterCounts.onViewToday})</span>}
+                        </button>
+                        {onViewToday && (
+                            <button onClick={() => setOnViewToday(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear on view today filter">×</button>
                         )}
                     </div>
                     <div className="flex items-center gap-1">
