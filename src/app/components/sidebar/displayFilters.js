@@ -35,13 +35,6 @@ export default function DisplayFilters({ type, presetRange, customRange, display
     }
   };
 
-  const formatSelectedCounty = () => {
-    switch (selectedCounty[0]?.county) {
-      default:
-        return 'anywhere';
-    }
-  };
-
   return (
     <div className="normal-case leading-1">
       Showing&nbsp;
@@ -51,13 +44,13 @@ export default function DisplayFilters({ type, presetRange, customRange, display
         <>{formatType(type)} {formatDate(customRange.to)}</>
       ) : (
         <>{formatType(type)} {formatDate(customRange.from)} - {formatDate(customRange.to)}</>
-      )} 
+      )}
       {selectedCounty[0] ? (
-          <> in {selectedCounty[0].county} county</>
+          <> in {selectedCounty[0]} county</>
         ) : (
-          <> {formatSelectedCounty()}</>
+          <> anywhere</>
         )}
-        
+
     </div>
   );
 }

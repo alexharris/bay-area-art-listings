@@ -128,7 +128,7 @@ export default function FilterChipRow({
         setShowCustomCalendar(false);
     };
 
-    const countyNames = selectedCounty?.map(obj => obj.county) ?? [];
+    const countyNames = selectedCounty ?? [];
     const whereLabel = userLocation ? 'Near me'
         : countyNames.length === 1 ? countyNames[0]
         : countyNames.length > 1 ? `${countyNames.length} counties`

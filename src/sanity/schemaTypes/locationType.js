@@ -29,6 +29,19 @@ export const locationType = defineType({
       group: 'info',
     }),
     defineField({
+      name: 'county',
+      title: 'County',
+      type: 'string',
+      group: 'info',
+      options: {
+        list: [
+          'Alameda', 'Contra Costa', 'Marin', 'Napa',
+          'Sacramento', 'San Francisco', 'San Mateo',
+          'Santa Clara', 'Solano', 'Sonoma',
+        ],
+      },
+    }),
+    defineField({
       title: 'Website URL',
       name: 'Url',
       type: 'url',

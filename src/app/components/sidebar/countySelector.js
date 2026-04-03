@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import bayAreaZipcodes from '../../../data/bay-area-zipcodes.json';
 import { getCountyCounts } from '../../../utils/filterCounts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-function getZipcodesByCounty(county) {
-  const zipcodes = bayAreaZipcodes.filter(zipcode => zipcode.county === county);
-  return zipcodes;
-}
 
 const COUNTIES = [
   'Alameda', 'Contra Costa', 'Marin', 'Napa', 'Sacramento',
@@ -39,18 +33,14 @@ const CountySelector = ({
     if (!selectedCountyProp || (Array.isArray(selectedCountyProp) && selectedCountyProp.length === 0)) {
       setSelectedCounty('All');
     } else if (Array.isArray(selectedCountyProp) && selectedCountyProp.length > 0) {
-      // Find which county this zipcode array belongs to
-      const countyName = selectedCountyProp[0]?.county;
-      if (countyName) {
-        setSelectedCounty(countyName);
-      }
+      setSelectedCounty(selectedCountyProp[0]);
     }
   }, [selectedCountyProp]);
 
   // Calculate counts when filters or listings change
   useEffect(() => {
     if (currentFilters && listings && listings.length > 0) {
-      const counts = getCountyCounts(currentFilters, listings, getZipcodesByCounty);
+      const counts = getCountyCounts(currentFilters, listings);
       setCountyCounts(counts);
     }
   }, [currentFilters, listings]);
@@ -64,8 +54,7 @@ const CountySelector = ({
         const countyFromURL = params.get('selectedCounty');
         setSelectedCounty(countyFromURL);
 
-        // Call the onCountyChange with the zipcodes for this county
-        onCountyChange(getZipcodesByCounty(countyFromURL));
+        onCountyChange([countyFromURL]);
         if (clearUserLocation) clearUserLocation();
       }
     }
@@ -77,14 +66,14 @@ const CountySelector = ({
       return;
     }
     setSelectedCounty(value);
-    onCountyChange(getZipcodesByCounty(value));
+    onCountyChange(value === 'All' ? [] : [value]);
     if (clearUserLocation) clearUserLocation();
   };
 
   const selectValue = userLocation || locationLoading ? 'NearMe' : selectedCounty;
 
   if (listMode) {
-    const selectedNames = (selectedCountyProp || []).map(obj => obj.county);
+    const selectedNames = selectedCountyProp || [];
     const nearMeActive = !!(userLocation || locationLoading);
 
     const activeTab = nearMeActive ? 'nearme' : whereTab;
@@ -103,7 +92,7 @@ const CountySelector = ({
       const newNames = isSelected
         ? selectedNames.filter(n => n !== countyName)
         : [...selectedNames, countyName];
-      onCountyChange(newNames.flatMap(n => getZipcodesByCounty(n)));
+      onCountyChange(newNames);
     };
 
     return (

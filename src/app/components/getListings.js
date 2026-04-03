@@ -53,6 +53,7 @@ export default async function getListings() {
         _createdAt,
         "locationName": Location->Name,
         "locationAddress": Location->Address,
+        "locationCounty": Location->county,
         "locationUrl": Location->Url,
         "locationGeolocation": Location->Geolocation,
         "locationHours": Location->Hours,
