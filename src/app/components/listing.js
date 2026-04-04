@@ -122,7 +122,7 @@ export default function Listings({
               </div>
               <div className="text-gray-700">
                 <CalendarLink
-                  dateLabel={`${new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}${opening.time ? ` ${opening.time}` : ''}`}
+                  dateLabel={`${new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}${opening.time ? ` • ${opening.time}` : ''}`}
                   singleEvent={{
                     title: opening.title,
                     date: opening.date,
