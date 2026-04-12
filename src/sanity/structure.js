@@ -56,5 +56,30 @@ export const structure = (S) =>
                 .child(S.list().title('Months').items(createMonthListItems(S, '2025'))),
             ])
         ),
-      ...S.documentTypeListItems().filter(item => item.getId() !== 'settings'),
+      S.listItem()
+        .title('Location')
+        .schemaType('location')
+        .child(
+          S.list()
+            .title('Locations')
+            .items([
+              S.listItem()
+                .title('All Locations')
+                .child(
+                  S.documentList()
+                    .title('All Locations')
+                    .filter('_type == "location"')
+                    .child((id) => S.document().documentId(id).schemaType('location'))
+                ),
+              S.listItem()
+                .title('Manual Override')
+                .child(
+                  S.documentList()
+                    .title('Manual Override')
+                    .filter('_type == "location" && hoursManualOverride == true')
+                    .child((id) => S.document().documentId(id).schemaType('location'))
+                ),
+            ])
+        ),
+      ...S.documentTypeListItems().filter(item => !['settings', 'location'].includes(item.getId())),
     ]);
