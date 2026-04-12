@@ -88,7 +88,6 @@ export const structure = async (S) => {
         ),
       S.listItem()
         .title('Locations')
-        .schemaType('location')
         .child(
           S.list()
             .title('Locations')
