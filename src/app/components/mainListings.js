@@ -110,7 +110,6 @@ export default function DisplayListings({ newsletterSettings }) {
 
     // Mobile UI state
     const [mobileSortOpen, setMobileSortOpen] = useState(false);
-    const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
 
     // Use ref to track if initial setup is complete
@@ -314,7 +313,8 @@ export default function DisplayListings({ newsletterSettings }) {
         <>
             {/* Mobile Header */}
             <MobileHeader
-                onSearchOpen={() => setMobileSearchOpen(true)}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
             />
 
             {/* Mobile Filter Chip Row */}
@@ -348,8 +348,6 @@ export default function DisplayListings({ newsletterSettings }) {
                 updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
                 openingTitleOnly={openingTitleOnly}
                 setOpeningTitleOnly={setOpeningTitleOnly}
-                mobileSearchOpen={mobileSearchOpen}
-                setMobileSearchOpen={setMobileSearchOpen}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 userLocation={userLocation}

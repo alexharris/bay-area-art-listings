@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { useState } from 'react';
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import CountySelector from './sidebar/countySelector';
@@ -91,8 +90,6 @@ export default function FilterChipRow({
 
     openingTitleOnly,
     setOpeningTitleOnly,
-    mobileSearchOpen,
-    setMobileSearchOpen,
     searchTerm,
     setSearchTerm,
     userLocation,
@@ -106,14 +103,6 @@ export default function FilterChipRow({
     const [whenOpen, setWhenOpen] = useState(false);
     const [whenTab, setWhenTab] = useState('presets');
     const [whereOpen, setWhereOpen] = useState(false);
-
-    const searchRef = useRef(null);
-    useEffect(() => {
-        if (mobileSearchOpen) {
-            const t = setTimeout(() => searchRef.current?.focus(), 50);
-            return () => clearTimeout(t);
-        }
-    }, [mobileSearchOpen]);
 
     const whenActive = calendarDateRangePreset !== 'anytime';
     const whereActive = (selectedCounty && selectedCounty.length > 0) || !!userLocation;
@@ -136,34 +125,6 @@ export default function FilterChipRow({
 
     return (
         <div className="lg:hidden fixed inset-x-0 top-12 z-40 bg-white border-b border-gray-200">
-            {mobileSearchOpen ? (
-                <div className="flex items-center gap-2 px-3 py-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-gray-400" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input
-                        ref={searchRef}
-                        type="text"
-                        className="flex-1 text-[16px] bg-transparent outline-none placeholder:text-gray-400 min-w-0"
-                        placeholder="Search exhibitions..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    {searchTerm && (
-                        <button
-                            onClick={() => setSearchTerm('')}
-                            className="text-gray-400 hover:text-gray-600 shrink-0"
-                            aria-label="Clear search"
-                        >
-                            <X size={16} />
-                        </button>
-                    )}
-                    <button
-                        onClick={() => { setMobileSearchOpen(false); setSearchTerm(''); }}
-                        className="text-sm text-gray-600 shrink-0 ml-1"
-                    >
-                        Cancel
-                    </button>
-                </div>
-            ) : (
             <div className="flex flex-row gap-2 px-3 py-2 overflow-x-auto scrollbar-none">
                 {/* When chip */}
                 <Chip
@@ -214,7 +175,6 @@ export default function FilterChipRow({
                     />
                 )}
             </div>
-            )}
 
             {/* When mini-drawer */}
             <Drawer open={whenOpen} onOpenChange={setWhenOpen}>
