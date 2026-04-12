@@ -1,4 +1,5 @@
 import { client as sanityClient } from './lib/client';
+import { LocationExhibitions } from './components/LocationExhibitions';
 
 const getMonthCounts = async (client, year) => {
   const results = await client.fetch(
@@ -98,7 +99,15 @@ export const structure = async (S) => {
                   S.documentList()
                     .title('All Locations')
                     .filter('_type == "location"')
-                    .child((id) => S.document().documentId(id).schemaType('location'))
+                    .child((id) =>
+                      S.document()
+                        .documentId(id)
+                        .schemaType('location')
+                        .views([
+                          S.view.form(),
+                          S.view.component(LocationExhibitions).title('Exhibitions'),
+                        ])
+                    )
                 ),
               S.listItem()
                 .title('Manual Override')
@@ -106,7 +115,15 @@ export const structure = async (S) => {
                   S.documentList()
                     .title('Manual Override')
                     .filter('_type == "location" && hoursManualOverride == true')
-                    .child((id) => S.document().documentId(id).schemaType('location'))
+                    .child((id) =>
+                      S.document()
+                        .documentId(id)
+                        .schemaType('location')
+                        .views([
+                          S.view.form(),
+                          S.view.component(LocationExhibitions).title('Exhibitions'),
+                        ])
+                    )
                 ),
             ])
         ),
