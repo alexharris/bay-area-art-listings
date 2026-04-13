@@ -1,5 +1,7 @@
 import {defineField, defineType} from 'sanity'
 import {EventImageUrlInput} from '../components/EventImageUrlInput'
+import {StartDateInput} from '../components/StartDateInput'
+import {EndDateInput} from '../components/EndDateInput'
 
 export const listingType = defineType({
   name: 'listing',
@@ -48,14 +50,20 @@ export const listingType = defineType({
       type: 'date',
       options: {
         dateFormat: 'MMMM D, YYYY'
-      }      
+      },
+      components: {
+        input: StartDateInput,
+      },
     }),    
     defineField({
       name: 'EndDate',
       type: 'date',
       options: {
         dateFormat: 'MMMM D, YYYY'
-      }
+      },
+      components: {
+        input: EndDateInput,
+      },
     }),   
     defineField({
       name: 'DateOverride',
