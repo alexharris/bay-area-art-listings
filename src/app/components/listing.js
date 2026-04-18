@@ -220,7 +220,7 @@ export default function Listings({
             <div className="hidden md:flex flex-col gap-2 w-full">
               {renderOpenings(item) && (
                 <>
-                  <div className="text-xs uppercase tracking-wider text-gray-400">Events</div>
+                  <div className="text-xs uppercase tracking-wider text-gray-400">Upcoming Events</div>
                   {renderOpenings(item)}
                 </>
               )}
