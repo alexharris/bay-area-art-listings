@@ -56,15 +56,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <meta itemProp="name" content="Art Board"></meta>    
-        <meta itemProp="description" content="A directory of visual arts exhibitions in the San Francisco Bay Area."></meta>    
-        <meta itemProp="image" content="https://bayareaartlist.com/favicon/opengraph-image.png"></meta>        
+        <meta itemProp="name" content="Art Board"></meta>
+        <meta itemProp="description" content="A directory of visual arts exhibitions in the San Francisco Bay Area."></meta>
+        <meta itemProp="image" content="https://bayareaartlist.com/favicon/opengraph-image.png"></meta>
+        <script src="https://cdn.usefathom.com/script.js" data-site="RPZZSMRK" defer></script>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <script async data-id="101494168" src="//static.getclicky.com/js"></script>
       </body>
     </html>
   );
