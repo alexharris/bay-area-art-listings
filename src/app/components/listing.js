@@ -17,10 +17,12 @@ export default function Listings({
   endingSoonOnly,
   setEndingSoonOnly,
   openingTodayOnly,
-  setOpeningTodayOnly
+  setOpeningTodayOnly,
+  highlightSlug,
 }) {
   const [showDetails, setShowDetails] = useState({});
   const [venueOpen, setVenueOpen] = useState({});
+  const [copiedSlug, setCopiedSlug] = useState(null);
 
   const shouldShowOpenToday = (item) => item.isOnViewToday === true;
 
@@ -127,7 +129,11 @@ export default function Listings({
   return (
     <ul id="list-view" className="w-full px-3 md:p-2 lg:px-4">
       {listings.map((item, index) => (
-        <li className="border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col md:flex-row justify-between gap-4" key={item._id || index}>
+        <li
+          id={generateSlug(item.Event)}
+          className={`border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col md:flex-row justify-between gap-4${highlightSlug && generateSlug(item.Event) === highlightSlug ? ' listing-highlight' : ''}`}
+          key={item._id || index}
+        >
 
           {/* Left Column - Title + image + (notes on desktop) */}
           <div className="flex flex-col md:flex-row lg:flex-row gap-4 w-full md:w-1/2 lg:w-2/3 xl:w-1/2">
@@ -201,6 +207,21 @@ export default function Listings({
                     </span>
                 }
               </div>
+
+              {/* Share */}
+              <button
+                onClick={() => {
+                  const slug = generateSlug(item.Event);
+                  navigator.clipboard.writeText(`${window.location.origin}?show=${slug}`);
+                  setCopiedSlug(slug);
+                  setTimeout(() => setCopiedSlug(null), 2000);
+                }}
+                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 mb-2 -mt-1"
+                aria-label="Copy share link"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                {copiedSlug === generateSlug(item.Event) ? 'Copied!' : 'Share'}
+              </button>
 
               {/* Date */}
               <div className="font-semibold mb-1">
