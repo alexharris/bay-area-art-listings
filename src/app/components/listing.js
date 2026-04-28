@@ -214,30 +214,32 @@ export default function Listings({
               </div>
 
               {/* Notes — desktop only */}
-              <div className="hidden md:flex flex-col gap-2">
+              <div className="hidden md:block">
                 <NotesRenderer notes={item.Notes} itemIndex={index} />
-                <div className="flex items-center gap-1">
-                  <FavoriteButton listingId={item._id} />
-                  <button
-                    onClick={() => {
-                      const slug = generateSlug(item.Event);
-                      navigator.clipboard.writeText(`${window.location.origin}?show=${slug}`);
-                      setCopiedSlug(slug);
-                      setTimeout(() => setCopiedSlug(null), 2000);
-                    }}
-                    aria-label="Copy share link"
-                    className="pt-0 pb-1 px-1 -mt-2 text-gray-400 hover:text-gray-600 relative"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                      <polyline points="16 6 12 2 8 6"/>
-                      <line x1="12" y1="2" x2="12" y2="15"/>
-                    </svg>
-                    {copiedSlug === generateSlug(item.Event) && (
-                      <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-xs text-gray-500 whitespace-nowrap">Copied!</span>
-                    )}
-                  </button>
-                </div>
+              </div>
+
+              {/* Actions — desktop only */}
+              <div className="hidden md:flex items-center gap-1">
+                <FavoriteButton listingId={item._id} />
+                <button
+                  onClick={() => {
+                    const slug = generateSlug(item.Event);
+                    navigator.clipboard.writeText(`${window.location.origin}?show=${slug}`);
+                    setCopiedSlug(slug);
+                    setTimeout(() => setCopiedSlug(null), 2000);
+                  }}
+                  aria-label="Copy share link"
+                  className="pt-0 pb-1 px-1 -mt-2 text-gray-400 hover:text-gray-600 relative"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                    <polyline points="16 6 12 2 8 6"/>
+                    <line x1="12" y1="2" x2="12" y2="15"/>
+                  </svg>
+                  {copiedSlug === generateSlug(item.Event) && (
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-xs text-gray-500 whitespace-nowrap">Copied!</span>
+                  )}
+                </button>
               </div>
             </div>
           </div>
