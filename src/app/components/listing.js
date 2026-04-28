@@ -24,6 +24,18 @@ export default function Listings({
   const [venueOpen, setVenueOpen] = useState({});
   const [copiedSlug, setCopiedSlug] = useState(null);
 
+  const handleShare = (item) => {
+    const slug = generateSlug(item.Event);
+    const url = `${window.location.origin}?show=${slug}`;
+    if (navigator.share) {
+      navigator.share({ title: item.Event, url });
+    } else {
+      navigator.clipboard.writeText(url);
+      setCopiedSlug(slug);
+      setTimeout(() => setCopiedSlug(null), 2000);
+    }
+  };
+
   const shouldShowOpenToday = (item) => item.isOnViewToday === true;
 
   const renderVenueCard = (item, index) => {
@@ -222,13 +234,8 @@ export default function Listings({
               <div className="hidden md:flex items-center gap-1 mt-2">
                 <FavoriteButton listingId={item._id} />
                 <button
-                  onClick={() => {
-                    const slug = generateSlug(item.Event);
-                    navigator.clipboard.writeText(`${window.location.origin}?show=${slug}`);
-                    setCopiedSlug(slug);
-                    setTimeout(() => setCopiedSlug(null), 2000);
-                  }}
-                  aria-label="Copy share link"
+                  onClick={() => handleShare(item)}
+                  aria-label="Share"
                   className="pt-0 pb-1 px-1 -mt-2 text-gray-400 hover:text-gray-600 relative"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -310,13 +317,8 @@ export default function Listings({
             <div className="flex items-center gap-1">
               <FavoriteButton listingId={item._id} />
               <button
-                onClick={() => {
-                  const slug = generateSlug(item.Event);
-                  navigator.clipboard.writeText(`${window.location.origin}?show=${slug}`);
-                  setCopiedSlug(slug);
-                  setTimeout(() => setCopiedSlug(null), 2000);
-                }}
-                aria-label="Copy share link"
+                onClick={() => handleShare(item)}
+                aria-label="Share"
                 className="pt-0 pb-1 px-1 -mt-2 text-gray-400 hover:text-gray-600 relative"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
