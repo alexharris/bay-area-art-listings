@@ -27,7 +27,7 @@ const sortLabels = {
     recentlyAdded: 'Recently Added',
 };
 
-export default function DisplayListings({ newsletterSettings }) {
+export default function DisplayListings({ newsletterSettings, sharedSlug }) {
     // Get today's date in US West Coast (Pacific Time) - memoized to prevent recreation
     const today = useMemo(() => {
         return new Date(
@@ -57,6 +57,15 @@ export default function DisplayListings({ newsletterSettings }) {
     const { listings, isLoading: listingsLoading } = useListings();
     const { locations, isLoading: locationsLoading } = useLocations();
     const loading = listingsLoading || locationsLoading;
+
+    // Scroll to shared listing after data loads
+    useEffect(() => {
+        if (sharedSlug && listings && listings.length > 0) {
+            setTimeout(() => {
+                document.getElementById(sharedSlug)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+    }, [sharedSlug, listings]);
 
     // Filtering
     const [calendarTypeFilter, setCalendarTypeFilter] = useState('onview'); // onview, opening, closing
@@ -502,6 +511,7 @@ export default function DisplayListings({ newsletterSettings }) {
                                 setEndingSoonOnly={setEndingSoonOnly}
                                 openingTodayOnly={openingTodayOnly}
                                 setOpeningTodayOnly={setOpeningTodayOnly}
+                                highlightSlug={sharedSlug}
                             />
                         ) : null}
                     </>
