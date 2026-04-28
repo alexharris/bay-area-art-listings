@@ -16,7 +16,7 @@ function downloadAppleCalendarEvent({icsEvent, selectedDate}) {
             return 'Opening';
         } else if (selectedDate === 'end') {
             return 'Closing';
-        } else if (selectedDate === 'range') {
+        } else if (selectedDate === 'range' || selectedDate === 'single') {
             return '';
         }
     })();

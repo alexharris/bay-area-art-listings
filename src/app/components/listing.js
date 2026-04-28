@@ -4,11 +4,10 @@ import CalendarLink from './CalendarLink';
 import NotesRenderer from './NotesRenderer';
 import DateNote from './DateNote';
 import HoursPopup from './HoursPopup';
-import TodaysHoursStatus from './TodaysHoursStatus';
 import CityFromPlaceId from './CityFromPlaceId';
 import FavoriteButton from './FavoriteButton';
 import { Badge } from '@/components/ui/badge';
-import { generateSlug } from '../../utils/shared';
+import { generateSlug, getTodayName } from '../../utils/shared';
 
 export default function Listings({
   listings,
@@ -25,86 +24,68 @@ export default function Listings({
 
   const shouldShowOpenToday = (item) => item.isOnViewToday === true;
 
-  const renderVenueCard = (item, index, isMobile = false) => (
-    <div className={`${isMobile ? '' : 'bg-gray-50 rounded p-4'} flex flex-col justify-between`}>
-      {item.locationName.toLowerCase() === 'various'
-        ? <div className="flex flex-row font-semibold">
-            {item.eventUrl
-              ? <a href={item.eventUrl} target="_blank" rel="noopener noreferrer">{item.locationName}</a>
-              : <span>{item.locationName}</span>
-            }
-          </div>
-        : <>
-            <div className="flex flex-row items-center gap-2 mb-1 lg:mb-0">
-              {/* Mobile: name + inline chevron as toggle */}
-              <button
-                className="md:hidden flex items-center gap-1 font-semibold text-left"
-                onClick={() => setVenueOpen(prev => ({ ...prev, [index]: !prev[index] }))}
-                aria-label={venueOpen[index] ? 'Hide venue details' : 'Show venue details'}
-              >
-                {item.locationName}
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  {venueOpen[index] ? <polyline points="18 15 12 9 6 15"/> : <polyline points="6 9 12 15 18 9"/>}
-                </svg>
+  const renderVenueCard = (item, index) => {
+    if (item.locationName.toLowerCase() === 'various') {
+      return (
+        <div className="bg-gray-50 rounded p-3">
+          {item.eventUrl
+            ? <a href={item.eventUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-sm">{item.locationName}</a>
+            : <span className="font-medium text-sm">{item.locationName}</span>
+          }
+        </div>
+      );
+    }
+
+    const todayName = getTodayName();
+    const rawHours = item.locationHours?.[todayName];
+    const todayHours = rawHours
+      ? rawHours.replace(`${todayName}: `, '').replace(`${todayName}:`, '').trim()
+      : null;
+    const isClosed = todayHours?.toLowerCase().includes('closed');
+    const isOpen = todayHours && !isClosed;
+
+    const mapsUrl = item.googlePlaceId
+      ? `https://www.google.com/maps/place/?q=place_id:${item.googlePlaceId}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.locationName + ' ' + item.locationAddress)}`;
+
+    return (
+      <div className="bg-gray-50 rounded p-3 flex gap-2 text-sm text-gray-600">
+        {/* Pin icon */}
+        <span className="text-base leading-snug flex-shrink-0">📍</span>
+
+        {/* Content */}
+        <div className="flex flex-col gap-1">
+          <a href={item.locationUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-gray-900">
+            {item.locationName}
+          </a>
+          <CityFromPlaceId googlePlaceId={item.googlePlaceId} fallbackAddress={item.locationAddress} />
+          {todayHours ? (
+            <HoursPopup locationName={item.locationName} locationHours={item.locationHours} locationUrl={item.locationUrl}>
+              <button className="flex items-center gap-1 cursor-pointer underline w-fit">
+                Today: {isClosed ? 'Closed' : todayHours}
               </button>
-              {/* Desktop: name as link */}
-              <a href={item.locationUrl} target="_blank" rel="noopener noreferrer" className="hidden md:block font-semibold">
-                {item.locationName}
-              </a>
-            </div>
-
-            <div className={`${venueOpen[index] ? 'flex' : 'hidden'} md:flex flex-col gap-1`}>
-              <div className="hidden md:block">
-                <CityFromPlaceId googlePlaceId={item.googlePlaceId} fallbackAddress={item.locationAddress} />
-              </div>
-              <TodaysHoursStatus locationHours={item.locationHours} locationUrl={item.locationUrl} locationName={item.locationName} />
-            </div>
-
-            <div className={`${venueOpen[index] ? 'flex' : 'hidden'} md:flex flex-row items-center gap-2 mt-1`}>
+            </HoursPopup>
+          ) : !item.locationHours ? (
+            <a href={item.locationUrl} target="_blank" rel="noopener noreferrer" className="underline">Check hours</a>
+          ) : null}
+          <div className="flex items-center gap-3 mt-0.5">
+            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="underline">
+              Directions
+            </a>
+            {item.locationInstagram && (
               <a
-                className="flex flex-row gap-1 items-center"
-                href={item.googlePlaceId
-                  ? `https://www.google.com/maps/place/?q=place_id:${item.googlePlaceId}`
-                  : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.locationName + ' ' + item.locationAddress)}`}
+                href={`https://instagram.com/${item.locationInstagram.replace(/^@/, '')}`}
                 target="_blank" rel="noopener noreferrer"
+                className="underline"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-map-pin w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Instagram
               </a>
-              <a className="underline flex flex-row gap-1 items-center" href={item.locationUrl} target="_blank" rel="noopener noreferrer" aria-label="Visit venue website">
-                <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-globe w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              </a>
-              <div>
-                {item.locationHours ? (
-                  <HoursPopup locationName={item.locationName} locationHours={item.locationHours} locationUrl={item.locationUrl}>
-                    <button className="underline flex flex-row gap-1 items-center cursor-pointer" aria-label="View hours">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    </button>
-                  </HoursPopup>
-                ) : (
-                  <span className="flex flex-row gap-1 items-center" aria-label="Hours not available">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-clock w-6 lg:w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  </span>
-                )}
-              </div>
-              {item.locationInstagram && (
-                <a
-                  className="underline flex flex-row gap-1 items-center"
-                  href={`https://instagram.com/${item.locationInstagram.replace(/^@/, '')}`}
-                  target="_blank" rel="noopener noreferrer"
-                  aria-label={`${item.locationName} on Instagram`}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="feather feather-instagram w-6 lg:w-5" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
-                  </svg>
-                </a>
-              )}
-            </div>
-          </>
-      }
-    </div>
-  );
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const renderOpenings = (item) => {
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
@@ -114,32 +95,42 @@ export default function Listings({
     if (!upcoming.length) return null;
     return (
       <div className="flex flex-col gap-1 mt-1">
-        {upcoming.map((opening, idx) => (
-          <div key={opening._key || idx} className="text-sm">
+        {upcoming.map((opening, idx) => {
+          const isToday = opening.date === today;
+          return (
+          <div key={opening._key || idx} className="text-sm border-b border-dashed border-gray-100 pb-1.5 last:border-0 last:pb-0">
             <div className="flex flex-col">
               <div className="flex items-center">
-                <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-1.5 flex-shrink-0"></span>
+                <span className={`inline-block w-2 h-2 rounded-full mr-1.5 flex-shrink-0 ${isToday ? 'bg-green-400' : 'bg-yellow-400'}`}></span>
                 <span className="font-medium">{opening.title}</span>
               </div>
-              <div className="ml-3.5 text-gray-700">
-                {new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}
-                {opening.time && ` ${opening.time}`}
+              <div className="text-gray-700">
+                <CalendarLink
+                  dateLabel={`${new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}${opening.time ? ` • ${opening.time}` : ''}`}
+                  singleEvent={{
+                    title: opening.title,
+                    date: opening.date,
+                    time: opening.time,
+                    locationName: item.locationName,
+                  }}
+                />
               </div>
             </div>
-            {opening.note && <div className="text-gray-600 ml-3.5">{opening.note}</div>}
+            {opening.note && <div className="text-gray-600">{opening.note}</div>}
           </div>
-        ))}
+          );
+        })}
       </div>
     );
   };
 
   return (
-    <ul id="list-view" className="w-full px-3 md:p-2 lg:p-0 lg:pr-6">
+    <ul id="list-view" className="w-full px-3 md:p-2 lg:px-4">
       {listings.map((item, index) => (
-        <li className="border-b min-h-40 border-dashed border-gray-400 py-6 w-full relative flex flex-col md:flex-row justify-between gap-2 lg:gap-4" key={item._id || index}>
+        <li className="border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col md:flex-row justify-between gap-4" key={item._id || index}>
 
           {/* Left Column - Title + image + (notes on desktop) */}
-          <div className="flex flex-col md:flex-row lg:flex-row gap-3 w-full md:w-2/3">
+          <div className="flex flex-col md:flex-row lg:flex-row gap-4 w-full md:w-1/2 lg:w-2/3 xl:w-1/2">
 
             {/* Desktop gallery well — hidden on mobile */}
             {item.eventImageUrl && (
@@ -167,10 +158,10 @@ export default function Listings({
               </div>
             )}
 
-            <div className="flex flex-col gap-3 flex-1">
+            <div className="flex flex-col flex-1">
               {/* Mobile gallery well — above title on mobile */}
               {item.eventImageUrl && (
-                <div className="md:hidden w-full bg-gray-100 rounded overflow-hidden">
+                <div className="md:hidden w-full bg-gray-100 rounded overflow-hidden mb-3">
                   <div className="relative w-full aspect-[4/3]">
                     {item.eventImageUrl.includes('cdn.sanity.io') ? (
                       <Image
@@ -195,7 +186,7 @@ export default function Listings({
               )}
 
               {/* Title */}
-              <div className="md:-mt-1">
+              <div className="md:-mt-1 mb-2">
                 {item.EventUrl
                   ? <a
                       href={item.EventUrl}
@@ -211,43 +202,51 @@ export default function Listings({
                 }
               </div>
 
-              {/* Notes + openings — desktop only */}
+              {/* Date */}
+              <div className="font-semibold mb-1">
+                <CalendarLink listing={item} location="" dateLabel={item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`} />
+              </div>
+
+              {/* Notes — desktop only */}
               <div className="hidden md:flex flex-col gap-2">
                 <NotesRenderer notes={item.Notes} itemIndex={index} />
                 <FavoriteButton listingId={item._id} />
-                {renderOpenings(item)}
               </div>
             </div>
           </div>
 
-          {/* Right Side Container - Date and Location */}
-          <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-2 lg:gap-4 w-full md:w-auto lg:w-1/2">
+          {/* Right Side Container - Subevents and Location */}
+          <div className="hidden md:flex md:flex-row lg:flex-col xl:flex-row items-start gap-2 lg:gap-4 md:w-1/2 lg:w-1/3 xl:w-1/2">
 
-            {/* Date section */}
-            <div className="flex flex-col gap-2 w-full text-left items-start justify-start">
-              <div className="font-semibold">
-                <CalendarLink listing={item} location="" dateLabel={item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`} />
-              </div>
-
-              <div className="flex flex-row flex-wrap gap-2 items-start">
-                <DateNote
-                  startDate={item.StartDate}
-                  endDate={item.EndDate}
-                  endingSoonOnly={endingSoonOnly}
-                  setEndingSoonOnly={setEndingSoonOnly}
-                  openingTodayOnly={openingTodayOnly}
-                  setOpeningTodayOnly={setOpeningTodayOnly}
-                />
-                {shouldShowOpenToday(item) && (
-                  <Badge
-                    variant="outline"
-                    className="!border-green-300 text-black hover:bg-green-50 cursor-pointer transition-colors"
-                    onClick={() => setOnViewToday(!onViewToday)}
-                  >
-                    On View Today
-                  </Badge>
-                )}
-              </div>
+            {/* Badges + subevents — desktop only, always reserve space */}
+            <div className="hidden md:flex flex-col gap-2 w-full">
+              {renderOpenings(item) && (
+                <>
+                  <div className="text-xs uppercase tracking-wider text-gray-400">Upcoming Events</div>
+                  {renderOpenings(item)}
+                </>
+              )}
+              {(shouldShowOpenToday(item) || item.StartDate || item.EndDate) && (
+                <div className="flex flex-row flex-wrap gap-2">
+                  <DateNote
+                    startDate={item.StartDate}
+                    endDate={item.EndDate}
+                    endingSoonOnly={endingSoonOnly}
+                    setEndingSoonOnly={setEndingSoonOnly}
+                    openingTodayOnly={openingTodayOnly}
+                    setOpeningTodayOnly={setOpeningTodayOnly}
+                  />
+                  {shouldShowOpenToday(item) && (
+                    <Badge
+                      variant="outline"
+                      className="!border-green-300 text-black hover:bg-green-50 cursor-pointer transition-colors"
+                      onClick={() => setOnViewToday(!onViewToday)}
+                    >
+                      On View Today
+                    </Badge>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Venue section — desktop only (mobile renders at bottom of li) */}
@@ -257,8 +256,27 @@ export default function Listings({
 
           </div>
 
-          {/* Notes + openings — mobile only */}
-          <div className="md:hidden flex flex-col">
+          {/* Notes + badges + openings — mobile only */}
+          <div className="md:hidden flex flex-col gap-2">
+            <div className="flex flex-row flex-wrap gap-2">
+              <DateNote
+                startDate={item.StartDate}
+                endDate={item.EndDate}
+                endingSoonOnly={endingSoonOnly}
+                setEndingSoonOnly={setEndingSoonOnly}
+                openingTodayOnly={openingTodayOnly}
+                setOpeningTodayOnly={setOpeningTodayOnly}
+              />
+              {shouldShowOpenToday(item) && (
+                <Badge
+                  variant="outline"
+                  className="!border-green-300 text-black hover:bg-green-50 cursor-pointer transition-colors"
+                  onClick={() => setOnViewToday(!onViewToday)}
+                >
+                  On View Today
+                </Badge>
+              )}
+            </div>
             <NotesRenderer notes={item.Notes} itemIndex={index} />
             <FavoriteButton listingId={item._id} />
             {renderOpenings(item)}
@@ -266,7 +284,7 @@ export default function Listings({
 
           {/* Venue card — mobile only, at bottom */}
           <div className="md:hidden">
-            {renderVenueCard(item, index, true)}
+            {renderVenueCard(item, index)}
           </div>
 
           {showDetails[index] && (

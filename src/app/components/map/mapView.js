@@ -7,72 +7,221 @@ import { extractPortableTextContent } from '../../../utils/helpers';
 import TodaysHoursStatus from '../TodaysHoursStatus';
 import HoursPopup from '../HoursPopup';
 import { formatDate } from '../../../utils/shared';
+import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import Image from 'next/image';
+import CalendarLink from '../CalendarLink';
+import NotesRenderer from '../NotesRenderer';
+import DateNote from '../DateNote';
+import { Badge } from '@/components/ui/badge';
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
-const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
-// ShowCard component for displaying individual show details
-function ShowCard({ item, compact = false }) {
-    const description = item.Notes ? extractPortableTextContent(item.Notes) : '';
-    
+// MapController fits the map to visible marker positions when a county is selected or flies to user location
+const MapController = dynamic(
+    () => Promise.all([import('react-leaflet'), import('leaflet')]).then(([rl, L]) => {
+        const useMap = rl.useMap;
+        function Controller({ selectedCounty, markerPositions, userLocation }) {
+            const map = useMap();
+            useEffect(() => {
+                if (userLocation) {
+                    map.flyTo([userLocation.lat, userLocation.lng], 13, { duration: 0.8 });
+                    return;
+                }
+                const hasCounty = selectedCounty?.length > 0;
+                if (!hasCounty) {
+                    map.flyTo([37.7749, -122.4194], 10, { duration: 0.8 });
+                    return;
+                }
+                if (markerPositions.length === 0) return;
+                if (markerPositions.length === 1) {
+                    map.flyTo(markerPositions[0], 14, { duration: 0.8 });
+                    return;
+                }
+                const bounds = L.latLngBounds(markerPositions);
+                map.flyToBounds(bounds, { padding: [60, 60], maxZoom: 14, duration: 1.2 });
+            }, [selectedCounty?.length, markerPositions.length, userLocation?.lat, userLocation?.lng]);
+            return null;
+        }
+        return Controller;
+    }),
+    { ssr: false }
+);
+
+// Render sub-events (openings) matching the list view style
+function renderOpenings(item) {
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+    const upcoming = item.openings
+        ?.filter(o => o.date >= today)
+        .sort((a, b) => a.date.localeCompare(b.date)) || [];
+    if (!upcoming.length) return null;
     return (
-        <div className="flex flex-col border border-gray-100 p-3 rounded-md">
-            <div className="flex gap-3">
-                {item.eventImageUrl && (
-                    <div className="flex-shrink-0">
-                        <img 
-                            src={item.eventImageUrl} 
-                            alt={item.eventImageCaption || item.Event}
-                            className="w-24 h-24 object-cover rounded"
-                        />
-                        {item.eventImageCaption && (
-                            <p className="text-xs text-gray-500 mt-1 italic w-24">{item.eventImageCaption}</p>
+        <div className="flex flex-col gap-1 mt-1">
+            {upcoming.map((opening, idx) => {
+                const isToday = opening.date === today;
+                return (
+                    <div key={opening._key || idx} className="text-sm border-b border-dashed border-gray-100 pb-1.5 last:border-0 last:pb-0">
+                        <div className="flex flex-col">
+                            <div className="flex items-center">
+                                <span className={`inline-block w-2 h-2 rounded-full mr-1.5 flex-shrink-0 ${isToday ? 'bg-green-400' : 'bg-yellow-400'}`}></span>
+                                <span className="font-medium">{opening.title}</span>
+                            </div>
+                            <div className="text-gray-700">
+                                <CalendarLink
+                                    dateLabel={`${new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}${opening.time ? ` ${opening.time}` : ''}`}
+                                    singleEvent={{
+                                        title: opening.title,
+                                        date: opening.date,
+                                        time: opening.time,
+                                        locationName: item.locationName,
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        {opening.note && <div className="text-gray-600">{opening.note}</div>}
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
+// ShowCard mirrors the mobile list view layout
+function ShowCard({ item, formatDate }) {
+    return (
+        <div className="border-b border-dashed border-gray-300 py-4 last:border-0 flex flex-col gap-2">
+            {/* Image */}
+            {item.eventImageUrl && (
+                <div className="w-full bg-gray-100 rounded overflow-hidden mb-1">
+                    <div className="relative w-full aspect-[4/3]">
+                        {item.eventImageUrl.includes('cdn.sanity.io') ? (
+                            <Image
+                                src={item.eventImageUrl}
+                                alt={item.eventImageCaption || item.Event}
+                                fill
+                                className="object-cover"
+                                sizes="100vw"
+                            />
+                        ) : (
+                            <img
+                                src={item.eventImageUrl}
+                                alt={item.eventImageCaption || item.Event}
+                                className="w-full h-full object-cover"
+                            />
                         )}
                     </div>
-                )}
-                
-                <div className="flex flex-col flex-1 min-w-0">
-                    {item.EventUrl ? (
-                        <a
-                            href={item.EventUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-lg font-medium hover:text-blue-600 transition-colors"
-                        >
-                            {item.Event}
-                        </a>
-                    ) : (
-                        <span className="text-lg font-medium">
-                            {item.Event}
-                        </span>
-                    )}
-                    <span className="text-sm text-gray-600 mb-2">
-                        {item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`}
-                    </span>
-                    
-                    {description && (
-                        <div className="max-h-36 overflow-y-scroll text-sm text-gray-700 leading-relaxed">
-                            {description}
-                        </div>
+                    {item.eventImageCaption && (
+                        <p className="text-xs text-gray-400 px-2.5 py-2 leading-snug">{item.eventImageCaption}</p>
                     )}
                 </div>
+            )}
+
+            {/* Title */}
+            <div className="mb-1">
+                {item.EventUrl ? (
+                    <a href={item.EventUrl} target="_blank" rel="noopener noreferrer" className="text-2xl">
+                        <h3>{item.Event}<svg xmlns="http://www.w3.org/2000/svg" className="inline-block ml-1 w-4 h-4 align-baseline" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></h3>
+                    </a>
+                ) : (
+                    <span className="text-2xl"><h3>{item.Event}</h3></span>
+                )}
+            </div>
+
+            {/* Date */}
+            <div className="font-semibold mb-1">
+                <CalendarLink listing={item} location="" dateLabel={item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`} />
+            </div>
+
+            {/* Badges */}
+            <div className="flex flex-row flex-wrap gap-2">
+                <DateNote startDate={item.StartDate} endDate={item.EndDate} endingSoonOnly={false} setEndingSoonOnly={() => {}} openingTodayOnly={false} setOpeningTodayOnly={() => {}} />
+                {item.isOnViewToday && (
+                    <Badge variant="outline" className="!border-green-300 text-black">On View Today</Badge>
+                )}
+            </div>
+
+            {/* Notes */}
+            <NotesRenderer notes={item.Notes} itemIndex={item._id} />
+
+            {/* Sub-events */}
+            {renderOpenings(item)}
+        </div>
+    );
+}
+
+// Mobile bottom sheet content for a location group
+function LocationSheet({ group, formatDate }) {
+    if (!group) return null;
+    const { locationName, locationAddress, locationUrl, locationHours, items } = group;
+    const hasOnViewToday = items.some(item => item.isOnViewToday === true);
+
+    return (
+        <div className="flex flex-col min-h-0 flex-1">
+            {/* Sticky header */}
+            <div className="px-4 pt-2 pb-3 border-b border-gray-100">
+                <h2 className="text-lg font-semibold mb-2">{locationName}</h2>
+                <div className="flex gap-4 text-sm">
+                    <a
+                        className="flex items-start gap-1.5 text-gray-600 hover:text-black underline decoration-dashed"
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationAddress)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        {locationAddress}
+                    </a>
+                </div>
+                <div className="flex gap-4 mt-2 text-sm">
+                    {locationUrl && (
+                        <a
+                            className="flex items-center gap-1.5 text-gray-600 hover:text-black underline decoration-dashed"
+                            href={locationUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            Website
+                        </a>
+                    )}
+                    {hasOnViewToday && (
+                        <HoursPopup
+                            locationName={locationName}
+                            locationHours={locationHours}
+                            locationUrl={locationUrl}
+                        >
+                            <button className="flex items-center gap-1.5 text-gray-600 hover:text-black text-sm underline decoration-dashed">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                Hours
+                            </button>
+                        </HoursPopup>
+                    )}
+                </div>
+            </div>
+
+            {/* Scrollable show list */}
+            <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3 pb-[env(safe-area-inset-bottom)]">
+                {items.map((item, i) => (
+                    <ShowCard key={i} item={item} formatDate={formatDate} />
+                ))}
             </div>
         </div>
     );
 }
 
-export default function MapView({ 
-    filteredListings, 
-    locations, 
-    highlightsOnly, 
-    selectedLocation, 
-    searchTerm 
+export default function MapView({
+    filteredListings,
+    locations,
+    highlightsOnly,
+    selectedLocation,
+    selectedCounty,
+    searchTerm,
+    userLocation,
 }) {
     const [L, setL] = useState(null);
-    const [carouselIndices, setCarouselIndices] = useState({});
+    const [isMobile, setIsMobile] = useState(false);
+    const [selectedGroup, setSelectedGroup] = useState(null);
 
     // Load Leaflet when component mounts
     useEffect(() => {
@@ -81,9 +230,16 @@ export default function MapView({
         });
     }, []);
 
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 1024);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, []);
+
     if (!L) {
         return (
-            <div className="h-screen border w-full flex items-center justify-center" role="status" aria-label="Loading map">
+            <div className="h-full border w-full flex items-center justify-center" role="status" aria-label="Loading map">
                 <div className="animate-pulse text-2xl text-gray-500">Loading map...</div>
             </div>
         );
@@ -91,22 +247,22 @@ export default function MapView({
 
     // Filter listings for map display
     const filteredItems = filteredListings
-        .filter(item => highlightsOnly ? item.Highlight : true)                                        
+        .filter(item => highlightsOnly ? item.Highlight : true)
         .filter(item => selectedLocation ? item.locationName === selectedLocation : true)
         .filter(item => item.locationName.toLowerCase() !== 'various')
         .filter(item => {
             const searchLower = searchTerm.toLowerCase();
-            
-            return item.Event.toLowerCase().includes(searchLower) || 
-                   item.locationName.toLowerCase().includes(searchLower) || 
+
+            return item.Event.toLowerCase().includes(searchLower) ||
+                   item.locationName.toLowerCase().includes(searchLower) ||
                    (item.locationAddress ? item.locationAddress.toLowerCase().includes(searchLower) : false) ||
                    extractPortableTextContent(item.Notes).toLowerCase().includes(searchLower) ||
                    (item.locationUrl ? item.locationUrl.toLowerCase().includes(searchLower) : false);
         });
-    
+
     // Group listings by location coordinates
     const locationGroups = {};
-    
+
     filteredItems.forEach(item => {
         const location = locations.find(loc => loc.Name === item.locationName);
         if (location && location.Geolocation) {
@@ -126,23 +282,29 @@ export default function MapView({
         }
     });
 
-    const toggleShow = (key, direction) => {
-        setCarouselIndices(prev => {
-            const currentIndex = prev[key] || 0;
-            const totalItems = locationGroups[key].items.length;
-            const newIndex = direction === 'next'
-                ? (currentIndex + 1) % totalItems
-                : (currentIndex - 1 + totalItems) % totalItems;
-            return {
-                ...prev,
-                [key]: newIndex
-            };
-        });
-    };
+    const markerPositions = Object.values(locationGroups).map(g => g.position);
+
+    // Blue dot icon for user's position
+    const userLocationIconUrl = `data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='9' fill='%234A90D9' stroke='white' stroke-width='2'/%3E%3Ccircle cx='10' cy='10' r='4' fill='white'/%3E%3C/svg%3E`;
+
+    const userMarker = userLocation ? (
+        <Marker
+            key="user-location"
+            position={[userLocation.lat, userLocation.lng]}
+            icon={L.icon({
+                iconUrl: userLocationIconUrl,
+                iconSize: [20, 20],
+                iconAnchor: [10, 10],
+                popupAnchor: [0, -12]
+            })}
+        >
+        </Marker>
+    ) : null;
+
 
     const markers = Object.entries(locationGroups).map(([key, group]) => {
         const totalItems = group.items.length;
-        
+
         // Check if any item in the group is "on view today" using the pre-computed flag
         // (accounts for both show dates AND venue hours)
         const hasOnViewToday = group.items.some(item => item.isOnViewToday === true);
@@ -166,7 +328,7 @@ export default function MapView({
             }
             return hasOnViewToday ? singlePinOpenIcon : singlePinClosedIcon;
         };
-        
+
         return (
             <Marker
                 key={key}
@@ -177,96 +339,50 @@ export default function MapView({
                     iconAnchor: [12, 23],
                     popupAnchor: [0, -23]
                 })}
+                eventHandlers={{
+                    click: () => setSelectedGroup(group)
+                }}
             >
-            <Popup className="location-popup" maxWidth={400}>
-                <div className="popup-content">
-                {/* Header bar with location info */}
-                <div className="pb-3 mb-4">
-                    <h2 className="text-xl font-semibold mb-1">{group.locationName}</h2>
-                    <div className="flex flex-wrap gap-4 text-sm">
-                    <a
-                        className="flex flex-row gap-1 items-center text-black hover:text-blue-600"
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(group.locationAddress)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="View on Google Maps"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    </a>
-                    {group.locationUrl && (
-                        <a
-                        className="flex flex-row gap-1 items-center text-black hover:text-blue-600"
-                        href={group.locationUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="Visit venue website"
-                        >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                        </a>
-                    )}
-                    {hasOnViewToday && (
-                        <HoursPopup
-                        locationName={group.locationName}
-                        locationHours={group.locationHours}
-                        locationUrl={group.locationUrl}
-                        >
-                        <button className="flex flex-row gap-1 items-center text-black hover:text-blue-600" aria-label="View hours">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        </button>
-                        </HoursPopup>
-                    )}
-                    </div>
-                </div>
-                
-                {/* Shows section */}
-                <div>
-                    {totalItems === 1 ? (
-                    // Single show - display directly
-                    <ShowCard item={group.items[0]} />
-                    ) : (
-                    // Multiple shows - carousel
-                    <div className="space-y-4">
-                        <ShowCard item={group.items[carouselIndices[key] || 0]} />
-                        
-                        <div className="flex flex-row justify-end items-center gap-3">
-                        <button 
-                            onClick={() => toggleShow(key, 'prev')}
-                            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                            aria-label="Previous show"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                        </button>
-                        <span className="text-sm text-gray-500 font-medium min-w-[3rem] text-center">
-                            {(carouselIndices[key] || 0) + 1} of {totalItems}
-                        </span>
-                        <button 
-                            onClick={() => toggleShow(key, 'next')}
-                            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                            aria-label="Next show"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                        </button>
-                        </div>
-                    </div>
-                    )}
-                </div>
-                </div>
-            </Popup>
             </Marker>
         );
     });
 
     return (
-        <div id="map-view" className="w-full">
-            <div className="h-screen w-full">
-                <MapContainer center={[37.7749, -122.4194]} zoom={10} scrollWheelZoom={true} className="h-screen w-full z-0">
+        <div id="map-view" className="w-full h-full relative">
+            <div className="h-full w-full">
+                <MapContainer center={[37.7749, -122.4194]} zoom={10} scrollWheelZoom={true} className="h-full w-full z-0">
                     <TileLayer
                         attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
                         url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png"
                     />
+                    <MapController selectedCounty={selectedCounty} markerPositions={markerPositions} userLocation={userLocation} />
                     {markers}
+                    {userMarker}
                 </MapContainer>
             </div>
+
+            {/* Desktop side panel */}
+            <div className={`hidden lg:flex flex-col absolute top-0 bottom-0 right-0 w-96 bg-white shadow-xl z-[1000] transition-transform duration-300 ease-in-out ${selectedGroup ? 'translate-x-0' : 'translate-x-full'}`}>
+                {selectedGroup && (
+                    <>
+                        <button
+                            onClick={() => setSelectedGroup(null)}
+                            className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
+                            aria-label="Close panel"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                        <LocationSheet group={selectedGroup} formatDate={formatDate} />
+                    </>
+                )}
+            </div>
+
+            {/* Mobile bottom sheet */}
+            <Drawer open={isMobile && !!selectedGroup} onOpenChange={(open) => { if (!open) setSelectedGroup(null); }}>
+                <DrawerContent className="flex flex-col max-h-[70vh]">
+                    <LocationSheet group={selectedGroup} formatDate={formatDate} />
+                </DrawerContent>
+            </Drawer>
         </div>
     );
 }

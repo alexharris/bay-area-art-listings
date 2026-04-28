@@ -77,7 +77,7 @@ export default function AboutContent() {
     <div className="flex flex-col font-[family-name:var(--font-geist-sans)] min-h-[400px]">
       {loading ? (
         <div className="flex items-center justify-center flex-1">
-          <div className="animate-pulse text-3xl">🎨</div>
+          <div className="w-6 h-6 border-2 border-gray-200 border-t-gray-600 rounded-full animate-spin" />
         </div>
       ) : (
         content.map((item, index) => (

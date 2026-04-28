@@ -52,14 +52,13 @@ export function getCalendarTypeCounts(currentFilters, listings) {
  * Get counts for all county filter options
  * @param {Object} currentFilters - Current filter state
  * @param {Array} listings - All listings
- * @param {Function} getZipcodesByCounty - Function to get zipcodes for a county
  * @returns {Object} Object with counts for each county option
  */
-export function getCountyCounts(currentFilters, listings, getZipcodesByCounty) {
+export function getCountyCounts(currentFilters, listings) {
   const counties = [
     'All',
     'Alameda',
-    'Contra Costa', 
+    'Contra Costa',
     'Marin',
     'Napa',
     'Sacramento',
@@ -69,18 +68,13 @@ export function getCountyCounts(currentFilters, listings, getZipcodesByCounty) {
     'Solano',
     'Sonoma'
   ];
-  
+
   const counts = {};
-  
+
   counties.forEach(county => {
-    if (county === 'All') {
-      counts[county] = calculateFilterCount(currentFilters, listings, 'county', []);
-    } else {
-      const countyZipcodes = getZipcodesByCounty(county);
-      counts[county] = calculateFilterCount(currentFilters, listings, 'county', countyZipcodes);
-    }
+    counts[county] = calculateFilterCount(currentFilters, listings, 'county', county === 'All' ? [] : [county]);
   });
-  
+
   return counts;
 }
 

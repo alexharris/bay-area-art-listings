@@ -1,4 +1,7 @@
 import {defineField, defineType} from 'sanity'
+import {EventImageUrlInput} from '../components/EventImageUrlInput'
+import {StartDateInput} from '../components/StartDateInput'
+import {EndDateInput} from '../components/EndDateInput'
 
 export const listingType = defineType({
   name: 'listing',
@@ -19,11 +22,23 @@ export const listingType = defineType({
       title: 'SFAW URL'
     }),
     defineField({
+      name: 'EventImageUpload',
+      type: 'image',
+      title: 'Event Image',
+      description: 'Upload an image directly to Sanity (enables cropping, CDN serving). Takes priority over Event Image URL.',
+      options: {
+        hotspot: true,
+      },
+    }),
+    defineField({
       name: 'EventImageUrl',
       type: 'url',
-      title: 'Event Image URL',
-      description: 'URL of image to display when hovering over the event title'
-    }),     
+      title: 'Event Image URL (external)',
+      description: 'Paste an external URL, then click "Import to Sanity" to ingest it as a managed asset.',
+      components: {
+        input: EventImageUrlInput,
+      },
+    }),
     defineField({
       name: 'EventImageCaption',
       type: 'string',
@@ -35,14 +50,20 @@ export const listingType = defineType({
       type: 'date',
       options: {
         dateFormat: 'MMMM D, YYYY'
-      }      
+      },
+      components: {
+        input: StartDateInput,
+      },
     }),    
     defineField({
       name: 'EndDate',
       type: 'date',
       options: {
         dateFormat: 'MMMM D, YYYY'
-      }
+      },
+      components: {
+        input: EndDateInput,
+      },
     }),   
     defineField({
       name: 'DateOverride',

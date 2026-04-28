@@ -102,9 +102,6 @@ export default function FilterPresets({
                     <SelectItem value="anytime">
                         Anytime {calendarDateRangePreset !== 'anytime' && dateRangeCounts['anytime'] !== undefined ? `(${dateRangeCounts['anytime']})` : ''}
                     </SelectItem>
-                    <SelectItem value="today">
-                        Today {calendarDateRangePreset !== 'today' && dateRangeCounts['today'] !== undefined ? `(${dateRangeCounts['today']})` : ''}
-                    </SelectItem>
                     <SelectItem value="next7">
                         Next 7 Days {calendarDateRangePreset !== 'next7' && dateRangeCounts['next7'] !== undefined ? `(${dateRangeCounts['next7']})` : ''}
                     </SelectItem>

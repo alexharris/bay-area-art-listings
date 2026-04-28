@@ -95,6 +95,10 @@ function DisplayListingsInner({ newsletterSettings }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [selectedCounty, setSelectedCounty] = useState([]);
+    const [userLocation, setUserLocation] = useState(null);
+    const [nearbyRadius, setNearbyRadius] = useState(10);
+    const [locationError, setLocationError] = useState(null);
+    const [locationLoading, setLocationLoading] = useState(false);
     //  Sorting
     // Display
     const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('custom');
@@ -113,7 +117,6 @@ function DisplayListingsInner({ newsletterSettings }) {
 
     // Mobile UI state
     const [mobileSortOpen, setMobileSortOpen] = useState(false);
-    const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
 
     // Use ref to track if initial setup is complete
@@ -134,6 +137,8 @@ function DisplayListingsInner({ newsletterSettings }) {
         selectedCounty,
         calendarTypeFilter,
         calendarDateRangeFilter,
+        userLocation,
+        nearbyRadius,
     }), [
         highlightsOnly,
         onViewToday,
@@ -147,7 +152,10 @@ function DisplayListingsInner({ newsletterSettings }) {
         JSON.stringify(selectedCounty),
         calendarTypeFilter,
         calendarDateRangeFilter?.from?.getTime(),
-        calendarDateRangeFilter?.to?.getTime()
+        calendarDateRangeFilter?.to?.getTime(),
+        userLocation?.lat,
+        userLocation?.lng,
+        nearbyRadius,
     ]);
 
     // Set initial calendar filter defaults
@@ -213,6 +221,13 @@ function DisplayListingsInner({ newsletterSettings }) {
         setIsMapView(prev => !prev);
     }, []);
 
+    // Scroll to top when entering map view so sticky sidebar aligns correctly
+    useEffect(() => {
+        if (isMapView) {
+            window.scrollTo(0, 0);
+        }
+    }, [isMapView]);
+
     const updateCalendarDateRangeFilter = useCallback((dateRange) => {
         // Handle dates properly to avoid timezone issues
         let fromDate, toDate;
@@ -244,6 +259,41 @@ function DisplayListingsInner({ newsletterSettings }) {
         setCalendarDateRangePreset('custom');
     }, [setCalendarDateRangeFilter]);
 
+    const getUserLocation = useCallback(() => {
+        setLocationLoading(true);
+        setLocationError(null);
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+                setSelectedCounty([]);
+                setLocationLoading(false);
+            },
+            (err) => {
+                const msg =
+                    err.code === 1 ? 'Permission denied' :
+                    err.code === 2 ? 'Position unavailable' :
+                    err.code === 3 ? 'Request timed out' :
+                    'Location unavailable';
+                setLocationError(msg);
+                setLocationLoading(false);
+            }
+        );
+    }, []);
+
+    const clearUserLocation = useCallback(() => {
+        setUserLocation(null);
+        setLocationError(null);
+    }, []);
+
+    // Wraps setSelectedCounty to clear Near Me when a county is chosen
+    const handleSetSelectedCounty = useCallback((county) => {
+        setSelectedCounty(county);
+        if (county && county.length > 0) {
+            setUserLocation(null);
+            setLocationError(null);
+        }
+    }, []);
+
     const clearAllFilters = useCallback(() => {
         // Reset all filters to their initial values
         setCalendarTypeFilter('onview');
@@ -256,6 +306,8 @@ function DisplayListingsInner({ newsletterSettings }) {
         setSearchTerm('');
         setSelectedLocation('');
         setSelectedCounty([]);
+        setUserLocation(null);
+        setLocationError(null);
         setSortMethod('closingSoon');
 
         // Reset calendar date range to initial state (10 years from start of month)
@@ -273,7 +325,8 @@ function DisplayListingsInner({ newsletterSettings }) {
         <>
             {/* Mobile Header */}
             <MobileHeader
-                onSearchOpen={() => setMobileSearchOpen(true)}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
             />
 
             {/* Mobile Filter Chip Row */}
@@ -288,7 +341,7 @@ function DisplayListingsInner({ newsletterSettings }) {
                 showCustomCalendar={showCustomCalendar}
                 setShowCustomCalendar={setShowCustomCalendar}
                 selectedCounty={selectedCounty}
-                setSelectedCounty={setSelectedCounty}
+                setSelectedCounty={handleSetSelectedCounty}
                 onViewToday={onViewToday}
                 setOnViewToday={setOnViewToday}
                 endingSoonOnly={endingSoonOnly}
@@ -314,6 +367,13 @@ function DisplayListingsInner({ newsletterSettings }) {
                 setMobileSearchOpen={setMobileSearchOpen}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
+                userLocation={userLocation}
+                nearbyRadius={nearbyRadius}
+                setNearbyRadius={setNearbyRadius}
+                locationError={locationError}
+                locationLoading={locationLoading}
+                getUserLocation={getUserLocation}
+                clearUserLocation={clearUserLocation}
             />
 
             {/* Mobile Bottom Bar */}
@@ -329,11 +389,11 @@ function DisplayListingsInner({ newsletterSettings }) {
                 setSortMethod={setSortMethod}
             />
 
-            <div className={`flex flex-row w-full items-start lg:gap-4 ${isMapView ? 'h-screen' : ''}`}>
+            <div className={`flex flex-row w-full items-start pt-24 lg:pt-0 ${isMapView ? 'h-screen' : ''}`}>
 
                 {/* Desktop Sidebar */ }
                 <div
-                    className="w-[400px] sticky top-0 pt-4 hidden lg:block h-screen"
+                    className="w-[400px] sticky top-0 pt-4 hidden lg:block h-screen border-r border-gray-200"
                 >
                     <Sidebar
                         // Display states
@@ -354,6 +414,8 @@ function DisplayListingsInner({ newsletterSettings }) {
                         calendarDateRangePreset={calendarDateRangePreset}
                         setCalendarDateRangePreset={setCalendarDateRangePreset}
                         specialFilterCounts={specialFilterCounts}
+                        onViewToday={onViewToday}
+                        setOnViewToday={setOnViewToday}
                         openingTodayOnly={openingTodayOnly}
                         setOpeningTodayOnly={setOpeningTodayOnly}
                         endingSoonOnly={endingSoonOnly}
@@ -366,7 +428,14 @@ function DisplayListingsInner({ newsletterSettings }) {
                         selectedLocation={selectedLocation}
                         setSelectedLocation={setSelectedLocation}
                         selectedCounty={selectedCounty}
-                        setSelectedCounty={setSelectedCounty}
+                        setSelectedCounty={handleSetSelectedCounty}
+                        userLocation={userLocation}
+                        nearbyRadius={nearbyRadius}
+                        setNearbyRadius={setNearbyRadius}
+                        locationError={locationError}
+                        locationLoading={locationLoading}
+                        getUserLocation={getUserLocation}
+                        clearUserLocation={clearUserLocation}
 
                         // Date ranges for presets
                         startOfWeek={startOfWeek}
@@ -438,7 +507,9 @@ function DisplayListingsInner({ newsletterSettings }) {
                                     locations={locations}
                                     highlightsOnly={highlightsOnly}
                                     selectedLocation={selectedLocation}
+                                    selectedCounty={selectedCounty}
                                     searchTerm={searchTerm}
+                                    userLocation={userLocation}
                                 />
                             </div>
                         ) : displayedResults > 0 ? (
