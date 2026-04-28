@@ -138,8 +138,6 @@ export default function Listings({
       {listings.map((item, index) => (
         <li className="border-b min-h-40 border-dashed border-gray-400 py-6 w-full relative flex flex-col md:flex-row justify-between gap-2 lg:gap-4" key={item._id || index}>
 
-          <FavoriteButton listingId={item._id} />
-
           {/* Left Column - Title + image + (notes on desktop) */}
           <div className="flex flex-col md:flex-row lg:flex-row gap-3 w-full md:w-2/3">
 
@@ -216,6 +214,7 @@ export default function Listings({
               {/* Notes + openings — desktop only */}
               <div className="hidden md:flex flex-col gap-2">
                 <NotesRenderer notes={item.Notes} itemIndex={index} />
+                <FavoriteButton listingId={item._id} />
                 {renderOpenings(item)}
               </div>
             </div>
@@ -261,6 +260,7 @@ export default function Listings({
           {/* Notes + openings — mobile only */}
           <div className="md:hidden flex flex-col">
             <NotesRenderer notes={item.Notes} itemIndex={index} />
+            <FavoriteButton listingId={item._id} />
             {renderOpenings(item)}
           </div>
 

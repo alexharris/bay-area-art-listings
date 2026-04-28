@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogHeader, DialogTitle, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import AboutContent from '../aboutContent';
-import { useFavorites } from '@/context/FavoritesContext';
 
 export default function Sidebar({
     // Display states
@@ -59,18 +58,6 @@ export default function Sidebar({
 }) {
     const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
     const [newsletterDialogOpen, setNewsletterDialogOpen] = useState(false);
-    const [shareUrlCopied, setShareUrlCopied] = useState(false);
-    const { getShareUrl } = useFavorites();
-
-    const handleShareFavorites = () => {
-        const url = getShareUrl();
-        if (!url) return;
-        navigator.clipboard.writeText(window.location.origin + url).then(() => {
-            setShareUrlCopied(true);
-            setTimeout(() => setShareUrlCopied(false), 2000);
-        });
-    };
-    
     return (
         <div 
             id="sidebar" 
@@ -142,24 +129,6 @@ export default function Sidebar({
                         </button>
                         {favoritesOnly && (
                             <button onClick={() => setFavoritesOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear favorites filter">×</button>
-                        )}
-                        {favoriteCount > 0 && (
-                            <>
-                                <button
-                                    onClick={handleShareFavorites}
-                                    className="text-xs text-gray-400 hover:text-gray-700 underline transition-colors"
-                                >
-                                    {shareUrlCopied ? 'Copied!' : 'Share'}
-                                </button>
-                                <a
-                                    href={getShareUrl()}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-gray-400 hover:text-gray-700 underline transition-colors"
-                                >
-                                    View
-                                </a>
-                            </>
                         )}
                     </div>
                 </div>

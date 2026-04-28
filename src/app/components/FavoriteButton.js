@@ -1,22 +1,32 @@
 'use client';
 
 import { useFavorites } from '@/hooks/useFavorites';
+import { useState, useEffect, startTransition } from 'react';
 
 export default function FavoriteButton({ listingId }) {
   const { isFavorite, toggleFavorite, hydrated } = useFavorites();
+  const [localSaved, setLocalSaved] = useState(null);
+
+  const contextSaved = hydrated ? isFavorite(listingId) : false;
+
+  // Once context catches up, clear the optimistic override
+  useEffect(() => {
+    setLocalSaved(null);
+  }, [contextSaved]);
 
   if (!hydrated) return null;
 
-  const saved = isFavorite(listingId);
+  const saved = localSaved !== null ? localSaved : contextSaved;
 
   return (
     <button
       onClick={(e) => {
         e.stopPropagation();
-        toggleFavorite(listingId);
+        setLocalSaved(!saved);
+        startTransition(() => toggleFavorite(listingId));
       }}
       aria-label={saved ? 'Remove from saved' : 'Save exhibition'}
-      className={`absolute top-4 right-0 p-1.5 transition-colors ${saved ? 'text-red-500' : 'text-gray-400 hover:text-red-400'}`}
+      className={`pt-0 pb-1 px-1 -ml-1 -mt-2 ${saved ? 'text-red-500' : 'text-gray-400 hover:text-red-400'}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

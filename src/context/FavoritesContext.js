@@ -47,14 +47,8 @@ export function FavoritesProvider({ children }) {
     return items.includes(listingId);
   }, [items]);
 
-  const getShareUrl = useCallback(() => {
-    if (items.length === 0) return null;
-    const params = new URLSearchParams({ ids: items.join(','), name: 'Favorites' });
-    return `/list?${params.toString()}`;
-  }, [items]);
-
   return (
-    <FavoritesContext.Provider value={{ items, toggleFavorite, isFavorite, getShareUrl, hydrated }}>
+    <FavoritesContext.Provider value={{ items, toggleFavorite, isFavorite, hydrated }}>
       {children}
     </FavoritesContext.Provider>
   );
