@@ -219,7 +219,7 @@ export default function Listings({
               </div>
 
               {/* Actions — desktop only */}
-              <div className="hidden md:flex items-center gap-1">
+              <div className="hidden md:flex items-center gap-1 mt-2">
                 <FavoriteButton listingId={item._id} />
                 <button
                   onClick={() => {
