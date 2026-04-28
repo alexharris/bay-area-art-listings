@@ -27,12 +27,12 @@ export default function Listings({
   const handleShare = (item) => {
     const slug = generateSlug(item.Event);
     const url = `${window.location.origin}?show=${slug}`;
+    setCopiedSlug(slug);
+    setTimeout(() => setCopiedSlug(null), 1200);
     if (navigator.share) {
       navigator.share({ title: item.Event, url });
     } else {
       navigator.clipboard.writeText(url);
-      setCopiedSlug(slug);
-      setTimeout(() => setCopiedSlug(null), 2000);
     }
   };
 
@@ -236,16 +236,13 @@ export default function Listings({
                 <button
                   onClick={() => handleShare(item)}
                   aria-label="Share"
-                  className="pt-0 pb-1 px-1 -mt-2 text-gray-400 hover:text-gray-600 relative"
+                  className={`pt-0 pb-1 px-1 -mt-2 relative ${copiedSlug === generateSlug(item.Event) ? 'share-icon-active' : 'text-gray-400 hover:text-gray-600'}`}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
                     <polyline points="16 6 12 2 8 6"/>
                     <line x1="12" y1="2" x2="12" y2="15"/>
                   </svg>
-                  {copiedSlug === generateSlug(item.Event) && (
-                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-xs text-gray-500 whitespace-nowrap">Copied!</span>
-                  )}
                 </button>
               </div>
             </div>
@@ -319,16 +316,13 @@ export default function Listings({
               <button
                 onClick={() => handleShare(item)}
                 aria-label="Share"
-                className="pt-0 pb-1 px-1 -mt-2 text-gray-400 hover:text-gray-600 relative"
+                className={`pt-0 pb-1 px-1 -mt-2 relative ${copiedSlug === generateSlug(item.Event) ? 'share-icon-active' : 'text-gray-400 hover:text-gray-600'}`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
                   <polyline points="16 6 12 2 8 6"/>
                   <line x1="12" y1="2" x2="12" y2="15"/>
                 </svg>
-                {copiedSlug === generateSlug(item.Event) && (
-                  <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-xs text-gray-500 whitespace-nowrap">Copied!</span>
-                )}
               </button>
             </div>
             {renderOpenings(item)}

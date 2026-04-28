@@ -12,6 +12,16 @@
   animation: listing-highlight-fade 3s ease-out forwards;
 }
 
+@keyframes share-icon-fade {
+  0%   { color: black; }
+  20%  { color: black; }
+  100% { color: rgb(156 163 175); } /* gray-400 */
+}
+
+.share-icon-active {
+  animation: share-icon-fade 1.2s ease-out forwards;
+}
+
 /* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
