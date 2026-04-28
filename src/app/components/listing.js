@@ -32,7 +32,7 @@ export default function Listings({
     if (navigator.share) {
       navigator.share({ title: item.Event, url });
     } else {
-      navigator.clipboard.writeText(url);
+      navigator.clipboard?.writeText(url);
     }
   };
 
