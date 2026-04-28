@@ -307,6 +307,9 @@ function DisplayListingsInner({ newsletterSettings }) {
                 updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
                 openingTitleOnly={openingTitleOnly}
                 setOpeningTitleOnly={setOpeningTitleOnly}
+                favoritesOnly={favoritesOnly}
+                setFavoritesOnly={setFavoritesOnly}
+                favoriteCount={favoriteCount}
                 mobileSearchOpen={mobileSearchOpen}
                 setMobileSearchOpen={setMobileSearchOpen}
                 searchTerm={searchTerm}
