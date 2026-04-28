@@ -363,8 +363,6 @@ function DisplayListingsInner({ newsletterSettings }) {
                 favoritesOnly={favoritesOnly}
                 setFavoritesOnly={setFavoritesOnly}
                 favoriteCount={favoriteCount}
-                mobileSearchOpen={mobileSearchOpen}
-                setMobileSearchOpen={setMobileSearchOpen}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 userLocation={userLocation}
