@@ -139,11 +139,11 @@ export default function Listings({
   };
 
   return (
-    <ul id="list-view" className="w-full px-3 md:p-2 lg:px-4">
+    <ul id="list-view" className="w-full">
       {listings.map((item, index) => (
         <li
           id={generateSlug(item.Event)}
-          className={`border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col md:flex-row justify-between gap-4${highlightSlug && generateSlug(item.Event) === highlightSlug ? ' listing-highlight' : ''}`}
+          className={`border-b min-h-40 border-dashed border-gray-400 py-5 px-3 md:px-2 lg:px-4 w-full relative flex flex-col md:flex-row justify-between gap-4${highlightSlug && generateSlug(item.Event) === highlightSlug ? ' listing-highlight' : ''}`}
           key={item._id || index}
         >
 
@@ -235,14 +235,24 @@ export default function Listings({
                 <FavoriteButton listingId={item._id} />
                 <button
                   onClick={() => handleShare(item)}
-                  aria-label="Share"
+                  aria-label="Copy link"
                   className={`pt-0 pb-1 px-1 -mt-2 relative ${copiedSlug === generateSlug(item.Event) ? 'share-icon-active' : 'text-gray-400 hover:text-gray-600'}`}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                    <polyline points="16 6 12 2 8 6"/>
-                    <line x1="12" y1="2" x2="12" y2="15"/>
-                  </svg>
+                  {copiedSlug === generateSlug(item.Event) ? (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 text-xs bg-black text-white rounded whitespace-nowrap pointer-events-none">
+                        Copied!
+                      </span>
+                    </>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <rect x="9" y="2" width="6" height="4" rx="1"/>
+                      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                    </svg>
+                  )}
                 </button>
               </div>
             </div>
