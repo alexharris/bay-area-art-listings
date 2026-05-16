@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import { extractPortableTextContent } from '../../../utils/helpers';
-import TodaysHoursStatus from '../TodaysHoursStatus';
 import HoursPopup from '../HoursPopup';
-import { formatDate } from '../../../utils/shared';
+import { formatDate, getTodayName } from '../../../utils/shared';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import Image from 'next/image';
 import CalendarLink from '../CalendarLink';
@@ -155,7 +154,12 @@ function ShowCard({ item, formatDate }) {
 function LocationSheet({ group, formatDate }) {
     if (!group) return null;
     const { locationName, locationAddress, locationUrl, locationHours, items } = group;
-    const hasOnViewToday = items.some(item => item.isOnViewToday === true);
+    const todayName = getTodayName();
+    const todayHoursRaw = locationHours?.[todayName];
+    const todayHoursDisplay = todayHoursRaw
+        ? todayHoursRaw.replace(`${todayName}: `, '').replace(`${todayName}:`, '')
+        : null;
+    const todayIsClosed = !todayHoursRaw || todayHoursRaw.toLowerCase().includes('closed');
 
     return (
         <div className="flex flex-col min-h-0 flex-1">
@@ -173,6 +177,16 @@ function LocationSheet({ group, formatDate }) {
                         {locationAddress}
                     </a>
                 </div>
+                {locationHours && (
+                    <div className="flex gap-4 mt-2 text-sm">
+                        <HoursPopup locationName={locationName} locationHours={locationHours} locationUrl={locationUrl}>
+                            <button className="flex items-start gap-1.5 text-gray-600 hover:text-black underline decoration-dashed">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                Today: {todayIsClosed ? 'Closed' : todayHoursDisplay}
+                            </button>
+                        </HoursPopup>
+                    </div>
+                )}
                 <div className="flex gap-4 mt-2 text-sm">
                     {locationUrl && (
                         <a
@@ -184,18 +198,6 @@ function LocationSheet({ group, formatDate }) {
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                             Website
                         </a>
-                    )}
-                    {hasOnViewToday && (
-                        <HoursPopup
-                            locationName={locationName}
-                            locationHours={locationHours}
-                            locationUrl={locationUrl}
-                        >
-                            <button className="flex items-center gap-1.5 text-gray-600 hover:text-black text-sm underline decoration-dashed">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                Hours
-                            </button>
-                        </HoursPopup>
                     )}
                 </div>
             </div>

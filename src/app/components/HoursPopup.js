@@ -16,7 +16,7 @@ export default function HoursPopup({
       <PopoverTrigger asChild>
         {children}
       </PopoverTrigger>
-      <PopoverContent className="w-80 lg:w-96" align="end">
+      <PopoverContent className="w-80 lg:w-96 z-[1100]" align="end">
         <div className="space-y-3">
           <h4 className="font-semibold text-sm">{locationName} Hours</h4>
           {locationHours ? (
