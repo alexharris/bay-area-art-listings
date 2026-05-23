@@ -8,9 +8,10 @@ import 'leaflet/dist/leaflet.css';
 import { getFilteredListings } from '../../utils/filters';
 import { applySorting } from '../../utils/sort';
 import { getCalendarTypeCounts } from '../../utils/filterCounts';
-import { formatDate } from '../../utils/shared';
+import { formatDate, generateSlug } from '../../utils/shared';
 
 import { X } from 'lucide-react';
+import { FavoritesProvider, useFavorites } from '@/context/FavoritesContext';
 import MobileHeader from './MobileHeader';
 import MobileBottomBar from './MobileBottomBar';
 import FilterChipRow from './FilterChipRow';
@@ -19,6 +20,7 @@ import MapView from './map/mapView';
 import Sidebar from './sidebar/sidebar';
 import LoadingSkeleton from './LoadingSkeleton';
 import ContentToolbar from './ContentToolbar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 
 const sortLabels = {
     closingSoon: 'End Date',
@@ -27,7 +29,7 @@ const sortLabels = {
     recentlyAdded: 'Recently Added',
 };
 
-export default function DisplayListings({ newsletterSettings }) {
+function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
     // Get today's date in US West Coast (Pacific Time) - memoized to prevent recreation
     const today = useMemo(() => {
         return new Date(
@@ -58,6 +60,22 @@ export default function DisplayListings({ newsletterSettings }) {
     const { locations, isLoading: locationsLoading } = useLocations();
     const loading = listingsLoading || locationsLoading;
 
+    const [sharedSlugNotFound, setSharedSlugNotFound] = useState(false);
+
+    // Scroll to shared listing after data loads
+    useEffect(() => {
+        if (sharedSlug && listings && listings.length > 0) {
+            const found = listings.some(item => generateSlug(item.Event) === sharedSlug);
+            if (!found) {
+                setSharedSlugNotFound(true);
+            } else {
+                setTimeout(() => {
+                    document.getElementById(sharedSlug)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        }
+    }, [sharedSlug, listings]);
+
     // Filtering
     const [calendarTypeFilter, setCalendarTypeFilter] = useState('onview'); // onview, opening, closing
     const [calendarDateRangeFilterInternal, setCalendarDateRangeFilterInternal] = useState(null); // actual date range to filter on
@@ -85,6 +103,12 @@ export default function DisplayListings({ newsletterSettings }) {
     const [endingSoonOnly, setEndingSoonOnly] = useState(false);
     const [openingTodayOnly, setOpeningTodayOnly] = useState(false);
     const [openingTitleOnly, setOpeningTitleOnly] = useState(false);
+    const [favoritesOnly, setFavoritesOnly] = useState(false);
+    const { items: favoriteIds } = useFavorites();
+    const favoriteCount = useMemo(
+        () => (listings ? listings.filter(l => favoriteIds.includes(l._id)).length : 0),
+        [listings, favoriteIds]
+    );
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [selectedCounty, setSelectedCounty] = useState([]);
@@ -123,6 +147,8 @@ export default function DisplayListings({ newsletterSettings }) {
         endingSoonOnly,
         openingTodayOnly,
         openingTitleOnly,
+        favoritesOnly,
+        favoriteIds,
         searchTerm,
         selectedLocation,
         selectedCounty,
@@ -136,6 +162,8 @@ export default function DisplayListings({ newsletterSettings }) {
         endingSoonOnly,
         openingTodayOnly,
         openingTitleOnly,
+        favoritesOnly,
+        JSON.stringify(favoriteIds),
         searchTerm,
         selectedLocation,
         JSON.stringify(selectedCounty),
@@ -291,6 +319,7 @@ export default function DisplayListings({ newsletterSettings }) {
         setEndingSoonOnly(false);
         setOpeningTodayOnly(false);
         setOpeningTitleOnly(false);
+        setFavoritesOnly(false);
         setSearchTerm('');
         setSelectedLocation('');
         setSelectedCounty([]);
@@ -311,6 +340,24 @@ export default function DisplayListings({ newsletterSettings }) {
 
     return (
         <>
+            <Dialog open={sharedSlugNotFound} onOpenChange={setSharedSlugNotFound}>
+                <DialogContent className="max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle>Show not found</DialogTitle>
+                        <DialogDescription>
+                            The exhibition you&rsquo;re looking for couldn&rsquo;t be found. It may have ended or been removed.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <button className="inline-flex items-center justify-center rounded bg-black text-white px-4 py-2 text-sm hover:bg-gray-800">
+                                Browse listings
+                            </button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
             {/* Mobile Header */}
             <MobileHeader
                 searchTerm={searchTerm}
@@ -348,6 +395,9 @@ export default function DisplayListings({ newsletterSettings }) {
                 updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
                 openingTitleOnly={openingTitleOnly}
                 setOpeningTitleOnly={setOpeningTitleOnly}
+                favoritesOnly={favoritesOnly}
+                setFavoritesOnly={setFavoritesOnly}
+                favoriteCount={favoriteCount}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 userLocation={userLocation}
@@ -405,6 +455,9 @@ export default function DisplayListings({ newsletterSettings }) {
                         setEndingSoonOnly={setEndingSoonOnly}
                         openingTitleOnly={openingTitleOnly}
                         setOpeningTitleOnly={setOpeningTitleOnly}
+                        favoritesOnly={favoritesOnly}
+                        setFavoritesOnly={setFavoritesOnly}
+                        favoriteCount={favoriteCount}
                         selectedLocation={selectedLocation}
                         setSelectedLocation={setSelectedLocation}
                         selectedCounty={selectedCounty}
@@ -472,6 +525,12 @@ export default function DisplayListings({ newsletterSettings }) {
                 ) : (
                     <>
 
+                        {favoritesOnly && !isMapView && (
+                            <div className="mx-3 mt-3 px-3 py-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800">
+                                Your favorites are stored in your browser&rsquo;s local storage, which can be cleared intentionally or sometimes by mistake. Also, you won&rsquo;t be able to access your favorites on other devices (for now&hellip;)
+                            </div>
+                        )}
+
                         {displayedResults === 0 &&
                             <div className="text-center flex-grow flex flex-col justify-center text-2xl py-36">
                                 <p className="pb-4">No Results</p>
@@ -502,6 +561,7 @@ export default function DisplayListings({ newsletterSettings }) {
                                 setEndingSoonOnly={setEndingSoonOnly}
                                 openingTodayOnly={openingTodayOnly}
                                 setOpeningTodayOnly={setOpeningTodayOnly}
+                                highlightSlug={sharedSlug}
                             />
                         ) : null}
                     </>
@@ -513,4 +573,12 @@ export default function DisplayListings({ newsletterSettings }) {
         </>
     );
 
+}
+
+export default function DisplayListings({ newsletterSettings, sharedSlug }) {
+    return (
+        <FavoritesProvider>
+            <DisplayListingsInner newsletterSettings={newsletterSettings} sharedSlug={sharedSlug} />
+        </FavoritesProvider>
+    );
 }

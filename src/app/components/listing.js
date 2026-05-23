@@ -5,6 +5,7 @@ import NotesRenderer from './NotesRenderer';
 import DateNote from './DateNote';
 import HoursPopup from './HoursPopup';
 import CityFromPlaceId from './CityFromPlaceId';
+import FavoriteButton from './FavoriteButton';
 import { Badge } from '@/components/ui/badge';
 import { generateSlug, getTodayName } from '../../utils/shared';
 
@@ -16,10 +17,24 @@ export default function Listings({
   endingSoonOnly,
   setEndingSoonOnly,
   openingTodayOnly,
-  setOpeningTodayOnly
+  setOpeningTodayOnly,
+  highlightSlug,
 }) {
   const [showDetails, setShowDetails] = useState({});
   const [venueOpen, setVenueOpen] = useState({});
+  const [copiedSlug, setCopiedSlug] = useState(null);
+
+  const handleShare = (item) => {
+    const slug = generateSlug(item.Event);
+    const url = `${window.location.origin}?show=${slug}`;
+    setCopiedSlug(slug);
+    setTimeout(() => setCopiedSlug(null), 1200);
+    if (navigator.share) {
+      navigator.share({ title: item.Event, url });
+    } else {
+      navigator.clipboard?.writeText(url);
+    }
+  };
 
   const shouldShowOpenToday = (item) => item.isOnViewToday === true;
 
@@ -126,7 +141,11 @@ export default function Listings({
   return (
     <ul id="list-view" className="w-full px-3 md:p-2 lg:px-4">
       {listings.map((item, index) => (
-        <li className="border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col md:flex-row justify-between gap-4" key={item._id || index}>
+        <li
+          id={generateSlug(item.Event)}
+          className={`border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col md:flex-row justify-between gap-4${highlightSlug && generateSlug(item.Event) === highlightSlug ? ' listing-highlight' : ''}`}
+          key={item._id || index}
+        >
 
           {/* Left Column - Title + image + (notes on desktop) */}
           <div className="flex flex-col md:flex-row lg:flex-row gap-4 w-full md:w-1/2 lg:w-2/3 xl:w-1/2">
@@ -207,8 +226,24 @@ export default function Listings({
               </div>
 
               {/* Notes — desktop only */}
-              <div className="hidden md:flex flex-col gap-2">
+              <div className="hidden md:block">
                 <NotesRenderer notes={item.Notes} itemIndex={index} />
+              </div>
+
+              {/* Actions — desktop only */}
+              <div className="hidden md:flex items-center gap-1 mt-2">
+                <FavoriteButton listingId={item._id} />
+                <button
+                  onClick={() => handleShare(item)}
+                  aria-label="Share"
+                  className={`pt-0 pb-1 px-1 -mt-2 relative ${copiedSlug === generateSlug(item.Event) ? 'share-icon-active' : 'text-gray-400 hover:text-gray-600'}`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                    <polyline points="16 6 12 2 8 6"/>
+                    <line x1="12" y1="2" x2="12" y2="15"/>
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
@@ -276,6 +311,20 @@ export default function Listings({
               )}
             </div>
             <NotesRenderer notes={item.Notes} itemIndex={index} />
+            <div className="flex items-center gap-1">
+              <FavoriteButton listingId={item._id} />
+              <button
+                onClick={() => handleShare(item)}
+                aria-label="Share"
+                className={`pt-0 pb-1 px-1 -mt-2 relative ${copiedSlug === generateSlug(item.Event) ? 'share-icon-active' : 'text-gray-400 hover:text-gray-600'}`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                  <polyline points="16 6 12 2 8 6"/>
+                  <line x1="12" y1="2" x2="12" y2="15"/>
+                </svg>
+              </button>
+            </div>
             {renderOpenings(item)}
           </div>
 

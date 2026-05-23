@@ -136,6 +136,8 @@ export function getFilteredListings(filters, listings) {
     endingSoonOnly: filters.endingSoonOnly || false,
     openingTodayOnly: filters.openingTodayOnly || false,
     openingTitleOnly: filters.openingTitleOnly || false,
+    favoritesOnly: filters.favoritesOnly || false,
+    favoriteIds: filters.favoriteIds || [],
     searchTerm: filters.searchTerm || '',
     selectedLocation: filters.selectedLocation || '',
     selectedCounty: filters.selectedCounty || [],
@@ -146,6 +148,7 @@ export function getFilteredListings(filters, listings) {
   };
 
   let filteredListings = listings
+  .filter(item => filters.favoritesOnly ? filters.favoriteIds.includes(item._id) : true)
   .filter(item =>filters.onViewToday ? determineOnViewTodayFilter(item) : true)
   .filter(item =>filters.sfArtWeekOnly ? item.sfawUrl : true)
   .filter(item =>filters.endingSoonOnly ? determineEndingSoonFilter(item) : true)

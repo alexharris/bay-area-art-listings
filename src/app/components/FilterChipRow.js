@@ -76,6 +76,10 @@ export default function FilterChipRow({
     setOpeningTodayOnly,
     specialFilterCounts,
 
+    favoritesOnly,
+    setFavoritesOnly,
+    favoriteCount,
+
     currentFilters,
     listings,
 
@@ -174,6 +178,15 @@ export default function FilterChipRow({
                         onToggle={() => setEndingSoonOnly(!endingSoonOnly)}
                     />
                 )}
+                <BadgeChip
+                    emoji="❤️"
+                    label="Saved"
+                    count={favoriteCount > 0 ? favoriteCount : null}
+                    active={favoritesOnly}
+                    activeClass="bg-pink-200 border-pink-300 text-black"
+                    inactiveClass={favoriteCount === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300'}
+                    onToggle={() => favoriteCount > 0 && setFavoritesOnly(!favoritesOnly)}
+                />
             </div>
 
             {/* When mini-drawer */}

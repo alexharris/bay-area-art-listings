@@ -37,6 +37,9 @@ export default function Sidebar({
     setEndingSoonOnly,
     openingTitleOnly,
     setOpeningTitleOnly,
+    favoritesOnly,
+    setFavoritesOnly,
+    favoriteCount,
     selectedLocation,
     setSelectedLocation,
     selectedCounty,
@@ -76,7 +79,7 @@ export default function Sidebar({
         setCalendarDateRangePreset('anytime');
         setShowCustomCalendar(false);
     };
-    
+
     return (
         <div 
             id="sidebar" 
@@ -150,6 +153,19 @@ export default function Sidebar({
                             <button onClick={() => setEndingSoonOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear ending soon filter">×</button>
                         )}
                     </div>
+                    <div className="flex items-center gap-1">
+                        <button
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${favoritesOnly ? 'bg-pink-200 border-pink-300 text-black' : favoriteCount === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            onClick={() => favoriteCount > 0 && setFavoritesOnly(!favoritesOnly)}
+                            disabled={favoriteCount === 0}
+                        >
+                            ❤️ Favorites
+                            {!favoritesOnly && favoriteCount > 0 && <span className="opacity-50">({favoriteCount})</span>}
+                        </button>
+                        {favoritesOnly && (
+                            <button onClick={() => setFavoritesOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear favorites filter">×</button>
+                        )}
+                    </div>
                 </div>
                 <div className="border-t border-gray-100"></div>
                 <div className="flex items-center gap-1">
@@ -191,6 +207,7 @@ export default function Sidebar({
                         Reset
                     </button>
                 </div>
+
             </div>
 
             {/* Fixed bottom section with About and Newsletter */}
