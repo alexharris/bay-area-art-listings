@@ -61,6 +61,11 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
     const loading = listingsLoading || locationsLoading;
 
     const [sharedSlugNotFound, setSharedSlugNotFound] = useState(false);
+    const [favoritesNoteDismissed, setFavoritesNoteDismissed] = useState(false);
+
+    useEffect(() => {
+        setFavoritesNoteDismissed(!!localStorage.getItem('favoritesNoteDismissed'));
+    }, []);
 
     // Scroll to shared listing after data loads
     useEffect(() => {
@@ -525,9 +530,22 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                 ) : (
                     <>
 
-                        {favoritesOnly && !isMapView && (
-                            <div className="mx-3 mt-3 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-500">
-                                The exhibitions are saved locally in your browser. Clearing your browser&rsquo;s Local Storage will clear your saved items, for better or worse.
+                        {favoritesOnly && !isMapView && !favoritesNoteDismissed && (
+                            <div className="mx-3 mt-3 bg-gray-50 rounded p-3 flex gap-2 text-sm text-gray-600">
+                                <span className="text-base leading-snug flex-shrink-0">⭐</span>
+                                <div>
+                                    The exhibitions are saved locally in your browser. Clearing your browser&rsquo;s Local Storage will clear your saved items, for better or worse.
+                                    <br />
+                                    <button
+                                        onClick={() => {
+                                            localStorage.setItem('favoritesNoteDismissed', 'true');
+                                            setFavoritesNoteDismissed(true);
+                                        }}
+                                        className="underline mt-1 inline-block"
+                                    >
+                                        ok whatever
+                                    </button>
+                                </div>
                             </div>
                         )}
 
