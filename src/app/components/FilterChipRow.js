@@ -127,66 +127,43 @@ export default function FilterChipRow({
         : countyNames.length > 1 ? `${countyNames.length} counties`
         : 'Anywhere';
 
+    const chips = [
+        {
+            key: 'when',
+            active: whenActive,
+            el: <Chip key="when" emoji="📅" label={whenLabel} active={whenActive} onOpen={() => setWhenOpen(true)} onClear={clearWhen} />,
+        },
+        {
+            key: 'where',
+            active: whereActive,
+            el: <Chip key="where" emoji="📍" label={whereLabel} active={whereActive} onOpen={() => setWhereOpen(true)} onClear={() => { setSelectedCounty([]); clearUserLocation?.(); }} />,
+        },
+        {
+            key: 'openingTitleOnly',
+            active: openingTitleOnly,
+            el: <BadgeChip key="openingTitleOnly" emoji="☀️" label="Has Events" count={specialFilterCounts?.openingTitleOnly} active={openingTitleOnly} activeClass="bg-yellow-200 border-yellow-300 text-black hover:bg-yellow-300" inactiveClass={!openingTitleOnly && !specialFilterCounts?.openingTitleOnly ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"} onToggle={() => (specialFilterCounts?.openingTitleOnly > 0 || openingTitleOnly) && setOpeningTitleOnly(!openingTitleOnly)} />,
+        },
+        {
+            key: 'onViewToday',
+            active: onViewToday,
+            el: <BadgeChip key="onViewToday" emoji="🟢" label="On View Today" count={specialFilterCounts?.onViewToday} active={onViewToday} activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400" inactiveClass={!onViewToday && !specialFilterCounts?.onViewToday ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"} onToggle={() => (specialFilterCounts?.onViewToday > 0 || onViewToday) && setOnViewToday(!onViewToday)} />,
+        },
+        ...(endingSoonOnly || specialFilterCounts?.endingSoonOnly > 0 ? [{
+            key: 'endingSoon',
+            active: endingSoonOnly,
+            el: <BadgeChip key="endingSoon" emoji="⏳" label="Ending Soon" count={specialFilterCounts?.endingSoonOnly} active={endingSoonOnly} activeClass="bg-red-300 border-red-400 text-black hover:bg-red-400" inactiveClass="bg-white text-gray-600 border-gray-200 hover:border-gray-300" onToggle={() => setEndingSoonOnly(!endingSoonOnly)} />,
+        }] : []),
+        {
+            key: 'favorites',
+            active: favoritesOnly,
+            el: <BadgeChip key="favorites" emoji="❤️" label="Saved" count={favoriteCount > 0 ? favoriteCount : null} active={favoritesOnly} activeClass="bg-pink-200 border-pink-300 text-black" inactiveClass={favoriteCount === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300'} onToggle={() => favoriteCount > 0 && setFavoritesOnly(!favoritesOnly)} />,
+        },
+    ].sort((a, b) => Number(b.active) - Number(a.active));
+
     return (
         <div className="lg:hidden fixed inset-x-0 top-12 z-40 bg-white border-b border-gray-200">
             <div className="flex flex-row gap-2 px-3 py-2 overflow-x-auto scrollbar-none">
-                {/* When chip */}
-                <Chip
-                    emoji="📅"
-                    label={whenLabel}
-                    active={whenActive}
-                    onOpen={() => setWhenOpen(true)}
-                    onClear={clearWhen}
-                />
-
-                {/* Where chip */}
-                <Chip
-                    emoji="📍"
-                    label={whereLabel}
-                    active={whereActive}
-                    onOpen={() => setWhereOpen(true)}
-                    onClear={() => { setSelectedCounty([]); clearUserLocation?.(); }}
-                />
-
-                {/* Badge chips */}
-                <BadgeChip
-                    emoji="☀️"
-                    label="Has Events"
-                    count={specialFilterCounts?.openingTitleOnly}
-                    active={openingTitleOnly}
-                    activeClass="bg-yellow-200 border-yellow-300 text-black hover:bg-yellow-300"
-                    inactiveClass={!openingTitleOnly && !specialFilterCounts?.openingTitleOnly ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"}
-                    onToggle={() => (specialFilterCounts?.openingTitleOnly > 0 || openingTitleOnly) && setOpeningTitleOnly(!openingTitleOnly)}
-                />
-                <BadgeChip
-                    emoji="🟢"
-                    label="On View Today"
-                    count={specialFilterCounts?.onViewToday}
-                    active={onViewToday}
-                    activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400"
-                    inactiveClass={!onViewToday && !specialFilterCounts?.onViewToday ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"}
-                    onToggle={() => (specialFilterCounts?.onViewToday > 0 || onViewToday) && setOnViewToday(!onViewToday)}
-                />
-                {(endingSoonOnly || specialFilterCounts?.endingSoonOnly > 0) && (
-                    <BadgeChip
-                        emoji="⏳"
-                        label="Ending Soon"
-                        count={specialFilterCounts?.endingSoonOnly}
-                        active={endingSoonOnly}
-                        activeClass="bg-red-300 border-red-400 text-black hover:bg-red-400"
-                        inactiveClass="bg-white text-gray-600 border-gray-200 hover:border-gray-300"
-                        onToggle={() => setEndingSoonOnly(!endingSoonOnly)}
-                    />
-                )}
-                <BadgeChip
-                    emoji="❤️"
-                    label="Saved"
-                    count={favoriteCount > 0 ? favoriteCount : null}
-                    active={favoritesOnly}
-                    activeClass="bg-pink-200 border-pink-300 text-black"
-                    inactiveClass={favoriteCount === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300'}
-                    onToggle={() => favoriteCount > 0 && setFavoritesOnly(!favoritesOnly)}
-                />
+                {chips.map(c => c.el)}
             </div>
 
             {/* When mini-drawer */}
