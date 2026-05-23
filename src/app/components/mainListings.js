@@ -532,7 +532,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
 
                         {favoritesOnly && !isMapView && !favoritesNoteDismissed && (
                             <div className="mx-3 mt-3 bg-gray-50 rounded p-3 flex gap-2 text-sm text-gray-600">
-                                <span className="text-base leading-snug flex-shrink-0">⭐</span>
+                                <span className="text-base leading-snug flex-shrink-0">💾</span>
                                 <div>
                                     The exhibitions are saved locally in your browser. Clearing your browser&rsquo;s Local Storage will clear your saved items, for better or worse.
                                     <br />
