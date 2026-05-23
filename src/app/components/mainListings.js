@@ -526,8 +526,8 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                     <>
 
                         {favoritesOnly && !isMapView && (
-                            <div className="mx-3 mt-3 px-3 py-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800">
-                                Your favorites are stored in your browser&rsquo;s local storage, which can be cleared intentionally or sometimes by mistake. Also, you won&rsquo;t be able to access your favorites on other devices (for now&hellip;)
+                            <div className="mx-3 mt-3 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-500">
+                                The exhibitions are saved locally in your browser. Clearing your browser&rsquo;s Local Storage will clear your saved items, for better or worse.
                             </div>
                         )}
 
