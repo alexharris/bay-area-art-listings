@@ -8,7 +8,7 @@ import 'leaflet/dist/leaflet.css';
 import { getFilteredListings } from '../../utils/filters';
 import { applySorting } from '../../utils/sort';
 import { getCalendarTypeCounts } from '../../utils/filterCounts';
-import { formatDate } from '../../utils/shared';
+import { formatDate, generateSlug } from '../../utils/shared';
 
 import { X } from 'lucide-react';
 import { FavoritesProvider, useFavorites } from '@/context/FavoritesContext';
@@ -20,6 +20,7 @@ import MapView from './map/mapView';
 import Sidebar from './sidebar/sidebar';
 import LoadingSkeleton from './LoadingSkeleton';
 import ContentToolbar from './ContentToolbar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 
 const sortLabels = {
     closingSoon: 'End Date',
@@ -59,12 +60,19 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
     const { locations, isLoading: locationsLoading } = useLocations();
     const loading = listingsLoading || locationsLoading;
 
+    const [sharedSlugNotFound, setSharedSlugNotFound] = useState(false);
+
     // Scroll to shared listing after data loads
     useEffect(() => {
         if (sharedSlug && listings && listings.length > 0) {
-            setTimeout(() => {
-                document.getElementById(sharedSlug)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
+            const found = listings.some(item => generateSlug(item.Event) === sharedSlug);
+            if (!found) {
+                setSharedSlugNotFound(true);
+            } else {
+                setTimeout(() => {
+                    document.getElementById(sharedSlug)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
         }
     }, [sharedSlug, listings]);
 
@@ -332,6 +340,24 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
 
     return (
         <>
+            <Dialog open={sharedSlugNotFound} onOpenChange={setSharedSlugNotFound}>
+                <DialogContent className="max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle>Show not found</DialogTitle>
+                        <DialogDescription>
+                            The exhibition you&rsquo;re looking for couldn&rsquo;t be found. It may have ended or been removed.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <button className="inline-flex items-center justify-center rounded bg-black text-white px-4 py-2 text-sm hover:bg-gray-800">
+                                Browse listings
+                            </button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
             {/* Mobile Header */}
             <MobileHeader
                 searchTerm={searchTerm}
@@ -498,6 +524,12 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                     <LoadingSkeleton count={5} />
                 ) : (
                     <>
+
+                        {favoritesOnly && !isMapView && (
+                            <div className="mx-3 mt-3 px-3 py-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800">
+                                Your favorites are stored in your browser&rsquo;s local storage, which can be cleared intentionally or sometimes by mistake. Also, you won&rsquo;t be able to access your favorites on other devices (for now&hellip;)
+                            </div>
+                        )}
 
                         {displayedResults === 0 &&
                             <div className="text-center flex-grow flex flex-col justify-center text-2xl py-36">
