@@ -113,7 +113,10 @@ export default function FilterChipRow({
     const whereActive = (selectedCounty && selectedCounty.length > 0) || !!userLocation;
 
     useEffect(() => {
-        chipRowRef.current?.scrollTo({ left: 0, behavior: 'smooth' });
+        const timer = setTimeout(() => {
+            chipRowRef.current?.scrollTo({ left: 0, behavior: 'smooth' });
+        }, 50);
+        return () => clearTimeout(timer);
     }, [whenActive, whereActive, openingTitleOnly, onViewToday, endingSoonOnly, favoritesOnly]);
 
     const whenLabels = { anytime: 'Anytime', today: 'Today', next7: 'Next 7 Days', thismonth: 'This Month', nextmonth: 'Next Month', custom: 'Custom dates' };
