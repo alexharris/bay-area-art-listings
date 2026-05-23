@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import CountySelector from './sidebar/countySelector';
@@ -9,7 +9,7 @@ import CountySelector from './sidebar/countySelector';
 function Chip({ emoji, label, active, onOpen, onClear, hasYellowDot }) {
     return (
         <div
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm whitespace-nowrap cursor-pointer select-none flex-shrink-0 transition-colors ${
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm whitespace-nowrap cursor-pointer select-none flex-shrink-0 transition-colors ${
                 active ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300'
             }`}
             role="button"
@@ -40,7 +40,7 @@ function Chip({ emoji, label, active, onOpen, onClear, hasYellowDot }) {
 function BadgeChip({ emoji, label, count, active, onToggle, activeClass, inactiveClass }) {
     return (
         <button
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm whitespace-nowrap flex-shrink-0 transition-colors ${
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm whitespace-nowrap flex-shrink-0 transition-colors ${
                 active ? activeClass : inactiveClass
             }`}
             onClick={onToggle}
@@ -107,9 +107,14 @@ export default function FilterChipRow({
     const [whenOpen, setWhenOpen] = useState(false);
     const [whenTab, setWhenTab] = useState('presets');
     const [whereOpen, setWhereOpen] = useState(false);
+    const chipRowRef = useRef(null);
 
     const whenActive = calendarDateRangePreset !== 'anytime';
     const whereActive = (selectedCounty && selectedCounty.length > 0) || !!userLocation;
+
+    useEffect(() => {
+        chipRowRef.current?.scrollTo({ left: 0, behavior: 'smooth' });
+    }, [whenActive, whereActive, openingTitleOnly, onViewToday, endingSoonOnly, favoritesOnly]);
 
     const whenLabels = { anytime: 'Anytime', today: 'Today', next7: 'Next 7 Days', thismonth: 'This Month', nextmonth: 'Next Month', custom: 'Custom dates' };
     const whenLabel = whenActive ? (whenLabels[calendarDateRangePreset] || calendarDateRangePreset) : 'Anytime';
@@ -162,7 +167,7 @@ export default function FilterChipRow({
 
     return (
         <div className="lg:hidden fixed inset-x-0 top-12 z-40 bg-white border-b border-gray-200">
-            <div className="flex flex-row gap-2 px-3 py-2 overflow-x-auto scrollbar-none">
+            <div ref={chipRowRef} className="flex flex-row gap-2 px-3 py-2 overflow-x-auto scrollbar-none">
                 {chips.map(c => c.el)}
             </div>
 
