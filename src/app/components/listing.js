@@ -23,16 +23,42 @@ export default function Listings({
   const [showDetails, setShowDetails] = useState({});
   const [venueOpen, setVenueOpen] = useState({});
   const [copiedSlug, setCopiedSlug] = useState(null);
+  const [tooltipSlug, setTooltipSlug] = useState(null);
 
   const handleShare = (item) => {
     const slug = generateSlug(item.Event);
     const url = `${window.location.origin}?show=${slug}`;
     setCopiedSlug(slug);
     setTimeout(() => setCopiedSlug(null), 1200);
+
+    const showTooltip = () => {
+      setTooltipSlug(slug);
+      setTimeout(() => setTooltipSlug(null), 1200);
+    };
+
+    const copyToClipboard = () => {
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(url).then(showTooltip).catch(() => {});
+      } else {
+        try {
+          const el = document.createElement('textarea');
+          el.value = url;
+          el.style.cssText = 'position:fixed;top:-9999px;opacity:0';
+          document.body.appendChild(el);
+          el.select();
+          document.execCommand('copy');
+          document.body.removeChild(el);
+          showTooltip();
+        } catch {}
+      }
+    };
+
     if (navigator.share) {
-      navigator.share({ title: item.Event, url });
+      navigator.share({ title: item.Event, url }).catch((err) => {
+        if (err.name !== 'AbortError') copyToClipboard();
+      });
     } else {
-      navigator.clipboard?.writeText(url);
+      copyToClipboard();
     }
   };
 
@@ -238,6 +264,11 @@ export default function Listings({
                   aria-label="Share"
                   className={`pt-0 pb-1 px-1 -mt-2 relative ${copiedSlug === generateSlug(item.Event) ? 'share-icon-active' : 'text-gray-400 hover:text-gray-600'}`}
                 >
+                  {tooltipSlug === generateSlug(item.Event) && (
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap pointer-events-none">
+                      Copied!
+                    </span>
+                  )}
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
                     <polyline points="16 6 12 2 8 6"/>
@@ -318,6 +349,11 @@ export default function Listings({
                 aria-label="Share"
                 className={`pt-0 pb-1 px-1 -mt-2 relative ${copiedSlug === generateSlug(item.Event) ? 'share-icon-active' : 'text-gray-400 hover:text-gray-600'}`}
               >
+                {tooltipSlug === generateSlug(item.Event) && (
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap pointer-events-none">
+                    Copied!
+                  </span>
+                )}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
                   <polyline points="16 6 12 2 8 6"/>
