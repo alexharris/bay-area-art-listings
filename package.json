@@ -27,6 +27,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
+    "geist": "^1.7.1",
     "googleapis": "^144.0.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.544.0",

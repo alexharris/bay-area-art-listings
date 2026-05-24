@@ -2,6 +2,7 @@ import {defineField, defineType} from 'sanity'
 import {EventImageUrlInput} from '../components/EventImageUrlInput'
 import {StartDateInput} from '../components/StartDateInput'
 import {EndDateInput} from '../components/EndDateInput'
+import {GenerateInstagramButton} from '../components/GenerateInstagramButton'
 
 export const listingType = defineType({
   name: 'listing',
@@ -119,6 +120,15 @@ export const listingType = defineType({
       name: 'InternalNotes',
       type: 'string',
       description: 'Notes just for internal use, not displayed on the site.',
-    }),    
+    }),
+    defineField({
+      name: 'instagramImage',
+      type: 'image',
+      title: 'Instagram Image',
+      description: 'Auto-generated 4:5 portrait image for Instagram. Requires an Event Image to be set.',
+      components: {
+        input: GenerateInstagramButton,
+      },
+    }),
   ],
 })
