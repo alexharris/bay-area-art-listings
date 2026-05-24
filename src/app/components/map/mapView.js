@@ -5,13 +5,14 @@ import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import { extractPortableTextContent } from '../../../utils/helpers';
 import HoursPopup from '../HoursPopup';
-import { formatDate, getTodayName } from '../../../utils/shared';
+import { formatDate, getTodayName, generateSlug } from '../../../utils/shared';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import Image from 'next/image';
 import CalendarLink from '../CalendarLink';
 import NotesRenderer from '../NotesRenderer';
 import DateNote from '../DateNote';
 import { Badge } from '@/components/ui/badge';
+import FavoriteButton from '../FavoriteButton';
 
 // Dynamically import MapContainer, TileLayer, Marker, and Popup from react-leaflet
 const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
@@ -89,6 +90,20 @@ function renderOpenings(item) {
 
 // ShowCard mirrors the mobile list view layout
 function ShowCard({ item, formatDate }) {
+    const [copied, setCopied] = useState(false);
+
+    const handleShare = () => {
+        const slug = generateSlug(item.Event);
+        const url = `${window.location.origin}?show=${slug}`;
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1200);
+        if (navigator.share) {
+            navigator.share({ title: item.Event, url });
+        } else {
+            navigator.clipboard?.writeText(url);
+        }
+    };
+
     return (
         <div className="border-b border-dashed border-gray-300 py-4 last:border-0 flex flex-col gap-2">
             {/* Image */}
@@ -146,6 +161,22 @@ function ShowCard({ item, formatDate }) {
 
             {/* Sub-events */}
             {renderOpenings(item)}
+
+            {/* Actions */}
+            <div className="flex items-center gap-1 mt-1">
+                <FavoriteButton listingId={item._id} />
+                <button
+                    onClick={handleShare}
+                    aria-label="Share"
+                    className={`pt-0 pb-1 px-1 -mt-2 relative ${copied ? 'share-icon-active' : 'text-gray-400 hover:text-gray-600'}`}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                        <polyline points="16 6 12 2 8 6"/>
+                        <line x1="12" y1="2" x2="12" y2="15"/>
+                    </svg>
+                </button>
+            </div>
         </div>
     );
 }
