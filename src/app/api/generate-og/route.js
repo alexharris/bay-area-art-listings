@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og'
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
 import { createClient } from 'next-sanity'
 
 export const runtime = 'nodejs'
@@ -12,14 +13,14 @@ const sanityClient = createClient({
   useCdn: false,
 })
 
-const fontBase = path.join(process.cwd(), 'node_modules/geist/dist/fonts/geist-sans')
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 let geistRegular = null
 let geistBold = null
 
 function loadFonts() {
-  if (!geistRegular) geistRegular = fs.readFileSync(path.join(fontBase, 'Geist-Regular.ttf'))
-  if (!geistBold) geistBold = fs.readFileSync(path.join(fontBase, 'Geist-Bold.ttf'))
+  if (!geistRegular) geistRegular = fs.readFileSync(path.join(__dirname, 'fonts/Geist-Regular.ttf'))
+  if (!geistBold) geistBold = fs.readFileSync(path.join(__dirname, 'fonts/Geist-Bold.ttf'))
 }
 
 export async function GET(request) {
