@@ -30,7 +30,8 @@ export function GenerateInstagramButton(props) {
         throw new Error('No image found for this listing. Add an Event Image first.')
       }
       if (!response.ok) {
-        throw new Error(`Generation failed (${response.status})`)
+        const body = await response.text().catch(() => '')
+        throw new Error(`Generation failed (${response.status})${body ? ': ' + body : ''}`)
       }
 
       const blob = await response.blob()

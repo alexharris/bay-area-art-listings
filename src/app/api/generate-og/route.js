@@ -1,7 +1,6 @@
 import { ImageResponse } from 'next/og'
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
 import { createClient } from 'next-sanity'
 
 export const runtime = 'nodejs'
@@ -13,155 +12,160 @@ const sanityClient = createClient({
   useCdn: false,
 })
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const fontsDir = path.join(process.cwd(), 'src/app/api/generate-og/fonts')
 
 let fontCache = null
 
 function loadFonts() {
   if (fontCache) return fontCache
   fontCache = {
-    regular: fs.readFileSync(path.join(__dirname, 'fonts/Geist-Regular.ttf')),
-    bold: fs.readFileSync(path.join(__dirname, 'fonts/Geist-Bold.ttf')),
+    regular: fs.readFileSync(path.join(fontsDir, 'Geist-Regular.ttf')),
+    bold: fs.readFileSync(path.join(fontsDir, 'Geist-Bold.ttf')),
   }
   return fontCache
 }
 
 export async function GET(request) {
-  const { searchParams } = new URL(request.url)
-  const id = searchParams.get('id')
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
 
-  if (!id) {
-    return new Response('Missing id parameter', { status: 400 })
-  }
+    if (!id) {
+      return new Response('Missing id parameter', { status: 400 })
+    }
 
-  const listing = await sanityClient.fetch(
-    `*[_id == $id][0]{
-      Event,
-      StartDate,
-      EndDate,
-      DateOverride,
-      "locationName": Location->Name,
-      "image": EventImageUpload {
-        "url": asset->url,
-        "width": asset->metadata.dimensions.width,
-        "height": asset->metadata.dimensions.height,
-        crop
-      }
-    }`,
-    { id }
-  )
+    const listing = await sanityClient.fetch(
+      `*[_id == $id][0]{
+        Event,
+        StartDate,
+        EndDate,
+        DateOverride,
+        "locationName": Location->Name,
+        "image": EventImageUpload {
+          "url": asset->url,
+          "width": asset->metadata.dimensions.width,
+          "height": asset->metadata.dimensions.height,
+          crop
+        }
+      }`,
+      { id }
+    )
 
-  if (!listing?.image?.url) {
-    return new Response('No image found for this listing', { status: 404 })
-  }
+    if (!listing?.image?.url) {
+      return new Response('No image found for this listing', { status: 404 })
+    }
 
-  const { regular, bold } = loadFonts()
+    const { regular, bold } = loadFonts()
 
-  const dateRange = formatDateRange(listing.StartDate, listing.EndDate, listing.DateOverride)
-  const imageUrl = buildCroppedImageUrl(listing.image, 1080, 945)
+    const dateRange = formatDateRange(listing.StartDate, listing.EndDate, listing.DateOverride)
+    const imageUrl = buildCroppedImageUrl(listing.image, 1080, 945)
 
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: 1080,
-          height: 1350,
-          backgroundColor: 'white',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            width: 1080,
-            height: 945,
-            overflow: 'hidden',
-            flexShrink: 0,
-          }}
-        >
-          <img
-            src={imageUrl}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
-          />
-        </div>
-
+    return new ImageResponse(
+      (
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
             width: 1080,
-            height: 405,
-            padding: '44px 52px 44px 52px',
+            height: 1350,
             backgroundColor: 'white',
-            justifyContent: 'center',
           }}
         >
           <div
             style={{
-              fontFamily: 'Geist',
-              fontWeight: 700,
-              fontSize: 54,
-              color: '#000000',
-              lineHeight: 1.2,
-              marginBottom: 20,
+              display: 'flex',
+              width: 1080,
+              height: 945,
+              overflow: 'hidden',
+              flexShrink: 0,
             }}
           >
-            {listing.Event}
+            <img
+              src={imageUrl}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
           </div>
 
-          {listing.locationName ? (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: 1080,
+              height: 405,
+              padding: '44px 52px 44px 52px',
+              backgroundColor: 'white',
+              justifyContent: 'center',
+            }}
+          >
             <div
               style={{
                 fontFamily: 'Geist',
-                fontWeight: 400,
-                fontSize: 38,
-                color: '#444444',
-                marginBottom: 12,
+                fontWeight: 700,
+                fontSize: 54,
+                color: '#000000',
+                lineHeight: 1.2,
+                marginBottom: 20,
               }}
             >
-              {listing.locationName}
+              {listing.Event}
             </div>
-          ) : null}
 
-          {dateRange ? (
-            <div
-              style={{
-                fontFamily: 'Geist',
-                fontWeight: 400,
-                fontSize: 34,
-                color: '#888888',
-              }}
-            >
-              {dateRange}
-            </div>
-          ) : null}
+            {listing.locationName ? (
+              <div
+                style={{
+                  fontFamily: 'Geist',
+                  fontWeight: 400,
+                  fontSize: 38,
+                  color: '#444444',
+                  marginBottom: 12,
+                }}
+              >
+                {listing.locationName}
+              </div>
+            ) : null}
+
+            {dateRange ? (
+              <div
+                style={{
+                  fontFamily: 'Geist',
+                  fontWeight: 400,
+                  fontSize: 34,
+                  color: '#888888',
+                }}
+              >
+                {dateRange}
+              </div>
+            ) : null}
+          </div>
         </div>
-      </div>
-    ),
-    {
-      width: 1080,
-      height: 1350,
-      fonts: [
-        {
-          name: 'Geist',
-          data: regular,
-          weight: 400,
-          style: 'normal',
-        },
-        {
-          name: 'Geist',
-          data: bold,
-          weight: 700,
-          style: 'normal',
-        },
-      ],
-    }
-  )
+      ),
+      {
+        width: 1080,
+        height: 1350,
+        fonts: [
+          {
+            name: 'Geist',
+            data: regular,
+            weight: 400,
+            style: 'normal',
+          },
+          {
+            name: 'Geist',
+            data: bold,
+            weight: 700,
+            style: 'normal',
+          },
+        ],
+      }
+    )
+  } catch (err) {
+    console.error('OG generation error:', err)
+    return new Response(err?.message || String(err), { status: 500 })
+  }
 }
 
 function buildCroppedImageUrl(image, outputW, outputH) {
