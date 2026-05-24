@@ -15,12 +15,15 @@ const sanityClient = createClient({
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-let geistRegular = null
-let geistBold = null
+let fontCache = null
 
 function loadFonts() {
-  if (!geistRegular) geistRegular = fs.readFileSync(path.join(__dirname, 'fonts/Geist-Regular.ttf'))
-  if (!geistBold) geistBold = fs.readFileSync(path.join(__dirname, 'fonts/Geist-Bold.ttf'))
+  if (fontCache) return fontCache
+  fontCache = {
+    regular: fs.readFileSync(path.join(__dirname, 'fonts/Geist-Regular.ttf')),
+    bold: fs.readFileSync(path.join(__dirname, 'fonts/Geist-Bold.ttf')),
+  }
+  return fontCache
 }
 
 export async function GET(request) {
@@ -52,7 +55,7 @@ export async function GET(request) {
     return new Response('No image found for this listing', { status: 404 })
   }
 
-  loadFonts()
+  const { regular, bold } = loadFonts()
 
   const dateRange = formatDateRange(listing.StartDate, listing.EndDate, listing.DateOverride)
   const imageUrl = buildCroppedImageUrl(listing.image, 1080, 945)
@@ -146,13 +149,13 @@ export async function GET(request) {
       fonts: [
         {
           name: 'Geist',
-          data: geistRegular,
+          data: regular,
           weight: 400,
           style: 'normal',
         },
         {
           name: 'Geist',
-          data: geistBold,
+          data: bold,
           weight: 700,
           style: 'normal',
         },

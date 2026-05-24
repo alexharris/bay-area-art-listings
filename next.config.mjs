@@ -8,6 +8,11 @@ const nextConfig = {
             },
         ],
     },
+    experimental: {
+        outputFileTracingIncludes: {
+            '/api/generate-og': ['./src/app/api/generate-og/fonts/**'],
+        },
+    },
 };
 
 export default nextConfig;
