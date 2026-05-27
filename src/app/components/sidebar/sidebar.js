@@ -155,11 +155,11 @@ export default function Sidebar({
                     </div>
                     <div className="flex items-center gap-1">
                         <button
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${favoritesOnly ? 'bg-pink-200 border-pink-300 text-black' : favoriteCount === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${favoritesOnly ? 'bg-amber-100 border-amber-300 text-black' : favoriteCount === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
                             onClick={() => favoriteCount > 0 && setFavoritesOnly(!favoritesOnly)}
                             disabled={favoriteCount === 0}
                         >
-                            ❤️ Favorites
+                            ⭐ Starred
                             {!favoritesOnly && favoriteCount > 0 && <span className="opacity-50">({favoriteCount})</span>}
                         </button>
                         {favoritesOnly && (

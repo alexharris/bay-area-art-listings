@@ -164,7 +164,7 @@ export default function FilterChipRow({
         {
             key: 'favorites',
             active: favoritesOnly,
-            el: <BadgeChip key="favorites" emoji="❤️" label="Saved" count={favoriteCount > 0 ? favoriteCount : null} active={favoritesOnly} activeClass="bg-pink-200 border-pink-300 text-black" inactiveClass={favoriteCount === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300'} onToggle={() => favoriteCount > 0 && setFavoritesOnly(!favoritesOnly)} />,
+            el: <BadgeChip key="favorites" emoji="⭐" label="Starred" count={favoriteCount > 0 ? favoriteCount : null} active={favoritesOnly} activeClass="bg-amber-100 border-amber-300 text-black" inactiveClass={favoriteCount === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300'} onToggle={() => favoriteCount > 0 && setFavoritesOnly(!favoritesOnly)} />,
         },
     ].sort((a, b) => Number(b.active) - Number(a.active));
 
