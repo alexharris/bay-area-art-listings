@@ -13,7 +13,8 @@ import { formatDate, generateSlug } from '../../utils/shared';
 import { X } from 'lucide-react';
 import { FavoritesProvider, useFavorites } from '@/context/FavoritesContext';
 import MobileHeader from './MobileHeader';
-import MobileBottomBar from './MobileBottomBar';
+import MobileSortDrawer from './MobileBottomBar';
+import MobileViewToggleBar from './MobileViewToggleBar';
 import FilterChipRow from './FilterChipRow';
 import Listing from './listing';
 import MapView from './map/mapView';
@@ -139,7 +140,6 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
 
     // Mobile UI state
     const [mobileSortOpen, setMobileSortOpen] = useState(false);
-    const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
 
     // Use ref to track if initial setup is complete
     const isInitialized = useRef(false);
@@ -369,6 +369,12 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                 setSearchTerm={setSearchTerm}
             />
 
+            {/* Mobile View Toggle Bar */}
+            <MobileViewToggleBar
+                isMapView={isMapView}
+                setIsMapView={setIsMapView}
+            />
+
             {/* Mobile Filter Chip Row */}
             <FilterChipRow
                 calendarTypeFilter={calendarTypeFilter}
@@ -414,20 +420,15 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                 clearUserLocation={clearUserLocation}
             />
 
-            {/* Mobile Bottom Bar */}
-            <MobileBottomBar
-                isMapView={isMapView}
-                setIsMapView={setIsMapView}
-                mobileAboutOpen={mobileAboutOpen}
-                setMobileAboutOpen={setMobileAboutOpen}
-                newsletterSettings={newsletterSettings}
+            {/* Mobile Sort Drawer */}
+            <MobileSortDrawer
                 mobileSortOpen={mobileSortOpen}
                 setMobileSortOpen={setMobileSortOpen}
                 sortMethod={sortMethod}
                 setSortMethod={setSortMethod}
             />
 
-            <div className={`flex flex-row w-full items-start pt-24 lg:pt-0 ${isMapView ? 'h-screen' : ''}`}>
+            <div className={`flex flex-row w-full items-start pt-[136px] lg:pt-0 ${isMapView ? 'h-screen' : ''}`}>
 
                 {/* Desktop Sidebar */ }
                 <div
@@ -490,7 +491,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                 </div>
 
             {/* Main Col */}
-            <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink pb-16 lg:pb-0 ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
+            <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink lg:pb-0 ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
                 <ContentToolbar
                     sortMethod={sortMethod}
                     setSortMethod={setSortMethod}

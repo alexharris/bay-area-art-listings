@@ -169,7 +169,7 @@ export default function FilterChipRow({
     ].sort((a, b) => Number(b.active) - Number(a.active));
 
     return (
-        <div className="lg:hidden fixed inset-x-0 top-12 z-40 bg-white border-b border-gray-200">
+        <div className="lg:hidden fixed inset-x-0 top-[88px] z-40 bg-white border-b border-gray-200">
             <div ref={chipRowRef} className="flex flex-row gap-2 px-3 py-2 overflow-x-auto scrollbar-none">
                 {chips.map(c => c.el)}
             </div>
