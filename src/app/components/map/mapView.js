@@ -266,9 +266,13 @@ function LocationSheet({ group, formatDate }) {
 
             {/* Scrollable show list */}
             <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3 pb-[env(safe-area-inset-bottom)]">
-                {items.map((item, i) => (
-                    <ShowCard key={i} item={item} formatDate={formatDate} />
-                ))}
+                {items.length === 0 ? (
+                    <p className="text-sm text-gray-400">No current exhibitions</p>
+                ) : (
+                    items.map((item, i) => (
+                        <ShowCard key={i} item={item} formatDate={formatDate} />
+                    ))
+                )}
             </div>
         </div>
     );
@@ -346,7 +350,25 @@ export default function MapView({
         }
     });
 
-    const markerPositions = Object.values(locationGroups).map(g => g.position);
+    // Add all locations with geolocation that have no filtered listings
+    locations.forEach(loc => {
+        if (!loc.Geolocation || loc.Name?.toLowerCase() === 'various') return;
+        const key = `${loc.Geolocation.lat},${loc.Geolocation.lng}`;
+        if (!locationGroups[key]) {
+            locationGroups[key] = {
+                position: [loc.Geolocation.lat, loc.Geolocation.lng],
+                location: loc,
+                locationName: loc.Name,
+                locationAddress: loc.Address,
+                locationUrl: loc.Url,
+                locationHours: loc.Hours,
+                items: [],
+                isEmpty: true,
+            };
+        }
+    });
+
+    const markerPositions = Object.values(locationGroups).filter(g => !g.isEmpty).map(g => g.position);
 
     // Blue dot icon for user's position
     const userLocationIconUrl = `data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='9' fill='%234A90D9' stroke='white' stroke-width='2'/%3E%3Ccircle cx='10' cy='10' r='4' fill='white'/%3E%3C/svg%3E`;
@@ -385,8 +407,12 @@ export default function MapView({
         // Multiple pin without green dot (none on view today)
         const multiplePinClosedIcon = `data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0_2001_109)'%3E%3Cpath d='M19 10C19 17 10 23 10 23C10 23 1 17 1 10C1 7.61305 1.94821 5.32387 3.63604 3.63604C5.32387 1.94821 7.61305 1 10 1C12.3869 1 14.6761 1.94821 16.364 3.63604C18.0518 5.32387 19 7.61305 19 10Z' fill='%23F5E8A0' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z' fill='%23F5E8A0' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M23 10C23 17 14 23 14 23C14 23 5 17 5 10C5 7.61305 5.94821 5.32387 7.63604 3.63604C9.32387 1.94821 11.6131 1 14 1C16.3869 1 18.6761 1.94821 20.364 3.63604C22.0518 5.32387 23 7.61305 23 10Z' fill='%23F5E8A0' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_2001_109'%3E%3Crect width='24' height='24' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E`;
 
+        // Gray pin for locations with no current shows
+        const emptyPinIcon = `data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z' fill='%23E5E7EB' stroke='%239CA3AF' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E`;
+
         // Select icon based on number of items and on-view-today status
         const getIconUrl = () => {
+            if (group.isEmpty) return emptyPinIcon;
             if (totalItems > 1) {
                 return hasOnViewToday ? multiplePinOpenIcon : multiplePinClosedIcon;
             }
