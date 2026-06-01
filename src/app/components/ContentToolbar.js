@@ -4,10 +4,10 @@ import SortSelector from './sidebar/sortSelector';
 import SearchInput from './SearchInput';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-export default function ContentToolbar({ sortMethod, setSortMethod, isMapView, setIsMapView, searchTerm, setSearchTerm }) {
+export default function ContentToolbar({ sortMethod, setSortMethod, isMapView, setIsMapView, searchClearKey, onSearch }) {
     return (
         <div className="hidden lg:flex sticky top-0 z-40 bg-white border-b border-gray-200 px-3 py-2 flex-row items-center justify-between gap-3">
-            <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+            <SearchInput key={searchClearKey} onSearch={onSearch} />
             <div className="flex flex-row items-center gap-3">
             {!isMapView && (
                 <div className="max-w-[200px] text-xs">
