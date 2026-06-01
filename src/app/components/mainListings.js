@@ -114,7 +114,10 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
         () => (listings ? listings.filter(l => favoriteIds.includes(l._id)).length : 0),
         [listings, favoriteIds]
     );
-    const [searchTerm, setSearchTerm] = useState('');
+    const [committedSearchTerm, setCommittedSearchTerm] = useState('');
+    const [searchClearKey, setSearchClearKey] = useState(0);
+    const onSearch = (value) => setCommittedSearchTerm(value);
+    const onClear = () => setCommittedSearchTerm('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [selectedCounty, setSelectedCounty] = useState([]);
     const [userLocation, setUserLocation] = useState(null);
@@ -154,7 +157,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
         openingTitleOnly,
         favoritesOnly,
         favoriteIds,
-        searchTerm,
+        searchTerm: committedSearchTerm,
         selectedLocation,
         selectedCounty,
         calendarTypeFilter,
@@ -169,7 +172,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
         openingTitleOnly,
         favoritesOnly,
         JSON.stringify(favoriteIds),
-        searchTerm,
+        committedSearchTerm,
         selectedLocation,
         JSON.stringify(selectedCounty),
         calendarTypeFilter,
@@ -325,7 +328,8 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
         setOpeningTodayOnly(false);
         setOpeningTitleOnly(false);
         setFavoritesOnly(false);
-        setSearchTerm('');
+        setCommittedSearchTerm('');
+        setSearchClearKey(k => k + 1);
         setSelectedLocation('');
         setSelectedCounty([]);
         setUserLocation(null);
@@ -365,8 +369,9 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
 
             {/* Mobile Header */}
             <MobileHeader
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
+                key={searchClearKey}
+                onSearch={onSearch}
+                onClear={onClear}
             />
 
             {/* Mobile Filter Chip Row */}
@@ -403,8 +408,6 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                 favoritesOnly={favoritesOnly}
                 setFavoritesOnly={setFavoritesOnly}
                 favoriteCount={favoriteCount}
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
                 userLocation={userLocation}
                 nearbyRadius={nearbyRadius}
                 setNearbyRadius={setNearbyRadius}
@@ -445,8 +448,6 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                         currentFilters={currentFilters}
 
                         // Filter states
-                        searchTerm={searchTerm}
-                        setSearchTerm={setSearchTerm}
                         calendarDateRangeFilter={calendarDateRangeFilter}
                         setCalendarDateRangeFilter={setCalendarDateRangeFilter}
                         calendarDateRangePreset={calendarDateRangePreset}
@@ -496,8 +497,8 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                     setSortMethod={setSortMethod}
                     isMapView={isMapView}
                     setIsMapView={setIsMapView}
-                    searchTerm={searchTerm}
-                    setSearchTerm={setSearchTerm}
+                    searchClearKey={searchClearKey}
+                    onSearch={onSearch}
                 />
 
                 {/* Mobile inline sort */}
@@ -505,7 +506,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                     <div className="lg:hidden flex items-center justify-between px-3 py-2 border-b border-gray-100">
                         <div className="flex items-center gap-1.5 text-sm">
                             <span className="font-medium text-gray-700">{displayedResults} exhibition{displayedResults !== 1 ? 's' : ''}</span>
-                            {(calendarTypeFilter !== 'onview' || calendarDateRangePreset !== 'anytime' || selectedCounty.length > 0 || onViewToday || endingSoonOnly || openingTodayOnly || openingTitleOnly || searchTerm) && (
+                            {(calendarTypeFilter !== 'onview' || calendarDateRangePreset !== 'anytime' || selectedCounty.length > 0 || onViewToday || endingSoonOnly || openingTodayOnly || openingTitleOnly || committedSearchTerm) && (
                                 <button
                                     onClick={clearAllFilters}
                                     className="text-gray-400 hover:text-gray-600"
@@ -565,7 +566,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                                     highlightsOnly={highlightsOnly}
                                     selectedLocation={selectedLocation}
                                     selectedCounty={selectedCounty}
-                                    searchTerm={searchTerm}
+                                    searchTerm={committedSearchTerm}
                                     userLocation={userLocation}
                                 />
                             </div>
