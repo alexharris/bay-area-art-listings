@@ -94,6 +94,15 @@ export const locationType = defineType({
       components: {input: GoogleSyncPanel},
     }),
     defineField({
+      name: 'venueTypes',
+      title: 'Venue Types',
+      type: 'array',
+      of: [{ type: 'string' }],
+      group: 'sync',
+      description: 'Populated automatically from Google Places (e.g. art_gallery, museum).',
+      readOnly: true,
+    }),
+    defineField({
       name: 'OriginalName',
       type: 'string',
       group: 'archive',

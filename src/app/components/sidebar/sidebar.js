@@ -13,6 +13,10 @@ import AboutContent from '../aboutContent';
 
 export default function Sidebar({
     // Display states
+    isMapView,
+    setIsMapView,
+    activeView = 'exhibitions',
+    setActiveView,
     showLogo = true,
     showMenu,
     setShowMenu,
@@ -69,6 +73,7 @@ export default function Sidebar({
     const [whenDrawerOpen, setWhenDrawerOpen] = useState(false);
     const [whenTab, setWhenTab] = useState('presets');
 
+    const isEventsView = activeView === 'events';
     const whenActive = calendarDateRangePreset !== 'anytime';
     const whenLabels = { anytime: 'Anytime', today: 'Today', next7: 'Next 7 Days', thismonth: 'This Month', nextmonth: 'Next Month', custom: 'Custom dates' };
     const whenLabel = whenActive ? (whenLabels[calendarDateRangePreset] || calendarDateRangePreset) : 'Anytime';
@@ -100,7 +105,31 @@ export default function Sidebar({
                     </div>
                 )}
                 <p className="hidden md:block">A directory of visual arts exhibitions in the Bay Area.</p>
+
+                {/* View toggle */}
+                <div className="flex items-stretch border border-gray-300 rounded-lg overflow-hidden text-sm">
+                    <button
+                        onClick={() => setActiveView('exhibitions')}
+                        className={`flex-1 flex items-center justify-center py-2 border-r border-gray-300 transition-colors ${activeView === 'exhibitions' ? 'font-medium text-gray-900' : 'text-gray-400'}`}
+                    >
+                        Exhibitions
+                    </button>
+                    <button
+                        onClick={() => setActiveView('events')}
+                        className={`flex-1 flex items-center justify-center py-2 border-r border-gray-300 transition-colors ${activeView === 'events' ? 'font-medium text-gray-900' : 'text-gray-400'}`}
+                    >
+                        Events
+                    </button>
+                    <button
+                        onClick={() => setActiveView('map')}
+                        className={`flex-1 flex items-center justify-center py-2 transition-colors ${activeView === 'map' ? 'font-medium text-gray-900' : 'text-gray-400'}`}
+                    >
+                        Map
+                    </button>
+                </div>
+
                 <div className="flex flex-col gap-2">
+                    {!isEventsView && (
                     <div className="flex items-center gap-1">
                         <button
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${openingTitleOnly ? 'bg-yellow-200 border-yellow-300 text-black' : !openingTitleOnly && specialFilterCounts.openingTitleOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
@@ -114,6 +143,8 @@ export default function Sidebar({
                             <button onClick={() => setOpeningTitleOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear openings filter">×</button>
                         )}
                     </div>
+                    )}
+                    {!isEventsView && (
                     <div className="flex items-center gap-1">
                         <button
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${onViewToday ? 'bg-green-300 border-green-400 text-black' : !onViewToday && specialFilterCounts.onViewToday === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
@@ -127,6 +158,7 @@ export default function Sidebar({
                             <button onClick={() => setOnViewToday(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear on view today filter">×</button>
                         )}
                     </div>
+                    )}
                     <div className="flex items-center gap-1">
                         <button
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${openingTodayOnly ? 'bg-green-300 border-green-400 text-black' : !openingTodayOnly && specialFilterCounts.openingTodayOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
@@ -140,6 +172,7 @@ export default function Sidebar({
                             <button onClick={() => setOpeningTodayOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear opening today filter">×</button>
                         )}
                     </div>
+                    {!isEventsView && (
                     <div className="flex items-center gap-1">
                         <button
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${endingSoonOnly ? 'bg-red-300 border-red-400 text-black' : !endingSoonOnly && specialFilterCounts.endingSoonOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
@@ -153,6 +186,8 @@ export default function Sidebar({
                             <button onClick={() => setEndingSoonOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear ending soon filter">×</button>
                         )}
                     </div>
+                    )}
+                    {!isEventsView && (
                     <div className="flex items-center gap-1">
                         <button
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${favoritesOnly ? 'bg-amber-100 border-amber-300 text-black' : favoriteCount === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
@@ -166,7 +201,9 @@ export default function Sidebar({
                             <button onClick={() => setFavoritesOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear favorites filter">×</button>
                         )}
                     </div>
+                    )}
                 </div>
+
                 <div className="border-t border-gray-100"></div>
                 <div className="flex items-center gap-1">
                     <button

@@ -18,6 +18,7 @@ import MobileViewToggleBar from './MobileViewToggleBar';
 import FilterChipRow from './FilterChipRow';
 import Listing from './listing';
 import MapView from './map/mapView';
+import EventsView from './events/EventsView';
 import Sidebar from './sidebar/sidebar';
 import LoadingSkeleton from './LoadingSkeleton';
 import ContentToolbar from './ContentToolbar';
@@ -109,6 +110,8 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
     const [endingSoonOnly, setEndingSoonOnly] = useState(false);
     const [openingTodayOnly, setOpeningTodayOnly] = useState(false);
     const [openingTitleOnly, setOpeningTitleOnly] = useState(false);
+    const [openingsOnly, setOpeningsOnly] = useState(false);
+
     const [favoritesOnly, setFavoritesOnly] = useState(false);
     const { items: favoriteIds } = useFavorites();
     const favoriteCount = useMemo(
@@ -128,7 +131,9 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
     //  Sorting
     // Display
     const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('custom');
-    const [isMapView, setIsMapView] = useState(false);
+    const [activeView, setActiveView] = useState('exhibitions');
+    const isMapView = activeView === 'map';
+    const setIsMapView = (val) => setActiveView(val ? 'map' : 'exhibitions');
     const [displayedResults, setDisplayedResults] = useState(0); // number of results
     const [showMenu, setShowMenu] = useState(false);
 
@@ -376,12 +381,13 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
 
             {/* Mobile View Toggle Bar */}
             <MobileViewToggleBar
-                isMapView={isMapView}
-                setIsMapView={setIsMapView}
+                activeView={activeView}
+                setActiveView={setActiveView}
             />
 
             {/* Mobile Filter Chip Row */}
             <FilterChipRow
+                activeView={activeView}
                 calendarTypeFilter={calendarTypeFilter}
                 setCalendarTypeFilter={setCalendarTypeFilter}
                 calendarTypeCounts={calendarTypeCounts}
@@ -411,6 +417,8 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                 updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
                 openingTitleOnly={openingTitleOnly}
                 setOpeningTitleOnly={setOpeningTitleOnly}
+                openingsOnly={openingsOnly}
+                setOpeningsOnly={setOpeningsOnly}
                 favoritesOnly={favoritesOnly}
                 setFavoritesOnly={setFavoritesOnly}
                 favoriteCount={favoriteCount}
@@ -439,6 +447,10 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                 >
                     <Sidebar
                         // Display states
+                        isMapView={isMapView}
+                        setIsMapView={setIsMapView}
+                        activeView={activeView}
+                        setActiveView={setActiveView}
                         showMenu={showMenu}
                         setShowMenu={setShowMenu}
                         displayedResults={displayedResults}
@@ -492,18 +504,18 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                 </div>
 
             {/* Main Col */}
-            <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink lg:pb-0 ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
+            <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink lg:pb-0 ${activeView === 'map' ? 'h-screen' : 'min-h-screen'}`}>
                 <ContentToolbar
                     sortMethod={sortMethod}
                     setSortMethod={setSortMethod}
-                    isMapView={isMapView}
-                    setIsMapView={setIsMapView}
+                    activeView={activeView}
+                    setActiveView={setActiveView}
                     searchClearKey={searchClearKey}
                     onSearch={onSearch}
                 />
 
                 {/* Mobile inline sort */}
-                {!isMapView && (
+                {activeView === 'exhibitions' && (
                     <div className="lg:hidden flex items-center justify-between px-3 py-2 border-b border-gray-100">
                         <div className="flex items-center gap-1.5 text-sm">
                             <span className="font-medium text-gray-700">{displayedResults} exhibition{displayedResults !== 1 ? 's' : ''}</span>
@@ -559,7 +571,16 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                             </div>
                         }
 
-                        {displayedResults > 0 && isMapView ? (
+                        {activeView === 'events' ? (
+                            <EventsView
+                                listings={listings}
+                                calendarDateRangeFilter={calendarDateRangeFilter}
+                                selectedCounty={selectedCounty}
+                                userLocation={userLocation}
+                                nearbyRadius={nearbyRadius}
+                                openingsOnly={openingsOnly}
+                            />
+                        ) : displayedResults > 0 && activeView === 'map' ? (
                             <div className="h-full flex-1">
                                 <MapView
                                     filteredListings={filteredListings}

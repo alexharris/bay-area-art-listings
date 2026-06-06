@@ -57,7 +57,7 @@ export async function GET() {
   // Query all locations with a GoogleID
   const locations = await sanityClient.fetch(
     `*[_type == "location" && defined(GoogleID)] {
-      _id, Name, Address, Geolocation, GoogleID, Hours, hoursManualOverride
+      _id, Name, Address, Geolocation, GoogleID, Hours, hoursManualOverride, venueTypes
     }`
   );
 
@@ -94,6 +94,7 @@ export async function GET() {
       const googleName = data.Name;
       const googleAddress = data.Address;
       const googleGeo = data.Geolocation;
+      const googleTypes = data.Types;
 
       const hoursChanged = googleHours ? !hoursAreEqual(location.Hours, googleHours) : false;
       const nameChanged = googleName ? googleName !== location.Name : false;
@@ -101,7 +102,10 @@ export async function GET() {
       const geoChanged = googleGeo
         ? googleGeo.lat !== location.Geolocation?.lat || googleGeo.lng !== location.Geolocation?.lng
         : false;
-      const anyChanged = hoursChanged || nameChanged || addressChanged || geoChanged;
+      const typesChanged = googleTypes
+        ? JSON.stringify(googleTypes) !== JSON.stringify(location.venueTypes ?? null)
+        : false;
+      const anyChanged = hoursChanged || nameChanged || addressChanged || geoChanged || typesChanged;
 
       const manualOverride = location.hoursManualOverride ?? false;
 
@@ -119,6 +123,7 @@ export async function GET() {
       if (nameChanged) updates.Name = googleName;
       if (addressChanged) updates.Address = googleAddress;
       if (geoChanged) updates.Geolocation = {_type: 'geopoint', lat: googleGeo.lat, lng: googleGeo.lng};
+      if (typesChanged) updates.venueTypes = googleTypes;
 
       await sanityClient.patch(location._id).set(updates).commit();
       summary.changed++;

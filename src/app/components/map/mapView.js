@@ -278,6 +278,22 @@ function LocationSheet({ group, formatDate }) {
     );
 }
 
+function getVenueEmoji(venueTypes) {
+    if (!venueTypes?.length) return null;
+    const priority = [
+        [['art_gallery', 'art_studio'], '🖼️'],
+        [['art_museum', 'museum', 'history_museum'], '🏛️'],
+        [['performing_arts_theater', 'auditorium', 'live_music_venue', 'event_venue', 'convention_center', 'movie_theater'], '🎭'],
+        [['cultural_center', 'community_center', 'non_profit_organization', 'association_or_organization'], '🏢'],
+        [['university', 'educational_institution'], '🎓'],
+        [['park', 'garden', 'farm', 'vineyard', 'hiking_area', 'sculpture'], '🌿'],
+    ];
+    for (const [types, emoji] of priority) {
+        if (types.some(t => venueTypes.includes(t))) return emoji;
+    }
+    return null;
+}
+
 export default function MapView({
     filteredListings,
     locations,
@@ -395,27 +411,16 @@ export default function MapView({
         // (accounts for both show dates AND venue hours)
         const hasOnViewToday = group.items.some(item => item.isOnViewToday === true);
 
-        // Single pin with green dot (on view today)
+
         const singlePinOpenIcon = `data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z' fill='%23F5E8A0' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z' fill='%2393D884' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E`;
-
-        // Single pin without green dot (not on view today)
         const singlePinClosedIcon = `data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z' fill='%23F5E8A0' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E`;
-
-        // Multiple pin with green dot (at least one on view today)
         const multiplePinOpenIcon = `data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0_2001_97)'%3E%3Cpath d='M19 10C19 17 10 23 10 23C10 23 1 17 1 10C1 7.61305 1.94821 5.32387 3.63604 3.63604C5.32387 1.94821 7.61305 1 10 1C12.3869 1 14.6761 1.94821 16.364 3.63604C18.0518 5.32387 19 7.61305 19 10Z' fill='%23F5E8A0' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z' fill='%23F5E8A0' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M23 10C23 17 14 23 14 23C14 23 5 17 5 10C5 7.61305 5.94821 5.32387 7.63604 3.63604C9.32387 1.94821 11.6131 1 14 1C16.3869 1 18.6761 1.94821 20.364 3.63604C22.0518 5.32387 23 7.61305 23 10Z' fill='%23F5E8A0' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14 13C15.6569 13 17 11.6569 17 10C17 8.34315 15.6569 7 14 7C12.3431 7 11 8.34315 11 10C11 11.6569 12.3431 13 14 13Z' fill='%2393D884' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_2001_97'%3E%3Crect width='24' height='24' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E`;
-
-        // Multiple pin without green dot (none on view today)
         const multiplePinClosedIcon = `data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0_2001_109)'%3E%3Cpath d='M19 10C19 17 10 23 10 23C10 23 1 17 1 10C1 7.61305 1.94821 5.32387 3.63604 3.63604C5.32387 1.94821 7.61305 1 10 1C12.3869 1 14.6761 1.94821 16.364 3.63604C18.0518 5.32387 19 7.61305 19 10Z' fill='%23F5E8A0' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z' fill='%23F5E8A0' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M23 10C23 17 14 23 14 23C14 23 5 17 5 10C5 7.61305 5.94821 5.32387 7.63604 3.63604C9.32387 1.94821 11.6131 1 14 1C16.3869 1 18.6761 1.94821 20.364 3.63604C22.0518 5.32387 23 7.61305 23 10Z' fill='%23F5E8A0' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_2001_109'%3E%3Crect width='24' height='24' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E`;
-
-        // Gray pin for locations with no current shows
         const emptyPinIcon = `data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z' fill='%23E5E7EB' stroke='%239CA3AF' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E`;
 
-        // Select icon based on number of items and on-view-today status
         const getIconUrl = () => {
             if (group.isEmpty) return emptyPinIcon;
-            if (totalItems > 1) {
-                return hasOnViewToday ? multiplePinOpenIcon : multiplePinClosedIcon;
-            }
+            if (totalItems > 1) return hasOnViewToday ? multiplePinOpenIcon : multiplePinClosedIcon;
             return hasOnViewToday ? singlePinOpenIcon : singlePinClosedIcon;
         };
 

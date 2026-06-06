@@ -58,6 +58,7 @@ export default async function getListings() {
         "locationGeolocation": Location->Geolocation,
         "locationHours": Location->Hours,
         "locationInstagram": Location->Instagram,
+        "locationVenueTypes": Location->venueTypes,
         "sfawUrl": sfawUrl
       }
     `, { today });    

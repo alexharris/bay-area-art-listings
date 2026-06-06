@@ -69,7 +69,7 @@ export async function POST(request) {
     const placeResponse = await placesClient.getPlace(placeRequest, {
       otherArgs: {
         headers: {
-          'X-Goog-FieldMask': 'displayName,formattedAddress,websiteUri,currentOpeningHours,location,id',
+          'X-Goog-FieldMask': 'displayName,formattedAddress,websiteUri,currentOpeningHours,location,id,types',
         },
       },
     });
@@ -99,7 +99,8 @@ export async function POST(request) {
         Friday: place.currentOpeningHours.weekdayDescriptions[4] || null,
         Saturday: place.currentOpeningHours.weekdayDescriptions[5] || null,
         Sunday: place.currentOpeningHours.weekdayDescriptions[6] || null,
-      } : null
+      } : null,
+      Types: place.types || null,
     };
 
     return NextResponse.json({ data: formattedData });
