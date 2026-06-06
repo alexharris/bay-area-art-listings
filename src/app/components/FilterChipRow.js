@@ -55,6 +55,8 @@ function BadgeChip({ emoji, label, count, active, onToggle, activeClass, inactiv
 
 export default function FilterChipRow({
     activeView = 'exhibitions',
+    hasShowOnly,
+    setHasShowOnly,
     calendarTypeFilter,
     setCalendarTypeFilter,
     calendarTypeCounts,
@@ -139,9 +141,10 @@ export default function FilterChipRow({
         : 'Anywhere';
 
     const isEventsView = activeView === 'events';
+    const isMapView = activeView === 'map';
 
     const chips = [
-        ...(!isEventsView || whenActive ? [{
+        ...(!isEventsView && !isMapView || whenActive ? [{
             key: 'when',
             active: whenActive,
             el: <Chip key="when" emoji="📅" label={whenLabel} active={whenActive} onOpen={() => setWhenOpen(true)} onClear={clearWhen} />,
@@ -151,6 +154,11 @@ export default function FilterChipRow({
             active: whereActive,
             el: <Chip key="where" emoji="📍" label={whereLabel} active={whereActive} onOpen={() => setWhereOpen(true)} onClear={() => { setSelectedCounty([]); clearUserLocation?.(); }} />,
         },
+        ...(isMapView ? [{
+            key: 'hasShowOnly',
+            active: hasShowOnly,
+            el: <BadgeChip key="hasShowOnly" emoji="🖼️" label="Has Show" active={hasShowOnly} activeClass="bg-gray-900 border-gray-900 text-white hover:bg-gray-800" inactiveClass="bg-white text-gray-600 border-gray-200 hover:border-gray-300" onToggle={() => setHasShowOnly(!hasShowOnly)} />,
+        }] : []),
         ...(isEventsView ? [{
             key: 'openingsOnly',
             active: openingsOnly,
@@ -166,7 +174,7 @@ export default function FilterChipRow({
             active: onViewToday,
             el: <BadgeChip key="onViewToday" emoji="🟢" label="On View Today" count={specialFilterCounts?.onViewToday} active={onViewToday} activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400" inactiveClass={!onViewToday && !specialFilterCounts?.onViewToday ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"} onToggle={() => (specialFilterCounts?.onViewToday > 0 || onViewToday) && setOnViewToday(!onViewToday)} />,
         }] : []),
-        ...(!isEventsView && (endingSoonOnly || specialFilterCounts?.endingSoonOnly > 0) ? [{
+        ...(!isEventsView && !isMapView && (endingSoonOnly || specialFilterCounts?.endingSoonOnly > 0) ? [{
             key: 'endingSoon',
             active: endingSoonOnly,
             el: <BadgeChip key="endingSoon" emoji="⏳" label="Ending Soon" count={specialFilterCounts?.endingSoonOnly} active={endingSoonOnly} activeClass="bg-red-300 border-red-400 text-black hover:bg-red-400" inactiveClass="bg-white text-gray-600 border-gray-200 hover:border-gray-300" onToggle={() => setEndingSoonOnly(!endingSoonOnly)} />,
@@ -174,7 +182,7 @@ export default function FilterChipRow({
         ...(!isEventsView ? [{
             key: 'favorites',
             active: favoritesOnly,
-            el: <BadgeChip key="favorites" emoji="⭐" label="Starred" count={favoriteCount > 0 ? favoriteCount : null} active={favoritesOnly} activeClass="bg-amber-100 border-amber-300 text-black" inactiveClass={favoriteCount === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300'} onToggle={() => favoriteCount > 0 && setFavoritesOnly(!favoritesOnly)} />,
+            el: <BadgeChip key="favorites" emoji="⭐" label="Starred" count={specialFilterCounts?.favorites > 0 ? specialFilterCounts.favorites : null} active={favoritesOnly} activeClass="bg-amber-100 border-amber-300 text-black" inactiveClass={!favoritesOnly && !specialFilterCounts?.favorites ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300'} onToggle={() => (specialFilterCounts?.favorites > 0 || favoritesOnly) && setFavoritesOnly(!favoritesOnly)} />,
         }] : []),
     ].sort((a, b) => Number(b.active) - Number(a.active));
 

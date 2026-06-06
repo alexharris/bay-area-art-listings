@@ -41,6 +41,8 @@ export default function Sidebar({
     setEndingSoonOnly,
     openingTitleOnly,
     setOpeningTitleOnly,
+    hasShowOnly,
+    setHasShowOnly,
     favoritesOnly,
     setFavoritesOnly,
     favoriteCount,
@@ -172,7 +174,7 @@ export default function Sidebar({
                             <button onClick={() => setOpeningTodayOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear opening today filter">×</button>
                         )}
                     </div>
-                    {!isEventsView && (
+                    {!isEventsView && activeView !== 'map' && (
                     <div className="flex items-center gap-1">
                         <button
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${endingSoonOnly ? 'bg-red-300 border-red-400 text-black' : !endingSoonOnly && specialFilterCounts.endingSoonOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
@@ -190,12 +192,12 @@ export default function Sidebar({
                     {!isEventsView && (
                     <div className="flex items-center gap-1">
                         <button
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${favoritesOnly ? 'bg-amber-100 border-amber-300 text-black' : favoriteCount === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
-                            onClick={() => favoriteCount > 0 && setFavoritesOnly(!favoritesOnly)}
-                            disabled={favoriteCount === 0}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${favoritesOnly ? 'bg-amber-100 border-amber-300 text-black' : !specialFilterCounts.favorites ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            onClick={() => (specialFilterCounts.favorites > 0 || favoritesOnly) && setFavoritesOnly(!favoritesOnly)}
+                            disabled={!favoritesOnly && !specialFilterCounts.favorites}
                         >
                             ⭐ Starred
-                            {!favoritesOnly && favoriteCount > 0 && <span className="opacity-50">({favoriteCount})</span>}
+                            {!favoritesOnly && specialFilterCounts.favorites > 0 && <span className="opacity-50">({specialFilterCounts.favorites})</span>}
                         </button>
                         {favoritesOnly && (
                             <button onClick={() => setFavoritesOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear favorites filter">×</button>
@@ -204,7 +206,19 @@ export default function Sidebar({
                     )}
                 </div>
 
-                <div className="border-t border-gray-100"></div>
+                {activeView === 'map' ? (
+                    <div className="flex items-center gap-1">
+                        <button
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${hasShowOnly ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}`}
+                            onClick={() => setHasShowOnly(!hasShowOnly)}
+                        >
+                            🖼️ Has Show
+                        </button>
+                        {hasShowOnly && (
+                            <button onClick={() => setHasShowOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear has show filter">×</button>
+                        )}
+                    </div>
+                ) : (
                 <div className="flex items-center gap-1">
                     <button
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${whenActive ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}`}
@@ -216,7 +230,8 @@ export default function Sidebar({
                     {whenActive && (
                         <button onClick={clearWhen} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear date filter">×</button>
                     )}
-                </div>                                                
+                </div>
+                )}                                                
           
                 <CountySelector
                     onCountyChange={setSelectedCounty}

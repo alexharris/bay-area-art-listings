@@ -302,6 +302,7 @@ export default function MapView({
     selectedCounty,
     searchTerm,
     userLocation,
+    hasShowOnly = false,
 }) {
     const [L, setL] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
@@ -366,23 +367,27 @@ export default function MapView({
         }
     });
 
-    // Add all locations with geolocation that have no filtered listings
-    locations.forEach(loc => {
-        if (!loc.Geolocation || loc.Name?.toLowerCase() === 'various') return;
-        const key = `${loc.Geolocation.lat},${loc.Geolocation.lng}`;
-        if (!locationGroups[key]) {
-            locationGroups[key] = {
-                position: [loc.Geolocation.lat, loc.Geolocation.lng],
-                location: loc,
-                locationName: loc.Name,
-                locationAddress: loc.Address,
-                locationUrl: loc.Url,
-                locationHours: loc.Hours,
-                items: [],
-                isEmpty: true,
-            };
-        }
-    });
+    // Add grey markers for locations with no filtered listings — but only when no
+    // location-specific filters are active (otherwise every other location shows as grey noise)
+    const hasLocationFilter = selectedLocation || selectedCounty?.length > 0 || userLocation || searchTerm;
+    if (!hasLocationFilter) {
+        locations.forEach(loc => {
+            if (!loc.Geolocation || loc.Name?.toLowerCase() === 'various') return;
+            const key = `${loc.Geolocation.lat},${loc.Geolocation.lng}`;
+            if (!locationGroups[key]) {
+                locationGroups[key] = {
+                    position: [loc.Geolocation.lat, loc.Geolocation.lng],
+                    location: loc,
+                    locationName: loc.Name,
+                    locationAddress: loc.Address,
+                    locationUrl: loc.Url,
+                    locationHours: loc.Hours,
+                    items: [],
+                    isEmpty: true,
+                };
+            }
+        });
+    }
 
     const markerPositions = Object.values(locationGroups).filter(g => !g.isEmpty).map(g => g.position);
 
@@ -404,7 +409,10 @@ export default function MapView({
     ) : null;
 
 
-    const markers = Object.entries(locationGroups).map(([key, group]) => {
+    const markers = Object.entries(locationGroups).filter(([, group]) => {
+        if (hasShowOnly && group.isEmpty) return false;
+        return true;
+    }).map(([key, group]) => {
         const totalItems = group.items.length;
 
         // Check if any item in the group is "on view today" using the pre-computed flag

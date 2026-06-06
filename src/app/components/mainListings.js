@@ -111,6 +111,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
     const [openingTodayOnly, setOpeningTodayOnly] = useState(false);
     const [openingTitleOnly, setOpeningTitleOnly] = useState(false);
     const [openingsOnly, setOpeningsOnly] = useState(false);
+    const [hasShowOnly, setHasShowOnly] = useState(false);
 
     const [favoritesOnly, setFavoritesOnly] = useState(false);
     const { items: favoriteIds } = useFavorites();
@@ -226,6 +227,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                 endingSoonOnly: getFilteredListings({ ...currentFilters, endingSoonOnly: true }, listings).length,
                 openingTodayOnly: getFilteredListings({ ...currentFilters, openingTodayOnly: true }, listings).length,
                 openingTitleOnly: getFilteredListings({ ...currentFilters, openingTitleOnly: true }, listings).length,
+                favorites: getFilteredListings({ ...currentFilters, favoritesOnly: true }, listings).length,
             };
 
             // Only update if counts actually changed
@@ -335,6 +337,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
         setFavoritesOnly(false);
         setCommittedSearchTerm('');
         setSearchClearKey(k => k + 1);
+        setHasShowOnly(false);
         setSelectedLocation('');
         setSelectedCounty([]);
         setUserLocation(null);
@@ -419,6 +422,8 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                 setOpeningTitleOnly={setOpeningTitleOnly}
                 openingsOnly={openingsOnly}
                 setOpeningsOnly={setOpeningsOnly}
+                hasShowOnly={hasShowOnly}
+                setHasShowOnly={setHasShowOnly}
                 favoritesOnly={favoritesOnly}
                 setFavoritesOnly={setFavoritesOnly}
                 favoriteCount={favoriteCount}
@@ -474,6 +479,8 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                         setEndingSoonOnly={setEndingSoonOnly}
                         openingTitleOnly={openingTitleOnly}
                         setOpeningTitleOnly={setOpeningTitleOnly}
+                        hasShowOnly={hasShowOnly}
+                        setHasShowOnly={setHasShowOnly}
                         favoritesOnly={favoritesOnly}
                         setFavoritesOnly={setFavoritesOnly}
                         favoriteCount={favoriteCount}
@@ -590,6 +597,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                                     selectedCounty={selectedCounty}
                                     searchTerm={committedSearchTerm}
                                     userLocation={userLocation}
+                                    hasShowOnly={hasShowOnly}
                                 />
                             </div>
                         ) : displayedResults > 0 ? (
