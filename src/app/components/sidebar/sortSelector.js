@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export default function SortSelector({ onSortChange, currentSort }) {
     const sortOptions = [
         { value: 'openingSoon', label: 'Start Date' },
-        { value: 'closingSoon', label: 'End Date' },
+        { value: 'closingSoon', label: 'Ending Soon' },
         { value: 'alphabetical', label: 'Alphabetical' },
         { value: 'recentlyAdded', label: 'Recently Added' },
         { value: 'oldestAdded', label: 'Oldest Added' },

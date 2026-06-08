@@ -25,7 +25,7 @@ import ContentToolbar from './ContentToolbar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 
 const sortLabels = {
-    closingSoon: 'End Date',
+    closingSoon: 'Ending Soon',
     openingSoon: 'Start Date',
     alphabetical: 'Alphabetical',
     recentlyAdded: 'Recently Added',
@@ -108,6 +108,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
     const [highlightsOnly, setHighlightsOnly] = useState(false);
     const [onViewToday, setOnViewToday] = useState(false);
     const [endingSoonOnly, setEndingSoonOnly] = useState(false);
+    const [comingUpOnly, setComingUpOnly] = useState(false);
     const [openingTodayOnly, setOpeningTodayOnly] = useState(false);
     const [openingTitleOnly, setOpeningTitleOnly] = useState(false);
     const [openingsOnly, setOpeningsOnly] = useState(false);
@@ -139,7 +140,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
     const [showMenu, setShowMenu] = useState(false);
 
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
-    const [sortMethod, setSortMethod] = useState('closingSoon');
+    const [sortMethod, setSortMethod] = useState('recentlyAdded');
     const [calendarTypeCounts, setCalendarTypeCounts] = useState({});
     const [specialFilterCounts, setSpecialFilterCounts] = useState({
         onViewToday: 0,
@@ -153,12 +154,25 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
     // Use ref to track if initial setup is complete
     const isInitialized = useRef(false);
 
+    // Measure the mobile fixed header stack so content padding stays in sync
+    const mobileHeaderRef = useRef(null);
+    const [mobileHeaderHeight, setMobileHeaderHeight] = useState(0);
+    useEffect(() => {
+        const el = mobileHeaderRef.current;
+        if (!el) return;
+        setMobileHeaderHeight(el.offsetHeight);
+        const observer = new ResizeObserver(() => setMobileHeaderHeight(el.offsetHeight));
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
+
     // Memoize currentFilters to prevent unnecessary re-renders in child components
     // Use stringified date values for proper comparison
     const currentFilters = useMemo(() => ({
         highlightsOnly,
         onViewToday,
         endingSoonOnly,
+        comingUpOnly,
         openingTodayOnly,
         openingTitleOnly,
         favoritesOnly,
@@ -174,6 +188,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
         highlightsOnly,
         onViewToday,
         endingSoonOnly,
+        comingUpOnly,
         openingTodayOnly,
         openingTitleOnly,
         favoritesOnly,
@@ -225,6 +240,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
             const newSpecialCounts = {
                 onViewToday: getFilteredListings({ ...currentFilters, onViewToday: true }, listings).length,
                 endingSoonOnly: getFilteredListings({ ...currentFilters, endingSoonOnly: true }, listings).length,
+                comingUpOnly: getFilteredListings({ ...currentFilters, comingUpOnly: true }, listings).length,
                 openingTodayOnly: getFilteredListings({ ...currentFilters, openingTodayOnly: true }, listings).length,
                 openingTitleOnly: getFilteredListings({ ...currentFilters, openingTitleOnly: true }, listings).length,
                 favorites: getFilteredListings({ ...currentFilters, favoritesOnly: true }, listings).length,
@@ -332,6 +348,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
         setHighlightsOnly(false);
         setOnViewToday(false);
         setEndingSoonOnly(false);
+        setComingUpOnly(false);
         setOpeningTodayOnly(false);
         setOpeningTitleOnly(false);
         setFavoritesOnly(false);
@@ -342,7 +359,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
         setSelectedCounty([]);
         setUserLocation(null);
         setLocationError(null);
-        setSortMethod('closingSoon');
+        setSortMethod('recentlyAdded');
 
         // Reset calendar date range to initial state (10 years from start of month)
         const tenYearsFromNow = new Date(startOfMonth);
@@ -375,66 +392,89 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                 </DialogContent>
             </Dialog>
 
-            {/* Mobile Header */}
-            <MobileHeader
-                key={searchClearKey}
-                onSearch={onSearch}
-                onClear={onClear}
-            />
-
-            {/* Mobile View Toggle Bar */}
-            <MobileViewToggleBar
-                activeView={activeView}
-                setActiveView={setActiveView}
-            />
-
-            {/* Mobile Filter Chip Row */}
-            <FilterChipRow
-                activeView={activeView}
-                calendarTypeFilter={calendarTypeFilter}
-                setCalendarTypeFilter={setCalendarTypeFilter}
-                calendarTypeCounts={calendarTypeCounts}
-                calendarDateRangePreset={calendarDateRangePreset}
-                setCalendarDateRangePreset={setCalendarDateRangePreset}
-                calendarDateRangeFilter={calendarDateRangeFilter}
-                setCalendarDateRangeFilter={setCalendarDateRangeFilter}
-                showCustomCalendar={showCustomCalendar}
-                setShowCustomCalendar={setShowCustomCalendar}
-                selectedCounty={selectedCounty}
-                setSelectedCounty={handleSetSelectedCounty}
-                onViewToday={onViewToday}
-                setOnViewToday={setOnViewToday}
-                endingSoonOnly={endingSoonOnly}
-                setEndingSoonOnly={setEndingSoonOnly}
-                openingTodayOnly={openingTodayOnly}
-                setOpeningTodayOnly={setOpeningTodayOnly}
-                specialFilterCounts={specialFilterCounts}
-                currentFilters={currentFilters}
-                listings={listings}
-                startOfWeek={startOfWeek}
-                endOfWeek={endOfWeek}
-                startOfMonth={startOfMonth}
-                endOfMonth={endOfMonth}
-                startOfNextMonth={startOfNextMonth}
-                endOfNextMonth={endOfNextMonth}
-                updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
-                openingTitleOnly={openingTitleOnly}
-                setOpeningTitleOnly={setOpeningTitleOnly}
-                openingsOnly={openingsOnly}
-                setOpeningsOnly={setOpeningsOnly}
-                hasShowOnly={hasShowOnly}
-                setHasShowOnly={setHasShowOnly}
-                favoritesOnly={favoritesOnly}
-                setFavoritesOnly={setFavoritesOnly}
-                favoriteCount={favoriteCount}
-                userLocation={userLocation}
-                nearbyRadius={nearbyRadius}
-                setNearbyRadius={setNearbyRadius}
-                locationError={locationError}
-                locationLoading={locationLoading}
-                getUserLocation={getUserLocation}
-                clearUserLocation={clearUserLocation}
-            />
+            {/* Mobile fixed header stack — single wrapper so height is measured organically */}
+            <div ref={mobileHeaderRef} className="lg:hidden fixed inset-x-0 top-0 z-50 bg-white">
+                <MobileHeader
+                    key={searchClearKey}
+                    onSearch={onSearch}
+                    onClear={onClear}
+                />
+                <MobileViewToggleBar
+                    activeView={activeView}
+                    setActiveView={setActiveView}
+                />
+                <FilterChipRow
+                    activeView={activeView}
+                    calendarTypeFilter={calendarTypeFilter}
+                    setCalendarTypeFilter={setCalendarTypeFilter}
+                    calendarTypeCounts={calendarTypeCounts}
+                    calendarDateRangePreset={calendarDateRangePreset}
+                    setCalendarDateRangePreset={setCalendarDateRangePreset}
+                    calendarDateRangeFilter={calendarDateRangeFilter}
+                    setCalendarDateRangeFilter={setCalendarDateRangeFilter}
+                    showCustomCalendar={showCustomCalendar}
+                    setShowCustomCalendar={setShowCustomCalendar}
+                    selectedCounty={selectedCounty}
+                    setSelectedCounty={handleSetSelectedCounty}
+                    onViewToday={onViewToday}
+                    setOnViewToday={setOnViewToday}
+                    endingSoonOnly={endingSoonOnly}
+                    setEndingSoonOnly={setEndingSoonOnly}
+                    comingUpOnly={comingUpOnly}
+                    setComingUpOnly={setComingUpOnly}
+                    openingTodayOnly={openingTodayOnly}
+                    setOpeningTodayOnly={setOpeningTodayOnly}
+                    specialFilterCounts={specialFilterCounts}
+                    currentFilters={currentFilters}
+                    listings={listings}
+                    startOfWeek={startOfWeek}
+                    endOfWeek={endOfWeek}
+                    startOfMonth={startOfMonth}
+                    endOfMonth={endOfMonth}
+                    startOfNextMonth={startOfNextMonth}
+                    endOfNextMonth={endOfNextMonth}
+                    updateCalendarDateRangeFilter={updateCalendarDateRangeFilter}
+                    openingTitleOnly={openingTitleOnly}
+                    setOpeningTitleOnly={setOpeningTitleOnly}
+                    openingsOnly={openingsOnly}
+                    setOpeningsOnly={setOpeningsOnly}
+                    hasShowOnly={hasShowOnly}
+                    setHasShowOnly={setHasShowOnly}
+                    favoritesOnly={favoritesOnly}
+                    setFavoritesOnly={setFavoritesOnly}
+                    favoriteCount={favoriteCount}
+                    userLocation={userLocation}
+                    nearbyRadius={nearbyRadius}
+                    setNearbyRadius={setNearbyRadius}
+                    locationError={locationError}
+                    locationLoading={locationLoading}
+                    getUserLocation={getUserLocation}
+                    clearUserLocation={clearUserLocation}
+                />
+                {activeView === 'exhibitions' && (
+                    <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
+                        <div className="flex items-center gap-1.5 text-sm">
+                            <span className="font-medium text-gray-700">{displayedResults} exhibition{displayedResults !== 1 ? 's' : ''}</span>
+                            {(calendarTypeFilter !== 'onview' || calendarDateRangePreset !== 'anytime' || selectedCounty.length > 0 || onViewToday || endingSoonOnly || openingTodayOnly || openingTitleOnly || committedSearchTerm) && (
+                                <button
+                                    onClick={clearAllFilters}
+                                    className="text-gray-400 hover:text-gray-600"
+                                    aria-label="Clear all filters"
+                                >
+                                    <X size={14} />
+                                </button>
+                            )}
+                        </div>
+                        <button
+                            onClick={() => setMobileSortOpen(true)}
+                            className="flex items-center gap-1 text-sm text-gray-500"
+                        >
+                            <span>{sortLabels[sortMethod] || sortMethod}</span>
+                            <span className="text-xs opacity-50">▾</span>
+                        </button>
+                    </div>
+                )}
+            </div>
 
             {/* Mobile Sort Drawer */}
             <MobileSortDrawer
@@ -444,7 +484,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                 setSortMethod={setSortMethod}
             />
 
-            <div className={`flex flex-row w-full items-start pt-[136px] lg:pt-0 ${isMapView ? 'h-screen' : ''}`}>
+            <div className={`flex flex-row w-full items-start ${isMapView ? 'h-screen' : ''}`} style={{ paddingTop: mobileHeaderHeight }}>
 
                 {/* Desktop Sidebar */ }
                 <div
@@ -477,6 +517,8 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                         setOpeningTodayOnly={setOpeningTodayOnly}
                         endingSoonOnly={endingSoonOnly}
                         setEndingSoonOnly={setEndingSoonOnly}
+                        comingUpOnly={comingUpOnly}
+                        setComingUpOnly={setComingUpOnly}
                         openingTitleOnly={openingTitleOnly}
                         setOpeningTitleOnly={setOpeningTitleOnly}
                         hasShowOnly={hasShowOnly}
@@ -520,31 +562,6 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                     searchClearKey={searchClearKey}
                     onSearch={onSearch}
                 />
-
-                {/* Mobile inline sort */}
-                {activeView === 'exhibitions' && (
-                    <div className="lg:hidden flex items-center justify-between px-3 py-2 border-b border-gray-100">
-                        <div className="flex items-center gap-1.5 text-sm">
-                            <span className="font-medium text-gray-700">{displayedResults} exhibition{displayedResults !== 1 ? 's' : ''}</span>
-                            {(calendarTypeFilter !== 'onview' || calendarDateRangePreset !== 'anytime' || selectedCounty.length > 0 || onViewToday || endingSoonOnly || openingTodayOnly || openingTitleOnly || committedSearchTerm) && (
-                                <button
-                                    onClick={clearAllFilters}
-                                    className="text-gray-400 hover:text-gray-600"
-                                    aria-label="Clear all filters"
-                                >
-                                    <X size={14} />
-                                </button>
-                            )}
-                        </div>
-                        <button
-                            onClick={() => setMobileSortOpen(true)}
-                            className="flex items-center gap-1 text-sm text-gray-500"
-                        >
-                            <span>{sortLabels[sortMethod] || sortMethod}</span>
-                            <span className="text-xs opacity-50">▾</span>
-                        </button>
-                    </div>
-                )}
 
                 {loading ? (
                     <LoadingSkeleton count={5} />
@@ -598,6 +615,13 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                                     searchTerm={committedSearchTerm}
                                     userLocation={userLocation}
                                     hasShowOnly={hasShowOnly}
+                                    hasActiveFilters={
+                                        highlightsOnly || onViewToday || endingSoonOnly ||
+                                        openingTodayOnly || openingTitleOnly || favoritesOnly ||
+                                        !!committedSearchTerm || !!selectedLocation ||
+                                        selectedCounty.length > 0 || !!userLocation ||
+                                        calendarDateRangePreset !== 'anytime'
+                                    }
                                 />
                             </div>
                         ) : displayedResults > 0 ? (

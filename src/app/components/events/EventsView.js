@@ -70,10 +70,10 @@ export default function EventsView({ listings, calendarDateRangeFilter, selected
     }
 
     return (
-        <div className="pt-4 pb-16 space-y-6">
+        <div className="pb-16 space-y-6">
             {dates.map(date => (
                 <div key={date}>
-                    <h2 className="sticky top-[140px] lg:top-10 bg-white z-10 text-xs font-bold uppercase tracking-wider text-gray-900 pt-3 pb-2 border-y border-gray-200 mb-0 px-3">
+                    <h2 className="sticky top-[140px] lg:top-10 bg-gray-50 z-10 text-xs font-bold uppercase tracking-wider text-gray-900 pt-3 pb-2 border-y border-gray-200 mb-0 px-3">
                         {formatDayHeader(date)}
                     </h2>
                     <div className="divide-y divide-gray-200">

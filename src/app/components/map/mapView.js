@@ -303,6 +303,7 @@ export default function MapView({
     searchTerm,
     userLocation,
     hasShowOnly = false,
+    hasActiveFilters = false,
 }) {
     const [L, setL] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
@@ -367,10 +368,9 @@ export default function MapView({
         }
     });
 
-    // Add grey markers for locations with no filtered listings — but only when no
-    // location-specific filters are active (otherwise every other location shows as grey noise)
-    const hasLocationFilter = selectedLocation || selectedCounty?.length > 0 || userLocation || searchTerm;
-    if (!hasLocationFilter) {
+    // Only show grey markers when no filters are active — any filter that reduces
+    // the listing set would make grey markers misleading noise
+    if (!hasActiveFilters) {
         locations.forEach(loc => {
             if (!loc.Geolocation || loc.Name?.toLowerCase() === 'various') return;
             const key = `${loc.Geolocation.lat},${loc.Geolocation.lng}`;

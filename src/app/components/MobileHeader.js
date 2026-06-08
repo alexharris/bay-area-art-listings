@@ -8,7 +8,7 @@ export default function MobileHeader({ onSearch, onClear }) {
   const [value, setValue] = useState('');
 
   return (
-    <header className="lg:hidden flex flex-row items-center gap-2 px-3 h-12 bg-white fixed inset-x-0 top-0 z-50 border-b border-gray-300">
+    <header className="lg:hidden flex flex-row items-center gap-2 px-3 h-12 bg-white border-b border-gray-300">
       <Link href="/" className="flex-shrink-0">
         <img
           src="/art-board-logo.png"

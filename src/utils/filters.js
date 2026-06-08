@@ -99,6 +99,20 @@ function determineEndingSoonFilter(item) {
     return diffDays >= 0 && diffDays <= 7;
 }
 
+// Function to determine if exhibition hasn't started yet
+function determineComingUpFilter(item) {
+    const now = new Date();
+    const todayLA = now.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+    let startDate;
+    if (typeof item.StartDate === 'string' && item.StartDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        startDate = new Date(item.StartDate + 'T12:00:00');
+    } else {
+        startDate = new Date(item.StartDate);
+    }
+    const startDateLA = startDate.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+    return startDateLA > todayLA;
+}
+
 // Function to determine if event is opening today
 function determineOpeningTodayFilter(item) {
     const getTodayInLA = () => {
@@ -134,6 +148,7 @@ export function getFilteredListings(filters, listings) {
     onViewToday: filters.onViewToday || false,
     sfArtWeekOnly: filters.sfArtWeekOnly || false,
     endingSoonOnly: filters.endingSoonOnly || false,
+    comingUpOnly: filters.comingUpOnly || false,
     openingTodayOnly: filters.openingTodayOnly || false,
     openingTitleOnly: filters.openingTitleOnly || false,
     favoritesOnly: filters.favoritesOnly || false,
@@ -152,6 +167,7 @@ export function getFilteredListings(filters, listings) {
   .filter(item =>filters.onViewToday ? determineOnViewTodayFilter(item) : true)
   .filter(item =>filters.sfArtWeekOnly ? item.sfawUrl : true)
   .filter(item =>filters.endingSoonOnly ? determineEndingSoonFilter(item) : true)
+  .filter(item =>filters.comingUpOnly ? determineComingUpFilter(item) : true)
   .filter(item =>filters.openingTodayOnly ? determineOpeningTodayFilter(item) : true)
   .filter(item => {
     if (!filters.openingTitleOnly) return true;

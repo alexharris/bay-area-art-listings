@@ -4,7 +4,7 @@ import { Check } from 'lucide-react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 
 const sortOptions = [
-    { value: 'closingSoon', label: 'End Date' },
+    { value: 'closingSoon', label: 'Ending Soon' },
     { value: 'openingSoon', label: 'Start Date' },
     { value: 'alphabetical', label: 'Alphabetical' },
     { value: 'recentlyAdded', label: 'Recently Added' },
