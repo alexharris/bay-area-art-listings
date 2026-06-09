@@ -59,6 +59,7 @@ export default function Sidebar({
     locationLoading,
     getUserLocation,
     clearUserLocation,
+    eventCountsByCounty,
 
     // Date ranges for presets
     startOfWeek,
@@ -262,6 +263,8 @@ export default function Sidebar({
                     locationLoading={locationLoading}
                     getUserLocation={getUserLocation}
                     clearUserLocation={clearUserLocation}
+                    activeView={activeView}
+                    eventCountsByCounty={eventCountsByCounty}
                     chipStyle
                 />
                 {/* Stats indicator showing total vs. filtered listings */}

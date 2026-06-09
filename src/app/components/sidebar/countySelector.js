@@ -19,6 +19,8 @@ const CountySelector = ({
   locationLoading,
   getUserLocation,
   clearUserLocation,
+  activeView,
+  eventCountsByCounty,
   listMode,
   onSelect,
   chipStyle = false,
@@ -71,6 +73,7 @@ const CountySelector = ({
   };
 
   const selectValue = userLocation || locationLoading ? 'NearMe' : selectedCounty;
+  const activeCounts = activeView === 'events' ? (eventCountsByCounty || {}) : countyCounts;
 
   if (listMode) {
     const selectedNames = selectedCountyProp || [];
@@ -163,7 +166,7 @@ const CountySelector = ({
             </div>
             {COUNTIES.map(county => {
               const isSelected = selectedNames.includes(county);
-              const count = !isSelected && countyCounts[county] !== undefined ? countyCounts[county] : null;
+              const count = !isSelected && activeCounts[county] !== undefined ? activeCounts[county] : null;
               return (
                 <button
                   key={county}
@@ -191,40 +194,40 @@ const CountySelector = ({
   const selectContent = (
     <SelectContent>
       <SelectItem value="All">
-        Anywhere {selectedCounty !== 'All' && countyCounts['All'] !== undefined ? `(${countyCounts['All']})` : ''}
+        Anywhere {selectedCounty !== 'All' && activeCounts['All'] !== undefined ? `(${activeCounts['All']})` : ''}
       </SelectItem>
       <SelectItem value="NearMe">
         {locationLoading ? 'Locating…' : 'Near me'}
       </SelectItem>
       <SelectItem value="Alameda">
-        Alameda {selectedCounty !== 'Alameda' && countyCounts['Alameda'] !== undefined ? `(${countyCounts['Alameda']})` : ''}
+        Alameda {selectedCounty !== 'Alameda' && activeCounts['Alameda'] !== undefined ? `(${activeCounts['Alameda']})` : ''}
       </SelectItem>
       <SelectItem value="Contra Costa">
-        Contra Costa {selectedCounty !== 'Contra Costa' && countyCounts['Contra Costa'] !== undefined ? `(${countyCounts['Contra Costa']})` : ''}
+        Contra Costa {selectedCounty !== 'Contra Costa' && activeCounts['Contra Costa'] !== undefined ? `(${activeCounts['Contra Costa']})` : ''}
       </SelectItem>
       <SelectItem value="Marin">
-        Marin {selectedCounty !== 'Marin' && countyCounts['Marin'] !== undefined ? `(${countyCounts['Marin']})` : ''}
+        Marin {selectedCounty !== 'Marin' && activeCounts['Marin'] !== undefined ? `(${activeCounts['Marin']})` : ''}
       </SelectItem>
       <SelectItem value="Napa">
-        Napa {selectedCounty !== 'Napa' && countyCounts['Napa'] !== undefined ? `(${countyCounts['Napa']})` : ''}
+        Napa {selectedCounty !== 'Napa' && activeCounts['Napa'] !== undefined ? `(${activeCounts['Napa']})` : ''}
       </SelectItem>
       <SelectItem value="Sacramento">
-        Sacramento {selectedCounty !== 'Sacramento' && countyCounts['Sacramento'] !== undefined ? `(${countyCounts['Sacramento']})` : ''}
+        Sacramento {selectedCounty !== 'Sacramento' && activeCounts['Sacramento'] !== undefined ? `(${activeCounts['Sacramento']})` : ''}
       </SelectItem>
       <SelectItem value="San Francisco">
-        San Francisco {selectedCounty !== 'San Francisco' && countyCounts['San Francisco'] !== undefined ? `(${countyCounts['San Francisco']})` : ''}
+        San Francisco {selectedCounty !== 'San Francisco' && activeCounts['San Francisco'] !== undefined ? `(${activeCounts['San Francisco']})` : ''}
       </SelectItem>
       <SelectItem value="San Mateo">
-        San Mateo {selectedCounty !== 'San Mateo' && countyCounts['San Mateo'] !== undefined ? `(${countyCounts['San Mateo']})` : ''}
+        San Mateo {selectedCounty !== 'San Mateo' && activeCounts['San Mateo'] !== undefined ? `(${activeCounts['San Mateo']})` : ''}
       </SelectItem>
       <SelectItem value="Santa Clara">
-        Santa Clara {selectedCounty !== 'Santa Clara' && countyCounts['Santa Clara'] !== undefined ? `(${countyCounts['Santa Clara']})` : ''}
+        Santa Clara {selectedCounty !== 'Santa Clara' && activeCounts['Santa Clara'] !== undefined ? `(${activeCounts['Santa Clara']})` : ''}
       </SelectItem>
       <SelectItem value="Solano">
-        Solano {selectedCounty !== 'Solano' && countyCounts['Solano'] !== undefined ? `(${countyCounts['Solano']})` : ''}
+        Solano {selectedCounty !== 'Solano' && activeCounts['Solano'] !== undefined ? `(${activeCounts['Solano']})` : ''}
       </SelectItem>
       <SelectItem value="Sonoma">
-        Sonoma {selectedCounty !== 'Sonoma' && countyCounts['Sonoma'] !== undefined ? `(${countyCounts['Sonoma']})` : ''}
+        Sonoma {selectedCounty !== 'Sonoma' && activeCounts['Sonoma'] !== undefined ? `(${activeCounts['Sonoma']})` : ''}
       </SelectItem>
     </SelectContent>
   );

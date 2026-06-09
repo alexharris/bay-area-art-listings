@@ -155,6 +155,21 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
     // Use ref to track if initial setup is complete
     const isInitialized = useRef(false);
 
+    // Count future openings per county for the events view where filter
+    const eventCountsByCounty = useMemo(() => {
+        if (!listings) return {};
+        const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+        const counts = {};
+        listings.forEach(listing => {
+            if (!listing.locationCounty) return;
+            const futureOpenings = (listing.openings || []).filter(o => o.date >= today);
+            if (futureOpenings.length > 0) {
+                counts[listing.locationCounty] = (counts[listing.locationCounty] || 0) + futureOpenings.length;
+            }
+        });
+        return counts;
+    }, [listings]);
+
     // Measure the mobile fixed header stack so content padding stays in sync
     const mobileHeaderRef = useRef(null);
     const [mobileHeaderHeight, setMobileHeaderHeight] = useState(0);
@@ -467,6 +482,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                     locationLoading={locationLoading}
                     getUserLocation={getUserLocation}
                     clearUserLocation={clearUserLocation}
+                    eventCountsByCounty={eventCountsByCounty}
                 />
                 {activeView === 'exhibitions' && (
                     <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
@@ -554,6 +570,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                         locationLoading={locationLoading}
                         getUserLocation={getUserLocation}
                         clearUserLocation={clearUserLocation}
+                        eventCountsByCounty={eventCountsByCounty}
 
                         // Date ranges for presets
                         startOfWeek={startOfWeek}

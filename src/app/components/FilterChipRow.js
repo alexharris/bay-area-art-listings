@@ -110,6 +110,7 @@ export default function FilterChipRow({
     locationLoading,
     getUserLocation,
     clearUserLocation,
+    eventCountsByCounty,
 }) {
     const [whenOpen, setWhenOpen] = useState(false);
     const [whenTab, setWhenTab] = useState('presets');
@@ -333,6 +334,8 @@ export default function FilterChipRow({
                             locationLoading={locationLoading}
                             getUserLocation={getUserLocation}
                             clearUserLocation={clearUserLocation}
+                            activeView={activeView}
+                            eventCountsByCounty={eventCountsByCounty}
                             listMode
                             onSelect={() => setWhereOpen(false)}
                         />
