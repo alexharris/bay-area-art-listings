@@ -8,7 +8,6 @@ export default function SortSelector({ onSortChange, currentSort }) {
         { value: 'closingSoon', label: 'Ending Soon' },
         { value: 'alphabetical', label: 'Alphabetical' },
         { value: 'recentlyAdded', label: 'Recently Added' },
-        { value: 'oldestAdded', label: 'Oldest Added' },
     ];
 
     return (

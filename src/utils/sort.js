@@ -80,7 +80,7 @@ export function applySorting(listings, method) {
     
   switch (method) {
         case 'openingSoon':
-            sortedListings.sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate));
+            sortedListings.sort((a, b) => new Date(b.StartDate) - new Date(a.StartDate));
             break;
         case 'closingSoon':
             sortedListings.sort((a, b) => new Date(a.EndDate) - new Date(b.EndDate));

@@ -578,6 +578,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                     setActiveView={setActiveView}
                     searchClearKey={searchClearKey}
                     onSearch={onSearch}
+                    onClear={onClear}
                 />
 
                 {loading ? (
@@ -585,7 +586,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                 ) : (
                     <>
 
-                        {favoritesOnly && !isMapView && !favoritesNoteDismissed && (
+                        {favoritesOnly && activeView === 'exhibitions' && !favoritesNoteDismissed && (
                             <div className="mx-3 mt-3 bg-gray-50 rounded p-3 flex gap-2 text-sm text-gray-600">
                                 <span className="text-base leading-snug flex-shrink-0">💾</span>
                                 <div>
@@ -604,7 +605,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                             </div>
                         )}
 
-                        {displayedResults === 0 &&
+                        {displayedResults === 0 && activeView !== 'events' &&
                             <div className="text-center flex-grow flex flex-col justify-center text-2xl py-36">
                                 <p className="pb-4">No Results</p>
                                 <p className="pb-4">¯\_(ツ)_/¯</p>
