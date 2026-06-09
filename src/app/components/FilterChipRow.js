@@ -10,7 +10,7 @@ function Chip({ emoji, label, active, onOpen, onClear, hasYellowDot }) {
     return (
         <div
             className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm whitespace-nowrap cursor-pointer select-none flex-shrink-0 transition-colors ${
-                active ? 'bg-green-300 text-black border-green-400' : 'bg-white text-gray-700 border-gray-300'
+                active ? 'bg-yellow-50 text-black border-yellow-200' : 'bg-white text-gray-700 border-gray-300'
             }`}
             role="button"
             tabIndex={0}
@@ -159,37 +159,37 @@ export default function FilterChipRow({
         ...(isMapView ? [{
             key: 'hasShowOnly',
             active: hasShowOnly,
-            el: <BadgeChip key="hasShowOnly" emoji="🖼️" label="Has Show" active={hasShowOnly} activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400" inactiveClass="bg-white text-gray-600 border-gray-200 hover:border-gray-300" onToggle={() => setHasShowOnly(!hasShowOnly)} />,
+            el: <BadgeChip key="hasShowOnly" emoji="🖼️" label="Has Show" active={hasShowOnly} activeClass="bg-yellow-50 border-yellow-200 text-black hover:bg-yellow-100" inactiveClass="bg-white text-gray-600 border-gray-200 hover:border-gray-300" onToggle={() => setHasShowOnly(!hasShowOnly)} />,
         }] : []),
         ...(isEventsView ? [{
             key: 'openingsOnly',
             active: openingsOnly,
-            el: <BadgeChip key="openingsOnly" emoji="🚪" label="Openings" active={openingsOnly} activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400" inactiveClass="bg-white text-gray-600 border-gray-200 hover:border-gray-300" onToggle={() => setOpeningsOnly(!openingsOnly)} />,
+            el: <BadgeChip key="openingsOnly" emoji="🚪" label="Openings" active={openingsOnly} activeClass="bg-yellow-50 border-yellow-200 text-black hover:bg-yellow-100" inactiveClass="bg-white text-gray-600 border-gray-200 hover:border-gray-300" onToggle={() => setOpeningsOnly(!openingsOnly)} />,
         }] : []),
         ...(!isEventsView ? [{
             key: 'openingTitleOnly',
             active: openingTitleOnly,
-            el: <BadgeChip key="openingTitleOnly" emoji="☀️" label="Has Events" count={specialFilterCounts?.openingTitleOnly} active={openingTitleOnly} activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400" inactiveClass={!openingTitleOnly && !specialFilterCounts?.openingTitleOnly ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"} onToggle={() => (specialFilterCounts?.openingTitleOnly > 0 || openingTitleOnly) && setOpeningTitleOnly(!openingTitleOnly)} />,
+            el: <BadgeChip key="openingTitleOnly" emoji="☀️" label="Has Events" count={specialFilterCounts?.openingTitleOnly} active={openingTitleOnly} activeClass="bg-yellow-50 border-yellow-200 text-black hover:bg-yellow-100" inactiveClass={!openingTitleOnly && !specialFilterCounts?.openingTitleOnly ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"} onToggle={() => (specialFilterCounts?.openingTitleOnly > 0 || openingTitleOnly) && setOpeningTitleOnly(!openingTitleOnly)} />,
         }] : []),
         ...(!isEventsView ? [{
             key: 'onViewToday',
             active: onViewToday,
-            el: <BadgeChip key="onViewToday" emoji="🟢" label="On View Today" count={specialFilterCounts?.onViewToday} active={onViewToday} activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400" inactiveClass={!onViewToday && !specialFilterCounts?.onViewToday ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"} onToggle={() => (specialFilterCounts?.onViewToday > 0 || onViewToday) && setOnViewToday(!onViewToday)} />,
+            el: <BadgeChip key="onViewToday" emoji="🟢" label="On View Today" count={specialFilterCounts?.onViewToday} active={onViewToday} activeClass="bg-yellow-50 border-yellow-200 text-black hover:bg-yellow-100" inactiveClass={!onViewToday && !specialFilterCounts?.onViewToday ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"} onToggle={() => (specialFilterCounts?.onViewToday > 0 || onViewToday) && setOnViewToday(!onViewToday)} />,
         }] : []),
         ...(!isEventsView && !isMapView && (endingSoonOnly || specialFilterCounts?.endingSoonOnly > 0) ? [{
             key: 'endingSoon',
             active: endingSoonOnly,
-            el: <BadgeChip key="endingSoon" emoji="⏳" label="Ending Soon" count={specialFilterCounts?.endingSoonOnly} active={endingSoonOnly} activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400" inactiveClass="bg-white text-gray-600 border-gray-200 hover:border-gray-300" onToggle={() => setEndingSoonOnly(!endingSoonOnly)} />,
+            el: <BadgeChip key="endingSoon" emoji="⏳" label="Ending Soon" count={specialFilterCounts?.endingSoonOnly} active={endingSoonOnly} activeClass="bg-yellow-50 border-yellow-200 text-black hover:bg-yellow-100" inactiveClass="bg-white text-gray-600 border-gray-200 hover:border-gray-300" onToggle={() => setEndingSoonOnly(!endingSoonOnly)} />,
         }] : []),
         ...(!isEventsView && !isMapView ? [{
             key: 'comingUp',
             active: comingUpOnly,
-            el: <BadgeChip key="comingUp" emoji="🔜" label="Coming Up" count={specialFilterCounts?.comingUpOnly} active={comingUpOnly} activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400" inactiveClass={!comingUpOnly && !specialFilterCounts?.comingUpOnly ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"} onToggle={() => (specialFilterCounts?.comingUpOnly > 0 || comingUpOnly) && setComingUpOnly(!comingUpOnly)} />,
+            el: <BadgeChip key="comingUp" emoji="🔜" label="Coming Up" count={specialFilterCounts?.comingUpOnly} active={comingUpOnly} activeClass="bg-yellow-50 border-yellow-200 text-black hover:bg-yellow-100" inactiveClass={!comingUpOnly && !specialFilterCounts?.comingUpOnly ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"} onToggle={() => (specialFilterCounts?.comingUpOnly > 0 || comingUpOnly) && setComingUpOnly(!comingUpOnly)} />,
         }] : []),
         ...(!isEventsView ? [{
             key: 'favorites',
             active: favoritesOnly,
-            el: <BadgeChip key="favorites" emoji="⭐" label="Starred" count={specialFilterCounts?.favorites > 0 ? specialFilterCounts.favorites : null} active={favoritesOnly} activeClass="bg-green-300 border-green-400 text-black hover:bg-green-400" inactiveClass={!favoritesOnly && !specialFilterCounts?.favorites ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300'} onToggle={() => (specialFilterCounts?.favorites > 0 || favoritesOnly) && setFavoritesOnly(!favoritesOnly)} />,
+            el: <BadgeChip key="favorites" emoji="⭐" label="Starred" count={specialFilterCounts?.favorites > 0 ? specialFilterCounts.favorites : null} active={favoritesOnly} activeClass="bg-yellow-50 border-yellow-200 text-black hover:bg-yellow-100" inactiveClass={!favoritesOnly && !specialFilterCounts?.favorites ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-700 border-gray-300'} onToggle={() => (specialFilterCounts?.favorites > 0 || favoritesOnly) && setFavoritesOnly(!favoritesOnly)} />,
         }] : []),
     ].sort((a, b) => Number(b.active) - Number(a.active));
 

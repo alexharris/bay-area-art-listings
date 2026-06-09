@@ -114,19 +114,19 @@ export default function Sidebar({
                 <div className="flex items-stretch border border-gray-300 rounded-lg overflow-hidden text-sm">
                     <button
                         onClick={() => setActiveView('exhibitions')}
-                        className={`flex-1 flex items-center justify-center py-2 border-r border-gray-300 transition-colors ${activeView === 'exhibitions' ? 'font-medium text-gray-900' : 'text-gray-400'}`}
+                        className={`flex-1 flex items-center justify-center py-2 border-r border-gray-300 transition-colors ${activeView === 'exhibitions' ? 'font-medium text-black bg-yellow-50' : 'text-black'}`}
                     >
                         Exhibitions
                     </button>
                     <button
                         onClick={() => setActiveView('events')}
-                        className={`flex-1 flex items-center justify-center py-2 border-r border-gray-300 transition-colors ${activeView === 'events' ? 'font-medium text-gray-900' : 'text-gray-400'}`}
+                        className={`flex-1 flex items-center justify-center py-2 border-r border-gray-300 transition-colors ${activeView === 'events' ? 'font-medium text-black bg-yellow-50' : 'text-black'}`}
                     >
                         Events
                     </button>
                     <button
                         onClick={() => setActiveView('map')}
-                        className={`flex-1 flex items-center justify-center py-2 transition-colors ${activeView === 'map' ? 'font-medium text-gray-900' : 'text-gray-400'}`}
+                        className={`flex-1 flex items-center justify-center py-2 transition-colors ${activeView === 'map' ? 'font-medium text-black bg-yellow-50' : 'text-black'}`}
                     >
                         Map
                     </button>
@@ -136,7 +136,7 @@ export default function Sidebar({
                     {!isEventsView && (
                     <div className="flex items-center gap-1">
                         <button
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${openingTitleOnly ? 'bg-green-300 border-green-400 text-black' : !openingTitleOnly && specialFilterCounts.openingTitleOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${openingTitleOnly ? 'bg-yellow-50 border-yellow-200 text-black' : !openingTitleOnly && specialFilterCounts.openingTitleOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
                             onClick={() => (specialFilterCounts.openingTitleOnly > 0 || openingTitleOnly) && setOpeningTitleOnly(!openingTitleOnly)}
                             disabled={!openingTitleOnly && specialFilterCounts.openingTitleOnly === 0}
                         >
@@ -151,7 +151,7 @@ export default function Sidebar({
                     {!isEventsView && (
                     <div className="flex items-center gap-1">
                         <button
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${onViewToday ? 'bg-green-300 border-green-400 text-black' : !onViewToday && specialFilterCounts.onViewToday === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${onViewToday ? 'bg-yellow-50 border-yellow-200 text-black' : !onViewToday && specialFilterCounts.onViewToday === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
                             onClick={() => (specialFilterCounts.onViewToday > 0 || onViewToday) && setOnViewToday(!onViewToday)}
                             disabled={!onViewToday && specialFilterCounts.onViewToday === 0}
                         >
@@ -165,7 +165,7 @@ export default function Sidebar({
                     )}
                     <div className="flex items-center gap-1">
                         <button
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${openingTodayOnly ? 'bg-green-300 border-green-400 text-black' : !openingTodayOnly && specialFilterCounts.openingTodayOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${openingTodayOnly ? 'bg-yellow-50 border-yellow-200 text-black' : !openingTodayOnly && specialFilterCounts.openingTodayOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
                             onClick={() => (specialFilterCounts.openingTodayOnly > 0 || openingTodayOnly) && setOpeningTodayOnly(!openingTodayOnly)}
                             disabled={!openingTodayOnly && specialFilterCounts.openingTodayOnly === 0}
                         >
@@ -179,7 +179,7 @@ export default function Sidebar({
                     {!isEventsView && activeView !== 'map' && (
                     <div className="flex items-center gap-1">
                         <button
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${endingSoonOnly ? 'bg-green-300 border-green-400 text-black' : !endingSoonOnly && specialFilterCounts.endingSoonOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${endingSoonOnly ? 'bg-yellow-50 border-yellow-200 text-black' : !endingSoonOnly && specialFilterCounts.endingSoonOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
                             onClick={() => (specialFilterCounts.endingSoonOnly > 0 || endingSoonOnly) && setEndingSoonOnly(!endingSoonOnly)}
                             disabled={!endingSoonOnly && specialFilterCounts.endingSoonOnly === 0}
                         >
@@ -194,7 +194,7 @@ export default function Sidebar({
                     {!isEventsView && activeView !== 'map' && (
                     <div className="flex items-center gap-1">
                         <button
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${comingUpOnly ? 'bg-green-300 border-green-400 text-black' : !comingUpOnly && specialFilterCounts.comingUpOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${comingUpOnly ? 'bg-yellow-50 border-yellow-200 text-black' : !comingUpOnly && specialFilterCounts.comingUpOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
                             onClick={() => (specialFilterCounts.comingUpOnly > 0 || comingUpOnly) && setComingUpOnly(!comingUpOnly)}
                             disabled={!comingUpOnly && specialFilterCounts.comingUpOnly === 0}
                         >
@@ -209,7 +209,7 @@ export default function Sidebar({
                     {!isEventsView && (
                     <div className="flex items-center gap-1">
                         <button
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${favoritesOnly ? 'bg-green-300 border-green-400 text-black' : !specialFilterCounts.favorites ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${favoritesOnly ? 'bg-yellow-50 border-yellow-200 text-black' : !specialFilterCounts.favorites ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
                             onClick={() => (specialFilterCounts.favorites > 0 || favoritesOnly) && setFavoritesOnly(!favoritesOnly)}
                             disabled={!favoritesOnly && !specialFilterCounts.favorites}
                         >
@@ -226,7 +226,7 @@ export default function Sidebar({
                 {activeView === 'map' ? (
                     <div className="flex items-center gap-1">
                         <button
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${hasShowOnly ? 'bg-green-300 border-green-400 text-black' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}`}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${hasShowOnly ? 'bg-yellow-50 border-yellow-200 text-black' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}`}
                             onClick={() => setHasShowOnly(!hasShowOnly)}
                         >
                             🖼️ Has Show
@@ -238,7 +238,7 @@ export default function Sidebar({
                 ) : (
                 <div className="flex items-center gap-1">
                     <button
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${whenActive ? 'bg-green-300 border-green-400 text-black' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}`}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${whenActive ? 'bg-yellow-50 border-yellow-200 text-black' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}`}
                         onClick={() => setWhenDrawerOpen(true)}
                     >
                         📅 {whenLabel}
@@ -312,7 +312,7 @@ export default function Sidebar({
                         <p className="px-4 pt-5 pb-1 text-sm text-gray-500">Find shows that are running in a certain date range</p>
                         {/* Segmented control */}
                         <div className="px-4 pt-2 pb-3">
-                            <div className="flex bg-gray-100 rounded-xl p-1">
+                            <div className="flex bg-yellow-50 rounded-xl p-1">
                                 <button
                                     onClick={() => setWhenTab('presets')}
                                     className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${whenTab === 'presets' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}

@@ -113,6 +113,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
     const [openingTitleOnly, setOpeningTitleOnly] = useState(false);
     const [openingsOnly, setOpeningsOnly] = useState(false);
     const [hasShowOnly, setHasShowOnly] = useState(false);
+    const [pendingScrollSlug, setPendingScrollSlug] = useState(null);
 
     const [favoritesOnly, setFavoritesOnly] = useState(false);
     const { items: favoriteIds } = useFavorites();
@@ -263,6 +264,22 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
             setSortMethod(prev => prev === 'openingSoon' ? 'closingSoon' : prev);
         }
     }, [calendarTypeFilter]);
+
+    // Scroll to a listing after switching to exhibitions view
+    useEffect(() => {
+        if (activeView === 'exhibitions' && pendingScrollSlug) {
+            const t = setTimeout(() => {
+                document.getElementById(pendingScrollSlug)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setPendingScrollSlug(null);
+            }, 150);
+            return () => clearTimeout(t);
+        }
+    }, [activeView, pendingScrollSlug]);
+
+    const handleShowSelect = useCallback((slug) => {
+        setActiveView('exhibitions');
+        setPendingScrollSlug(slug);
+    }, []);
 
     // Toggle map view
     const toggleMapView = useCallback(() => {
@@ -603,6 +620,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                                 userLocation={userLocation}
                                 nearbyRadius={nearbyRadius}
                                 openingsOnly={openingsOnly}
+                                onShowSelect={handleShowSelect}
                             />
                         ) : displayedResults > 0 && activeView === 'map' ? (
                             <div className="h-full flex-1">

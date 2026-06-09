@@ -1,6 +1,7 @@
 'use client'
 
 import { haversineDistance } from '../../../utils/distance';
+import { generateSlug } from '../../../utils/shared';
 
 function toDateStr(date) {
     if (!date) return null;
@@ -15,7 +16,7 @@ function formatDayHeader(dateStr) {
     return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
-export default function EventsView({ listings, calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius = 10, openingsOnly = false }) {
+export default function EventsView({ listings, calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius = 10, openingsOnly = false, onShowSelect }) {
     const today = new Date(
         new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })
     );
@@ -85,10 +86,7 @@ export default function EventsView({ listings, calendarDateRangeFilter, selected
                                 }
                                 <p className="text-base text-gray-700 font-medium">{event.title}</p>
                                 {event.time && <p className="text-sm text-gray-700">{event.time}</p>}
-                                {event.listing.EventUrl
-                                    ? <a href={event.listing.EventUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-700 truncate block hover:underline">Part of: {event.listing.Event}</a>
-                                    : <p className="text-sm text-gray-700 truncate">Part of: {event.listing.Event}</p>
-                                }
+                                <button onClick={() => onShowSelect?.(generateSlug(event.listing.Event))} className="text-sm text-gray-700 truncate block hover:underline text-left w-full">Part of: {event.listing.Event}</button>
                                 {event.note && <p className="text-sm text-gray-700">{event.note}</p>}
                             </div>
                         ))}

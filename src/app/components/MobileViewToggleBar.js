@@ -1,8 +1,8 @@
 'use client'
 
 export default function MobileViewToggleBar({ activeView, setActiveView }) {
-    const activeClass = 'text-gray-900 font-medium';
-    const inactiveClass = 'text-gray-400';
+    const activeClass = 'text-black font-medium bg-yellow-50';
+    const inactiveClass = 'text-black';
 
     return (
         <div className="lg:hidden bg-white">
