@@ -177,6 +177,11 @@ export default function FilterChipRow({
             active: onViewToday,
             el: <BadgeChip key="onViewToday" emoji="🟢" label="On View Today" count={specialFilterCounts?.onViewToday} active={onViewToday} activeClass="bg-yellow-50 border-yellow-200 text-black hover:bg-yellow-100" inactiveClass={!onViewToday && !specialFilterCounts?.onViewToday ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"} onToggle={() => (specialFilterCounts?.onViewToday > 0 || onViewToday) && setOnViewToday(!onViewToday)} />,
         }] : []),
+        ...(!isEventsView && !isMapView ? [{
+            key: 'openingTodayOnly',
+            active: openingTodayOnly,
+            el: <BadgeChip key="openingTodayOnly" emoji="👁️" label="Starting Today" count={specialFilterCounts?.openingTodayOnly} active={openingTodayOnly} activeClass="bg-yellow-50 border-yellow-200 text-black hover:bg-yellow-100" inactiveClass={!openingTodayOnly && !specialFilterCounts?.openingTodayOnly ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"} onToggle={() => (specialFilterCounts?.openingTodayOnly > 0 || openingTodayOnly) && setOpeningTodayOnly(!openingTodayOnly)} />,
+        }] : []),
         ...(!isEventsView && !isMapView && (endingSoonOnly || specialFilterCounts?.endingSoonOnly > 0) ? [{
             key: 'endingSoon',
             active: endingSoonOnly,

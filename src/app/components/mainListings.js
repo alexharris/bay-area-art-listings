@@ -548,6 +548,8 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                         setOnViewToday={setOnViewToday}
                         openingTodayOnly={openingTodayOnly}
                         setOpeningTodayOnly={setOpeningTodayOnly}
+                        openingsOnly={openingsOnly}
+                        setOpeningsOnly={setOpeningsOnly}
                         endingSoonOnly={endingSoonOnly}
                         setEndingSoonOnly={setEndingSoonOnly}
                         comingUpOnly={comingUpOnly}

@@ -37,6 +37,8 @@ export default function Sidebar({
     setOnViewToday,
     openingTodayOnly,
     setOpeningTodayOnly,
+    openingsOnly,
+    setOpeningsOnly,
     endingSoonOnly,
     setEndingSoonOnly,
     comingUpOnly,
@@ -77,11 +79,11 @@ export default function Sidebar({
     const [newsletterDialogOpen, setNewsletterDialogOpen] = useState(false);
     const [whenDrawerOpen, setWhenDrawerOpen] = useState(false);
     const [whenTab, setWhenTab] = useState('presets');
-
     const isEventsView = activeView === 'events';
     const whenActive = calendarDateRangePreset !== 'anytime';
     const whenLabels = { anytime: 'Anytime', today: 'Today', next7: 'Next 7 Days', thismonth: 'This Month', nextmonth: 'Next Month', custom: 'Custom dates' };
     const whenLabel = whenActive ? (whenLabels[calendarDateRangePreset] || calendarDateRangePreset) : 'Anytime';
+
     const clearWhen = () => {
         const now = new Date(); now.setHours(0, 0, 0, 0);
         const futureDate = new Date(); futureDate.setFullYear(futureDate.getFullYear() + 10); futureDate.setHours(23, 59, 59, 999);
@@ -164,6 +166,19 @@ export default function Sidebar({
                         )}
                     </div>
                     )}
+                    {isEventsView ? (
+                    <div className="flex items-center gap-1">
+                        <button
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${openingsOnly ? 'bg-yellow-50 border-yellow-200 text-black' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            onClick={() => setOpeningsOnly(!openingsOnly)}
+                        >
+                            🚪 Openings
+                        </button>
+                        {openingsOnly && (
+                            <button onClick={() => setOpeningsOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear openings filter">×</button>
+                        )}
+                    </div>
+                    ) : activeView !== 'map' ? (
                     <div className="flex items-center gap-1">
                         <button
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${openingTodayOnly ? 'bg-yellow-50 border-yellow-200 text-black' : !openingTodayOnly && specialFilterCounts.openingTodayOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
@@ -177,6 +192,7 @@ export default function Sidebar({
                             <button onClick={() => setOpeningTodayOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear opening today filter">×</button>
                         )}
                     </div>
+                    ) : null}
                     {!isEventsView && activeView !== 'map' && (
                     <div className="flex items-center gap-1">
                         <button
@@ -224,7 +240,7 @@ export default function Sidebar({
                     )}
                 </div>
 
-                {activeView === 'map' ? (
+                {activeView === 'map' && (
                     <div className="flex items-center gap-1">
                         <button
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${hasShowOnly ? 'bg-yellow-50 border-yellow-200 text-black' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}`}
@@ -236,7 +252,8 @@ export default function Sidebar({
                             <button onClick={() => setHasShowOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear has show filter">×</button>
                         )}
                     </div>
-                ) : (
+                )}
+                {!isEventsView && activeView !== 'map' && (
                 <div className="flex items-center gap-1">
                     <button
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${whenActive ? 'bg-yellow-50 border-yellow-200 text-black' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}`}
@@ -249,7 +266,7 @@ export default function Sidebar({
                         <button onClick={clearWhen} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear date filter">×</button>
                     )}
                 </div>
-                )}                                                
+                )}
           
                 <CountySelector
                     onCountyChange={setSelectedCounty}
@@ -300,34 +317,20 @@ export default function Sidebar({
                 </div>
             </div>
 
+
             {/* When drawer */}
             <Sheet open={whenDrawerOpen} onOpenChange={setWhenDrawerOpen}>
                 <SheetPortal>
                     <SheetPrimitive.Content className="fixed inset-y-0 right-0 z-[60] flex flex-col w-full max-w-sm bg-white shadow-xl transition ease-in-out duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right">
                         <SheetTitle className="sr-only">When</SheetTitle>
-                        <button
-                            onClick={() => setWhenDrawerOpen(false)}
-                            className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
-                            aria-label="Close panel"
-                        >
+                        <button onClick={() => setWhenDrawerOpen(false)} className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-white border border-gray-200 hover:bg-gray-50 transition-colors" aria-label="Close panel">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         </button>
-                        <p className="px-4 pt-5 pb-1 text-sm text-gray-500">Find shows that are running in a certain date range</p>
-                        {/* Segmented control */}
+                        <p className="px-4 pt-5 pb-1 text-sm text-gray-500">Find shows running in a certain date range</p>
                         <div className="px-4 pt-2 pb-3">
-                            <div className="flex bg-yellow-50 rounded-xl p-1">
-                                <button
-                                    onClick={() => setWhenTab('presets')}
-                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${whenTab === 'presets' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
-                                >
-                                    Date range
-                                </button>
-                                <button
-                                    onClick={() => setWhenTab('custom')}
-                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${whenTab === 'custom' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
-                                >
-                                    Custom
-                                </button>
+                            <div className="flex bg-gray-100 rounded-xl p-1">
+                                <button onClick={() => setWhenTab('presets')} className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${whenTab === 'presets' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}>Date range</button>
+                                <button onClick={() => setWhenTab('custom')} className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${whenTab === 'custom' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}>Custom</button>
                             </div>
                         </div>
                         <div className="flex-1 overflow-y-auto">
@@ -342,35 +345,16 @@ export default function Sidebar({
                                         const selectPreset = () => {
                                             setCalendarDateRangePreset(value);
                                             setShowCustomCalendar(false);
-                                            if (value === 'anytime') {
-                                                const now = new Date(); now.setHours(0, 0, 0, 0);
-                                                const far = new Date(); far.setFullYear(far.getFullYear() + 10); far.setHours(23, 59, 59, 999);
-                                                setCalendarDateRangeFilter({ from: now, to: far });
-                                            } else if (value === 'next7') {
-                                                const from = new Date(); from.setHours(0, 0, 0, 0);
-                                                const to = new Date(from); to.setDate(to.getDate() + 7); to.setHours(23, 59, 59, 999);
-                                                setCalendarDateRangeFilter({ from, to });
-                                            } else if (value === 'thismonth') {
-                                                const from = new Date(startOfMonth); from.setHours(0, 0, 0, 0);
-                                                const to = new Date(endOfMonth); to.setHours(23, 59, 59, 999);
-                                                setCalendarDateRangeFilter({ from, to });
-                                            } else if (value === 'nextmonth') {
-                                                const from = new Date(startOfNextMonth); from.setHours(0, 0, 0, 0);
-                                                const to = new Date(endOfNextMonth); to.setHours(23, 59, 59, 999);
-                                                setCalendarDateRangeFilter({ from, to });
-                                            }
+                                            if (value === 'anytime') { const now = new Date(); now.setHours(0,0,0,0); const far = new Date(); far.setFullYear(far.getFullYear()+10); far.setHours(23,59,59,999); setCalendarDateRangeFilter({ from: now, to: far }); }
+                                            else if (value === 'next7') { const from = new Date(); from.setHours(0,0,0,0); const to = new Date(from); to.setDate(to.getDate()+7); to.setHours(23,59,59,999); setCalendarDateRangeFilter({ from, to }); }
+                                            else if (value === 'thismonth') { const from = new Date(startOfMonth); from.setHours(0,0,0,0); const to = new Date(endOfMonth); to.setHours(23,59,59,999); setCalendarDateRangeFilter({ from, to }); }
+                                            else if (value === 'nextmonth') { const from = new Date(startOfNextMonth); from.setHours(0,0,0,0); const to = new Date(endOfNextMonth); to.setHours(23,59,59,999); setCalendarDateRangeFilter({ from, to }); }
                                             setWhenDrawerOpen(false);
                                         };
                                         return (
-                                            <button
-                                                key={value}
-                                                onClick={selectPreset}
-                                                className={`flex items-center gap-3 w-full px-4 py-3 text-left text-sm border-t border-gray-100 ${calendarDateRangePreset === value ? 'text-gray-900 font-medium' : 'text-gray-600'}`}
-                                            >
+                                            <button key={value} onClick={selectPreset} className={`flex items-center gap-3 w-full px-4 py-3 text-left text-sm border-t border-gray-100 ${calendarDateRangePreset === value ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
                                                 <span className={`flex-shrink-0 w-4 h-4 rounded-full border flex items-center justify-center ${calendarDateRangePreset === value ? 'bg-gray-900 border-gray-900' : 'border-gray-300 bg-white'}`}>
-                                                    {calendarDateRangePreset === value && (
-                                                        <svg width="6" height="6" viewBox="0 0 6 6" fill="white"><circle cx="3" cy="3" r="3"/></svg>
-                                                    )}
+                                                    {calendarDateRangePreset === value && <svg width="6" height="6" viewBox="0 0 6 6" fill="white"><circle cx="3" cy="3" r="3"/></svg>}
                                                 </span>
                                                 {label}
                                             </button>
@@ -381,38 +365,16 @@ export default function Sidebar({
                                 <div className="px-4 pb-4 flex flex-col gap-4">
                                     <div className="flex flex-col gap-1.5">
                                         <label className="text-sm text-gray-500">Start date</label>
-                                        <input
-                                            type="date"
-                                            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900"
+                                        <input type="date" className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900"
                                             value={calendarDateRangeFilter?.from ? calendarDateRangeFilter.from.toISOString().split('T')[0] : ''}
-                                            onChange={(e) => {
-                                                if (!e.target.value) return;
-                                                const from = new Date(e.target.value + 'T00:00:00');
-                                                const to = calendarDateRangeFilter?.to && calendarDateRangeFilter.to >= from
-                                                    ? calendarDateRangeFilter.to
-                                                    : new Date(e.target.value + 'T23:59:59');
-                                                setCalendarDateRangeFilter({ from, to });
-                                                setCalendarDateRangePreset('custom');
-                                                setShowCustomCalendar(true);
-                                            }}
+                                            onChange={(e) => { if (!e.target.value) return; const from = new Date(e.target.value+'T00:00:00'); const to = calendarDateRangeFilter?.to && calendarDateRangeFilter.to >= from ? calendarDateRangeFilter.to : new Date(e.target.value+'T23:59:59'); setCalendarDateRangeFilter({ from, to }); setCalendarDateRangePreset('custom'); setShowCustomCalendar(true); }}
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1.5">
                                         <label className="text-sm text-gray-500">End date</label>
-                                        <input
-                                            type="date"
-                                            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900"
+                                        <input type="date" className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900"
                                             value={calendarDateRangeFilter?.to ? calendarDateRangeFilter.to.toISOString().split('T')[0] : ''}
-                                            onChange={(e) => {
-                                                if (!e.target.value) return;
-                                                const to = new Date(e.target.value + 'T23:59:59');
-                                                const from = calendarDateRangeFilter?.from && calendarDateRangeFilter.from <= to
-                                                    ? calendarDateRangeFilter.from
-                                                    : new Date(e.target.value + 'T00:00:00');
-                                                setCalendarDateRangeFilter({ from, to });
-                                                setCalendarDateRangePreset('custom');
-                                                setShowCustomCalendar(true);
-                                            }}
+                                            onChange={(e) => { if (!e.target.value) return; const to = new Date(e.target.value+'T23:59:59'); const from = calendarDateRangeFilter?.from && calendarDateRangeFilter.from <= to ? calendarDateRangeFilter.from : new Date(e.target.value+'T00:00:00'); setCalendarDateRangeFilter({ from, to }); setCalendarDateRangePreset('custom'); setShowCustomCalendar(true); }}
                                         />
                                     </div>
                                     <Button className="w-full" onClick={() => setWhenDrawerOpen(false)}>Done</Button>
