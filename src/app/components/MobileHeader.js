@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from "next/link";
 import { X, Menu } from "lucide-react";
 import * as SheetPrimitive from "@radix-ui/react-dialog";
@@ -14,6 +14,13 @@ export default function MobileHeader({ onSearch, onClear }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [newsletterOpen, setNewsletterOpen] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onSearch?.(value);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [value]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

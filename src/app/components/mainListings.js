@@ -121,10 +121,10 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
         () => (listings ? listings.filter(l => favoriteIds.includes(l._id)).length : 0),
         [listings, favoriteIds]
     );
-    const [committedSearchTerm, setCommittedSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
     const [searchClearKey, setSearchClearKey] = useState(0);
-    const onSearch = (value) => setCommittedSearchTerm(value);
-    const onClear = () => setCommittedSearchTerm('');
+    const onSearch = (value) => setSearchTerm(value);
+    const onClear = () => setSearchTerm('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [selectedCounty, setSelectedCounty] = useState([]);
     const [userLocation, setUserLocation] = useState(null);
@@ -193,7 +193,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
         openingTitleOnly,
         favoritesOnly,
         favoriteIds,
-        searchTerm: committedSearchTerm,
+        searchTerm: searchTerm,
         selectedLocation,
         selectedCounty,
         calendarTypeFilter,
@@ -209,7 +209,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
         openingTitleOnly,
         favoritesOnly,
         JSON.stringify(favoriteIds),
-        committedSearchTerm,
+        searchTerm,
         selectedLocation,
         JSON.stringify(selectedCounty),
         calendarTypeFilter,
@@ -384,7 +384,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
         setOpeningTodayOnly(false);
         setOpeningTitleOnly(false);
         setFavoritesOnly(false);
-        setCommittedSearchTerm('');
+        setSearchTerm('');
         setSearchClearKey(k => k + 1);
         setHasShowOnly(false);
         setSelectedLocation('');
@@ -488,7 +488,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                     <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
                         <div className="flex items-center gap-1.5 text-sm">
                             <span className="font-medium text-gray-700">{displayedResults} exhibition{displayedResults !== 1 ? 's' : ''}</span>
-                            {(calendarTypeFilter !== 'onview' || calendarDateRangePreset !== 'anytime' || selectedCounty.length > 0 || onViewToday || endingSoonOnly || openingTodayOnly || openingTitleOnly || committedSearchTerm) && (
+                            {(calendarTypeFilter !== 'onview' || calendarDateRangePreset !== 'anytime' || selectedCounty.length > 0 || onViewToday || endingSoonOnly || openingTodayOnly || openingTitleOnly || searchTerm) && (
                                 <button
                                     onClick={clearAllFilters}
                                     className="text-gray-400 hover:text-gray-600"
@@ -650,13 +650,13 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                                     highlightsOnly={highlightsOnly}
                                     selectedLocation={selectedLocation}
                                     selectedCounty={selectedCounty}
-                                    searchTerm={committedSearchTerm}
+                                    searchTerm={searchTerm}
                                     userLocation={userLocation}
                                     hasShowOnly={hasShowOnly}
                                     hasActiveFilters={
                                         highlightsOnly || onViewToday || endingSoonOnly ||
                                         openingTodayOnly || openingTitleOnly || favoritesOnly ||
-                                        !!committedSearchTerm || !!selectedLocation ||
+                                        !!searchTerm || !!selectedLocation ||
                                         selectedCounty.length > 0 || !!userLocation ||
                                         calendarDateRangePreset !== 'anytime'
                                     }

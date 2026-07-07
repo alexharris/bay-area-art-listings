@@ -1,10 +1,17 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X } from "lucide-react";
 
 export default function SearchInput({ onSearch, onClear, inputRef }) {
     const [value, setValue] = useState('');
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            onSearch?.(value);
+        }, 250);
+        return () => clearTimeout(timer);
+    }, [value]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
