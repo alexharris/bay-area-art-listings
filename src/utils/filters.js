@@ -175,12 +175,16 @@ export function getFilteredListings(filters, listings) {
     return item.openings?.some(o => o.date >= today);
   })
   .filter(item => filters.selectedLocation ? item.locationName === filters.selectedLocation : true) // Selected Location
-  .filter(item => 
-    item.Event.toLowerCase().includes(filters.searchTerm.toLowerCase()) || 
-    item.locationName.toLowerCase().includes(filters.searchTerm.toLowerCase()) || 
-    (item.locationAddress ? item.locationAddress.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false) || 
-    extractPortableTextContent(item.Notes).toLowerCase().includes(filters.searchTerm.toLowerCase()) || 
-    (item.locationUrl ? item.locationUrl.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false)
+  .filter(item =>
+    item.Event.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+    item.locationName.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+    (item.locationAddress ? item.locationAddress.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false) ||
+    extractPortableTextContent(item.Notes).toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+    (item.locationUrl ? item.locationUrl.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false) ||
+    (item.openings ? item.openings.some(opening =>
+      (opening.title ? opening.title.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false) ||
+      (opening.note ? opening.note.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false)
+    ) : false)
   )
   .filter(item => filters.selectedCounty.length > 0 ? filters.selectedCounty.includes(item.locationCounty) : true) // Selected County
   .filter(item => {
