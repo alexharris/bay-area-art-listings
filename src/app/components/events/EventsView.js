@@ -2,6 +2,7 @@
 
 import { haversineDistance } from '../../../utils/distance';
 import { generateSlug } from '../../../utils/shared';
+import { extractPortableTextContent } from '../../../utils/helpers';
 
 function toDateStr(date) {
     if (!date) return null;
@@ -16,7 +17,7 @@ function formatDayHeader(dateStr) {
     return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
-export default function EventsView({ listings, calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius = 10, openingsOnly = false, onShowSelect }) {
+export default function EventsView({ listings, calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius = 10, openingsOnly = false, searchTerm = '', onShowSelect }) {
     const today = new Date(
         new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })
     );
@@ -49,6 +50,20 @@ export default function EventsView({ listings, calendarDateRangeFilter, selected
                 })
                 .map(opening => ({ ...opening, listing }))
         )
+        .filter(event => {
+            const term = searchTerm.trim().toLowerCase();
+            if (!term) return true;
+            const listing = event.listing;
+            return (
+                listing.Event.toLowerCase().includes(term) ||
+                listing.locationName.toLowerCase().includes(term) ||
+                (listing.locationAddress ? listing.locationAddress.toLowerCase().includes(term) : false) ||
+                extractPortableTextContent(listing.Notes).toLowerCase().includes(term) ||
+                (listing.locationUrl ? listing.locationUrl.toLowerCase().includes(term) : false) ||
+                (event.title ? event.title.toLowerCase().includes(term) : false) ||
+                (event.note ? event.note.toLowerCase().includes(term) : false)
+            );
+        })
         .sort((a, b) => a.date.localeCompare(b.date));
 
     // Group by date

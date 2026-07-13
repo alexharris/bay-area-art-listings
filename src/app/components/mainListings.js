@@ -9,6 +9,7 @@ import { getFilteredListings } from '../../utils/filters';
 import { applySorting } from '../../utils/sort';
 import { getCalendarTypeCounts } from '../../utils/filterCounts';
 import { formatDate, generateSlug } from '../../utils/shared';
+import { extractPortableTextContent } from '../../utils/helpers';
 
 import { X } from 'lucide-react';
 import { FavoritesProvider, useFavorites } from '@/context/FavoritesContext';
@@ -159,16 +160,29 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
     const eventCountsByCounty = useMemo(() => {
         if (!listings) return {};
         const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+        const term = searchTerm.trim().toLowerCase();
         const counts = {};
         listings.forEach(listing => {
             if (!listing.locationCounty) return;
-            const futureOpenings = (listing.openings || []).filter(o => o.date >= today);
+            const listingMatches = !term || (
+                listing.Event.toLowerCase().includes(term) ||
+                listing.locationName.toLowerCase().includes(term) ||
+                (listing.locationAddress ? listing.locationAddress.toLowerCase().includes(term) : false) ||
+                extractPortableTextContent(listing.Notes).toLowerCase().includes(term) ||
+                (listing.locationUrl ? listing.locationUrl.toLowerCase().includes(term) : false)
+            );
+            const futureOpenings = (listing.openings || []).filter(o => {
+                if (o.date < today) return false;
+                if (listingMatches) return true;
+                return (o.title ? o.title.toLowerCase().includes(term) : false) ||
+                    (o.note ? o.note.toLowerCase().includes(term) : false);
+            });
             if (futureOpenings.length > 0) {
                 counts[listing.locationCounty] = (counts[listing.locationCounty] || 0) + futureOpenings.length;
             }
         });
         return counts;
-    }, [listings]);
+    }, [listings, searchTerm]);
 
     // Measure the mobile fixed header stack so content padding stays in sync
     const mobileHeaderRef = useRef(null);
@@ -640,6 +654,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
                                 userLocation={userLocation}
                                 nearbyRadius={nearbyRadius}
                                 openingsOnly={openingsOnly}
+                                searchTerm={searchTerm}
                                 onShowSelect={handleShowSelect}
                             />
                         ) : displayedResults > 0 && activeView === 'map' ? (
