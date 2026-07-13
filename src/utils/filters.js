@@ -175,17 +175,23 @@ export function getFilteredListings(filters, listings) {
     return item.openings?.some(o => o.date >= today);
   })
   .filter(item => filters.selectedLocation ? item.locationName === filters.selectedLocation : true) // Selected Location
-  .filter(item =>
-    item.Event.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-    item.locationName.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-    (item.locationAddress ? item.locationAddress.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false) ||
-    extractPortableTextContent(item.Notes).toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-    (item.locationUrl ? item.locationUrl.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false) ||
-    (item.openings ? item.openings.some(opening =>
-      (opening.title ? opening.title.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false) ||
-      (opening.note ? opening.note.toLowerCase().includes(filters.searchTerm.toLowerCase()) : false)
-    ) : false)
-  )
+  .filter(item => {
+    const searchTerm = filters.searchTerm.toLowerCase();
+    const todayLA = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+    return (
+      item.Event.toLowerCase().includes(searchTerm) ||
+      item.locationName.toLowerCase().includes(searchTerm) ||
+      (item.locationAddress ? item.locationAddress.toLowerCase().includes(searchTerm) : false) ||
+      extractPortableTextContent(item.Notes).toLowerCase().includes(searchTerm) ||
+      (item.locationUrl ? item.locationUrl.toLowerCase().includes(searchTerm) : false) ||
+      (item.openings ? item.openings.some(opening =>
+        opening.date >= todayLA && (
+          (opening.title ? opening.title.toLowerCase().includes(searchTerm) : false) ||
+          (opening.note ? opening.note.toLowerCase().includes(searchTerm) : false)
+        )
+      ) : false)
+    );
+  })
   .filter(item => filters.selectedCounty.length > 0 ? filters.selectedCounty.includes(item.locationCounty) : true) // Selected County
   .filter(item => {
     if (!filters.userLocation) return true;
