@@ -8,8 +8,7 @@ import imageUrlBuilder from '@sanity/image-url';
 import CalendarLink from '@/app/components/CalendarLink';
 import TodaysHoursStatus from '@/app/components/TodaysHoursStatus';
 import HoursPopup from '@/app/components/HoursPopup';
-import CityFromPlaceId from '@/app/components/CityFromPlaceId';
-import { generateSlug, formatDate } from '@/utils/shared';
+import { generateSlug, formatDate, cityFromAddress } from '@/utils/shared';
 
 const client = createClient({
   projectId: 'ride9vgj',
@@ -41,6 +40,7 @@ export default function ShowPage() {
             _createdAt,
             "locationName": Location->Name,
             "locationAddress": Location->Address,
+            "locationCity": Location->City,
             "locationUrl": Location->Url,
             "locationGeolocation": Location->Geolocation,
             "locationHours": Location->Hours,
@@ -208,6 +208,10 @@ export default function ShowPage() {
                     </div>
                 )}
                 
+                {(listing.locationCity || listing.locationAddress) && (
+                    <p className="text-gray-600">{listing.locationCity || cityFromAddress(listing.locationAddress)}</p>
+                )}
+
                 {listing.locationAddress && (
                     <p className="text-gray-600">{listing.locationAddress}</p>
                 )}

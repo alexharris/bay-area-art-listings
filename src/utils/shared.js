@@ -58,3 +58,15 @@ export function generateSlug(title) {
 export function getTodayName() {
     return DAYS_OF_WEEK[new Date().getDay()];
 }
+
+/**
+ * Best-effort city extraction from a formatted address, used as a fallback
+ * for locations whose City field hasn't been synced from Google yet.
+ * @param {string} address - Formatted address (e.g. "123 Main St, Oakland, CA 94612")
+ * @returns {string} Extracted city, or empty string if unavailable
+ */
+export function cityFromAddress(address) {
+    if (!address) return '';
+    const parts = address.split(',').map(part => part.trim()).filter(Boolean);
+    return parts[1] || parts[0] || '';
+}

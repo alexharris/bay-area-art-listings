@@ -4,10 +4,9 @@ import CalendarLink from './CalendarLink';
 import NotesRenderer from './NotesRenderer';
 import DateNote from './DateNote';
 import HoursPopup from './HoursPopup';
-import CityFromPlaceId from './CityFromPlaceId';
 import FavoriteButton from './FavoriteButton';
 import { Badge } from '@/components/ui/badge';
-import { generateSlug, getTodayName } from '../../utils/shared';
+import { generateSlug, getTodayName, cityFromAddress } from '../../utils/shared';
 
 export default function Listings({
   listings,
@@ -98,7 +97,7 @@ export default function Listings({
           <a href={item.locationUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-gray-900">
             {item.locationName}
           </a>
-          <CityFromPlaceId googlePlaceId={item.googlePlaceId} fallbackAddress={item.locationAddress} />
+          <span className="text-sm leading-tight">{item.locationCity || cityFromAddress(item.locationAddress)}</span>
           {todayHours ? (
             <HoursPopup locationName={item.locationName} locationHours={item.locationHours} locationUrl={item.locationUrl}>
               <button className="flex items-center gap-1 cursor-pointer underline w-fit">
@@ -140,11 +139,11 @@ export default function Listings({
           return (
           <div key={opening._key || idx} className="text-sm border-b border-dashed border-gray-100 pb-1.5 last:border-0 last:pb-0">
             <div className="flex flex-col">
-              <div className="flex items-center">
-                <span className={`inline-block w-2 h-2 rounded-full mr-1.5 flex-shrink-0 ${isToday ? 'bg-green-400' : 'bg-yellow-400'}`}></span>
+              <div className="flex items-start">
+                <span className={`inline-block w-2 h-2 rounded-full mr-1.5 mt-1.5 flex-shrink-0 ${isToday ? 'bg-green-400' : 'bg-yellow-400'}`}></span>
                 <span className="font-medium">{opening.title}</span>
               </div>
-              <div className="text-gray-700">
+              <div className="text-gray-700 pl-3.5">
                 <CalendarLink
                   dateLabel={`${new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}${opening.time ? ` • ${opening.time}` : ''}`}
                   singleEvent={{
@@ -156,7 +155,7 @@ export default function Listings({
                 />
               </div>
             </div>
-            {opening.note && <div className="text-gray-600">{opening.note}</div>}
+            {opening.note && <div className="text-gray-600 pl-3.5">{opening.note}</div>}
           </div>
           );
         })}

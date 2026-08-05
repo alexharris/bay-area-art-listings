@@ -12,6 +12,8 @@ Bay Area Art Listings is a Next.js 15 application that displays visual arts exhi
 - `npm run build` - Build for production
 - `npm run lint` - Run Next.js linting
 
+**Do not run `npm run build` / `next build` to verify a change if `npm run dev` may already be running.** Both write to the same `.next` directory in incompatible formats; running them concurrently corrupts it and produces "missing required error components, refreshing..." in the browser. Check for a process on port 3333 first (`lsof -nP -iTCP:3333 -sTCP:LISTEN`) before building. Prefer `npm run lint` or a type check to verify changes while dev is running.
+
 ## Architecture
 
 ### Content Management

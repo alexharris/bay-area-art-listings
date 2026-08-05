@@ -29,6 +29,12 @@ export const locationType = defineType({
       group: 'info',
     }),
     defineField({
+      name: 'City',
+      type: 'string',
+      group: 'info',
+      description: 'Populated automatically from Google Places (Sync from Google, below).',
+    }),
+    defineField({
       name: 'county',
       title: 'County',
       type: 'string',

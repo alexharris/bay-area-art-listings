@@ -1,7 +1,7 @@
 'use client'
 
 import { haversineDistance } from '../../../utils/distance';
-import { generateSlug } from '../../../utils/shared';
+import { generateSlug, cityFromAddress } from '../../../utils/shared';
 import { extractPortableTextContent } from '../../../utils/helpers';
 
 function toDateStr(date) {
@@ -95,10 +95,13 @@ export default function EventsView({ listings, calendarDateRangeFilter, selected
                     <div className="divide-y divide-gray-200">
                         {grouped[date].map((event, i) => (
                             <div key={i} className="py-3 px-3">
-                                {event.listing.locationUrl
-                                    ? <a href={event.listing.locationUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 truncate block mb-0.5 hover:underline">{event.listing.locationName}</a>
-                                    : <p className="text-sm text-gray-400 truncate mb-0.5">{event.listing.locationName}</p>
-                                }
+                                {(() => {
+                                    const city = event.listing.locationCity || cityFromAddress(event.listing.locationAddress);
+                                    const label = city ? `${event.listing.locationName} · ${city}` : event.listing.locationName;
+                                    return event.listing.locationUrl
+                                        ? <a href={event.listing.locationUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 truncate block mb-0.5 hover:underline">{label}</a>
+                                        : <p className="text-sm text-gray-400 truncate mb-0.5">{label}</p>;
+                                })()}
                                 <p className="text-base text-gray-700 font-medium">{event.title}</p>
                                 {event.time && <p className="text-sm text-gray-700">{event.time}</p>}
                                 <button onClick={() => onShowSelect?.(generateSlug(event.listing.Event))} className="text-sm text-gray-700 truncate block hover:underline text-left w-full">Part of: {event.listing.Event}</button>

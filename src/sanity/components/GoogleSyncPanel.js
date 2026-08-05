@@ -17,6 +17,7 @@ export function GoogleSyncPanel(props) {
   const currentHours = useFormValue(['Hours']) || {}
   const currentName = useFormValue(['Name']) || ''
   const currentAddress = useFormValue(['Address']) || ''
+  const currentCity = useFormValue(['City']) || ''
   const currentGeolocation = useFormValue(['Geolocation'])
   const rawId = useFormValue(['_id']) || ''
   const publishedId = rawId.replace(/^drafts\./, '')
@@ -47,7 +48,7 @@ export function GoogleSyncPanel(props) {
           return
         }
 
-        const {Hours, Name, Address, Geolocation} = data.data
+        const {Hours, Name, Address, City, Geolocation} = data.data
 
         const updatedDays = Hours
           ? days.filter(day => (currentHours[day] ?? null) !== (Hours[day] ?? null))
@@ -56,6 +57,7 @@ export function GoogleSyncPanel(props) {
         const updatedFields = []
         if (Name && Name !== currentName) updatedFields.push('Name')
         if (Address && Address !== currentAddress) updatedFields.push('Address')
+        if (City && City !== currentCity) updatedFields.push('City')
         if (Geolocation && (Geolocation.lat !== currentGeolocation?.lat || Geolocation.lng !== currentGeolocation?.lng)) updatedFields.push('Geolocation')
 
         if (updatedDays.length === 0 && updatedFields.length === 0) {
@@ -64,6 +66,7 @@ export function GoogleSyncPanel(props) {
           const patches = []
           if (updatedFields.includes('Name')) patches.push({set: {Name}})
           if (updatedFields.includes('Address')) patches.push({set: {Address}})
+          if (updatedFields.includes('City')) patches.push({set: {City}})
           if (updatedFields.includes('Geolocation')) patches.push({set: {Geolocation: {_type: 'geopoint', lat: Geolocation.lat, lng: Geolocation.lng}}})
           updatedDays
             .filter(day => Hours[day] !== undefined)
@@ -113,6 +116,9 @@ export function GoogleSyncPanel(props) {
             </Text>
             <Text size={1} muted>
               <strong>Address</strong> — the formatted street address from Google
+            </Text>
+            <Text size={1} muted>
+              <strong>City</strong> — the venue's city, parsed from Google's address components
             </Text>
             <Text size={1} muted>
               <strong>Geolocation</strong> — latitude and longitude coordinates used for the map

@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import { extractPortableTextContent } from '../../../utils/helpers';
 import HoursPopup from '../HoursPopup';
-import { formatDate, getTodayName, generateSlug } from '../../../utils/shared';
+import { formatDate, getTodayName, generateSlug, cityFromAddress } from '../../../utils/shared';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import Image from 'next/image';
 import CalendarLink from '../CalendarLink';
@@ -64,11 +64,11 @@ function renderOpenings(item) {
                 return (
                     <div key={opening._key || idx} className="text-sm border-b border-dashed border-gray-100 pb-1.5 last:border-0 last:pb-0">
                         <div className="flex flex-col">
-                            <div className="flex items-center">
-                                <span className={`inline-block w-2 h-2 rounded-full mr-1.5 flex-shrink-0 ${isToday ? 'bg-green-400' : 'bg-yellow-400'}`}></span>
+                            <div className="flex items-start">
+                                <span className={`inline-block w-2 h-2 rounded-full mr-1.5 mt-1.5 flex-shrink-0 ${isToday ? 'bg-green-400' : 'bg-yellow-400'}`}></span>
                                 <span className="font-medium">{opening.title}</span>
                             </div>
-                            <div className="text-gray-700">
+                            <div className="text-gray-700 pl-3.5">
                                 <CalendarLink
                                     dateLabel={`${new Date(opening.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' })}${opening.time ? ` ${opening.time}` : ''}`}
                                     singleEvent={{
@@ -80,7 +80,7 @@ function renderOpenings(item) {
                                 />
                             </div>
                         </div>
-                        {opening.note && <div className="text-gray-600">{opening.note}</div>}
+                        {opening.note && <div className="text-gray-600 pl-3.5">{opening.note}</div>}
                     </div>
                 );
             })}
@@ -215,7 +215,8 @@ function ShowCard({ item, formatDate }) {
 // Mobile bottom sheet content for a location group
 function LocationSheet({ group, formatDate }) {
     if (!group) return null;
-    const { locationName, locationAddress, locationUrl, locationHours, items } = group;
+    const { locationName, locationAddress, locationUrl, locationHours, location, items } = group;
+    const city = location?.City || cityFromAddress(locationAddress);
     const todayName = getTodayName();
     const todayHoursRaw = locationHours?.[todayName];
     const todayHoursDisplay = todayHoursRaw
@@ -227,7 +228,10 @@ function LocationSheet({ group, formatDate }) {
         <div className="flex flex-col min-h-0 flex-1">
             {/* Sticky header */}
             <div className="px-4 pt-2 pb-3 border-b border-gray-100">
-                <h2 className="text-lg font-semibold mb-2">{locationName}</h2>
+                <div className="mb-2">
+                    <h2 className="text-lg font-semibold">{locationName}</h2>
+                    {city && <p className="text-sm text-gray-500">{city}</p>}
+                </div>
                 <div className="flex gap-4 text-sm">
                     <a
                         className="flex items-start gap-1.5 text-gray-600 hover:text-black underline decoration-dashed"
