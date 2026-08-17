@@ -8,10 +8,8 @@ const nextConfig = {
             },
         ],
     },
-    experimental: {
-        outputFileTracingIncludes: {
-            '/api/generate-og': ['./src/app/api/generate-og/fonts/**'],
-        },
+    outputFileTracingIncludes: {
+        '/api/generate-og': ['./src/app/api/generate-og/fonts/**'],
     },
 };
 

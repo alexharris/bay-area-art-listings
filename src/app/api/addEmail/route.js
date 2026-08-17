@@ -1,12 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
-
 export async function POST(request) {
   try {
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
+      return new Response('Newsletter signup not configured', { status: 503 });
+    }
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_KEY
+    );
     // Log to confirm the request is received
     console.log('Request received');
 
