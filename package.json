@@ -6,9 +6,11 @@
     "dev": "next dev --turbopack -p 3333",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "digest": "node scripts/send-digest.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.117.1",
     "@googlemaps/places": "^1.9.1",
     "@portabletext/react": "^3.2.0",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -29,8 +31,10 @@
     "dotenv": "^16.4.7",
     "geist": "^1.7.1",
     "googleapis": "^144.0.0",
+    "imapflow": "^1.7.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.544.0",
+    "mailparser": "^3.9.15",
     "next": "15.1.11",
     "next-sanity": "^9.8.30",
     "papaparse": "^5.4.1",
