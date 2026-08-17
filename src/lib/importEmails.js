@@ -3,24 +3,44 @@ import { ImapFlow } from 'imapflow'
 import { simpleParser } from 'mailparser'
 import { createClient } from '@sanity/client'
 
-const sanity = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-  token: process.env.SANITY_WRITE_TOKEN,
-  useCdn: false,
-  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-12-26',
-})
+// Lazy-initialized clients — created on first use so the module can be imported
+// at build time even when env vars aren't available in the build environment.
+let _sanity = null
+let _sanityProduction = null
+let _anthropic = null
 
-// Always read locations from production so matching works regardless of active dataset
-const sanityProduction = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-  dataset: 'production',
-  token: process.env.SANITY_WRITE_TOKEN,
-  useCdn: false,
-  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-12-26',
-})
+function getSanityClient() {
+  if (!_sanity) {
+    _sanity = createClient({
+      projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+      dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+      token: process.env.SANITY_WRITE_TOKEN,
+      useCdn: false,
+      apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-12-26',
+    })
+  }
+  return _sanity
+}
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+function getSanityProductionClient() {
+  if (!_sanityProduction) {
+    _sanityProduction = createClient({
+      projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+      dataset: 'production',
+      token: process.env.SANITY_WRITE_TOKEN,
+      useCdn: false,
+      apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-12-26',
+    })
+  }
+  return _sanityProduction
+}
+
+function getAnthropic() {
+  if (!_anthropic) {
+    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  }
+  return _anthropic
+}
 
 const BLOCKED_DOMAINS = ['facebook.com', 'twitter.com', 'instagram.com', 'linkedin.com', 'pinterest.com', 'youtube.com', 't.co', 'fb.com', 'tiktok.com', 'threads.net', 'bsky.app', 'mailchi.mp', 'campaign-archive.com', 'createsend.com', 'cmail19.com', 'cmail20.com']
 // Patterns that indicate a "view email in browser" or unsubscribe-style link — drop entirely
@@ -208,7 +228,7 @@ async function extractListingData(subject, textBody, htmlBody, locations = []) {
     ? `\nImage caption lines found in email text:\n${textCaptions.map(c => `- ${c}`).join('\n')}`
     : ''
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-opus-4-8',
     max_tokens: 4096,
     messages: [{
@@ -380,7 +400,7 @@ async function createDraft(data, subject, fromEmail, messageId, candidateImages,
       })
   }
 
-  return await sanity.create(doc)
+  return await getSanityClient().create(doc)
 }
 
 async function processEmail(parsed, locations) {
@@ -390,7 +410,7 @@ async function processEmail(parsed, locations) {
 
   // Skip if already imported
   if (messageId) {
-    const existing = await sanity.fetch(
+    const existing = await getSanityClient().fetch(
       `*[_type == "listing" && emailMessageId == $messageId][0]{ _id }`,
       { messageId }
     )
@@ -413,7 +433,7 @@ async function processEmail(parsed, locations) {
     const imgAttachment = parsed.attachments.find(a => a.contentType?.startsWith('image/'))
     if (imgAttachment) {
       try {
-        const asset = await sanity.assets.upload('image', imgAttachment.content, {
+        const asset = await getSanityClient().assets.upload('image', imgAttachment.content, {
           filename: imgAttachment.filename,
           contentType: imgAttachment.contentType,
         })
@@ -464,7 +484,7 @@ export async function importEmailsFromZoho() {
   // Fetch locations and raw email sources (with UIDs) in parallel
   console.log('Fetching locations and connecting to IMAP...')
   const [locations, emailData] = await Promise.all([
-    sanityProduction.fetch(`*[_type == "location" && !(_id in path("drafts.**"))]{ _id, Name, Address }`),
+    getSanityProductionClient().fetch(`*[_type == "location" && !(_id in path("drafts.**"))]{ _id, Name, Address }`),
     (async () => {
       const client = makeImapClient()
       await client.connect()
