@@ -4,23 +4,7 @@ const { createClient: createSanityClient } = require('@sanity/client');
 const { createClient: createSupabaseClient } = require('@supabase/supabase-js');
 
 
-const serverToken = process.env.POSTMARK_SERVER_TOKEN;
-const client = new postmark.ServerClient(serverToken);
-
-const sanity = createSanityClient({
-    projectId: 'ride9vgj',
-    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
-    useCdn: false,
-    apiVersion: 'v2022-03-07'
-});
-
-const supabase = createSupabaseClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_KEY
-)
-
-
-async function getEmails() {
+async function getEmails(supabase) {
     const { data, error } = await supabase
         .from('emails')
         .select('email');
@@ -33,22 +17,20 @@ async function getEmails() {
     return data.map(record => record.email);
 }
 
-const today = new Date().toISOString().split('T')[0];
-const nextWeek = new Date();
-nextWeek.setDate(nextWeek.getDate() + 7);
-const nextWeekDate = nextWeek.toISOString().split('T')[0];
-
-
-async function getListings() {
+async function getListings(sanity) {
+    const today = new Date().toISOString().split('T')[0];
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    const nextWeekDate = nextWeek.toISOString().split('T')[0];
 
     let listings = await sanity.fetch(`*[_type == "listing" && StartDate >= "${today}" && StartDate <= "${nextWeekDate}"]`);
-    
+
     // get the locations reference by the listing
     const locations = await Promise.all(listings.map(async listing => {
         const location = await sanity.fetch(`*[_type == "location" && _id == "${listing.Location._ref}"]`);
         return location
     }));
-  
+
     // combine them
     listings = listings.map((listing, index) => ({
         ...listing,
@@ -56,12 +38,6 @@ async function getListings() {
         locationAddress: locations[index][0]?.Address || 'Address Not Listed',
         locationUrl: locations[index][0]?.Url || ''
     }));
-   
-
-      
-    // const formattedListings = listings.map(listing => {
-    //     return `Title: ${listing.Event}\nStart Date: ${listing.StartDate}\nEnd Date: ${listing.EndDate}\n\n`;
-    // }).join('');
 
     listings = listings.map(listing => ({
         ...listing,
@@ -69,7 +45,6 @@ async function getListings() {
         EndDate: new Date(listing.EndDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     }));
 
-      
     var listingObjects = listings.map(listing => {
         return {
             "name": listing.Event,
@@ -80,24 +55,41 @@ async function getListings() {
             "locationUrl": listing.locationUrl
         }
     })
-    
 
-    const formattedListings = listingObjects
-
-    return formattedListings;
+    return listingObjects;
 }
 
 
 export async function POST(req) {
     if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ message: 'Method Not Allowed' }), { status: 405 });
+        return new Response(JSON.stringify({ message: 'Method Not Allowed' }), { status: 405 });
     }
 
-    var formattedListings = await getListings()
+    const serverToken = process.env.POSTMARK_SERVER_TOKEN;
+    const client = new postmark.ServerClient(serverToken);
+
+    const sanity = createSanityClient({
+        projectId: 'ride9vgj',
+        dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
+        useCdn: false,
+        apiVersion: 'v2022-03-07'
+    });
+
+    const supabase = createSupabaseClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_KEY
+    );
+
+    const today = new Date().toISOString().split('T')[0];
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    const nextWeekDate = nextWeek.toISOString().split('T')[0];
+
+    var formattedListings = await getListings(sanity)
 
     formattedListings.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
-    var emails = await getEmails()
+    var emails = await getEmails(supabase)
 
     let todayNice = new Date(today).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     let nextWeekDateNice = new Date(nextWeekDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -113,7 +105,7 @@ export async function POST(req) {
                     "today": todayNice,
                     "nextWeekDate": nextWeekDateNice,
                     "listings": formattedListings
-                }              
+                }
             });
             console.log(`Email sent to ${email}:`, response);
         }
