@@ -14,7 +14,7 @@ function getSanityClient() {
     _sanity = createClient({
       projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
       dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-      token: process.env.SANITY_WRITE_TOKEN,
+      token: process.env.SANITY_API_WRITE_TOKEN,
       useCdn: false,
       apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-12-26',
     })
@@ -27,7 +27,7 @@ function getSanityProductionClient() {
     _sanityProduction = createClient({
       projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
       dataset: 'production',
-      token: process.env.SANITY_WRITE_TOKEN,
+      token: process.env.SANITY_API_WRITE_TOKEN,
       useCdn: false,
       apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-12-26',
     })

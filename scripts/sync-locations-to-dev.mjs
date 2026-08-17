@@ -10,7 +10,7 @@ env.split('\n').forEach(line => {
 const production = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
   dataset: 'production',
-  token: process.env.SANITY_WRITE_TOKEN,
+  token: process.env.SANITY_API_WRITE_TOKEN,
   useCdn: false,
   apiVersion: '2024-12-26',
 })
@@ -18,7 +18,7 @@ const production = createClient({
 const development = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'development',
-  token: process.env.SANITY_WRITE_TOKEN,
+  token: process.env.SANITY_API_WRITE_TOKEN,
   useCdn: false,
   apiVersion: '2024-12-26',
 })
