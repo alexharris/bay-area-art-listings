@@ -1,5 +1,7 @@
 import { importEmailsFromZoho } from '@/lib/importEmails'
 
+export const maxDuration = 300
+
 export async function POST() {
   try {
     const results = await importEmailsFromZoho()
