@@ -7,6 +7,7 @@ import {GenerateInstagramButton} from '../components/GenerateInstagramButton'
 import {CandidateImagesInput} from '../components/CandidateImagesInput'
 import {ImportLinksInput} from '../components/ImportLinksInput'
 import {ImportNotesInput} from '../components/ImportNotesInput'
+import {ImportWarningsInput} from '../components/ImportWarningsInput'
 
 export const listingType = defineType({
   name: 'listing',
@@ -30,6 +31,13 @@ export const listingType = defineType({
     },
   ],
   fields: [
+    defineField({
+      name: 'importWarnings',
+      title: 'Import Warnings',
+      type: 'string',
+      components: { input: ImportWarningsInput },
+      hidden: ({ document }) => !document?.importWarnings,
+    }),
     defineField({
       name: 'Event',
       type: 'string',

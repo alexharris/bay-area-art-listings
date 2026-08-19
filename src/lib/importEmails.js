@@ -190,7 +190,7 @@ function extractCaptionsFromText(text) {
     .filter(l => captionStart.test(l) && l.length > 15 && l.length < 300)
 }
 
-async function extractListingData(subject, textBody, htmlBody, locations = []) {
+async function extractListingData(subject, textBody, htmlBody, locations = [], currentYear = new Date().getFullYear()) {
   const rawLinks = extractLinksFromHtml(htmlBody)
   const images = extractImagesFromHtml(htmlBody)
   const textCaptions = extractCaptionsFromText(textBody)
@@ -258,8 +258,8 @@ Return only a JSON array where each item represents one exhibition (use null for
     "galleryUrl": "the gallery or museum homepage URL — typically the root domain linked from the header/footer (e.g. 'https://gallery.com'). null if not found.",
     "imageUrl": "URL of the main exhibition artwork image — use caption, alt text, and position to match the correct image to this specific exhibition's section of the email. Ignore logos, banners, and social media icons.",
     "candidateImageUrls": ["up to 3 artwork image URLs that belong to this exhibition's section of the email — use position data to assign images to the correct show. Most relevant first."],
-    "startDate": "YYYY-MM-DD or null",
-    "endDate": "YYYY-MM-DD or null",
+    "startDate": "YYYY-MM-DD or null. CRITICAL: if no year is explicitly stated in the email, always use ${currentYear}. Never infer the year from the day of the week or any other reasoning. Never use a past year.",
+    "endDate": "YYYY-MM-DD or null. Same rule: if no year is stated, use ${currentYear}.",
     "openings": [
       {
         "title": "use 'Opening Reception' if it's a reception for the opening of the show, regardless of how the email words it. If the event also includes something else (e.g. an artist talk, performance, panel), append it: 'Opening Reception & Artist Talk'. Use exact wording only for standalone non-opening events like 'Closing Reception', 'Artist Talk', 'Panel Discussion'.",
@@ -269,6 +269,7 @@ Return only a JSON array where each item represents one exhibition (use null for
       }
     ],
     "description": "the full exhibition description text for this specific exhibition only, plain text only.",
+    "warnings": ["any issues to flag for the person reviewing this import — e.g. 'Email mentions 3 exhibitions but only 1 could be extracted here', 'Dates could not be determined from the email text', 'Exhibition URL could not be found'. Omit if no issues."],
     "decisions": {
       "title": "how you determined the exhibition title",
       "artist": "how you identified the artist(s), or why you left it blank",
@@ -334,7 +335,7 @@ function normalizeOpeningTitle(title) {
   return 'Opening Reception'
 }
 
-async function createDraft(data, subject, fromEmail, messageId, candidateImages, candidateLinks, locationName) {
+async function createDraft(data, subject, fromEmail, messageId, candidateImages, candidateLinks, locationName, warnings = []) {
   const importLines = [
     `Imported: ${new Date().toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' })}`,
     `From: ${fromEmail}`,
@@ -359,6 +360,7 @@ async function createDraft(data, subject, fromEmail, messageId, candidateImages,
     _type: 'listing',
     _id: `drafts.${crypto.randomUUID()}`,
     importNotes: importLines.join('\n'),
+    ...(warnings.length && { importWarnings: warnings.join('\n') }),
     ...(messageId && { emailMessageId: messageId }),
     ...(() => {
       // Prefer Claude's per-exhibition candidates; fall back to top images from email
@@ -451,6 +453,27 @@ async function processEmail(parsed, locations) {
   for (const data of listings) {
     if (!data.imageUrl && attachmentImageUrl) data.imageUrl = attachmentImageUrl
 
+    // Collect warnings — start with anything Claude flagged
+    const warnings = Array.isArray(data.warnings) ? [...data.warnings] : []
+
+    // Flag missing dates
+    if (!data.startDate && !data.endDate) {
+      warnings.push('⚠️ Dates could not be extracted from this email')
+    }
+
+    // Check for possible duplicate in production
+    if (data.title) {
+      try {
+        const duplicate = await getSanityProductionClient().fetch(
+          `*[_type == "listing" && !(_id in path("drafts.**")) && Event match $q][0]{ _id, Event }`,
+          { q: data.title }
+        )
+        if (duplicate) {
+          warnings.push(`⚠️ Possible duplicate — "${duplicate.Event}" already exists in the database`)
+        }
+      } catch {}
+    }
+
     // Add gallery homepage as first candidate link if Claude found one
     const listingLinks = [...links]
     if (data.galleryUrl && !listingLinks.some(l => l.url === data.galleryUrl)) {
@@ -461,7 +484,7 @@ async function processEmail(parsed, locations) {
       data.url = await resolveRedirect(data.url)
     }
     const matchedLocation = data.locationId ? locations.find(l => l._id === data.locationId) : null
-    const draft = await createDraft(data, subject, fromEmail, messageId, images, listingLinks, matchedLocation?.Name)
+    const draft = await createDraft(data, subject, fromEmail, messageId, images, listingLinks, matchedLocation?.Name, warnings)
     emailResults.push({ success: true, subject, sanityId: draft._id, title: draft.Event || null })
   }
   return emailResults
