@@ -461,19 +461,6 @@ async function processEmail(parsed, locations) {
       warnings.push('⚠️ Dates could not be extracted from this email')
     }
 
-    // Check for possible duplicate in production
-    if (data.title) {
-      try {
-        const duplicate = await getSanityProductionClient().fetch(
-          `*[_type == "listing" && !(_id in path("drafts.**")) && Event match $q][0]{ _id, Event }`,
-          { q: data.title }
-        )
-        if (duplicate) {
-          warnings.push(`⚠️ Possible duplicate — "${duplicate.Event}" already exists in the database`)
-        }
-      } catch {}
-    }
-
     // Add gallery homepage as first candidate link if Claude found one
     const listingLinks = [...links]
     if (data.galleryUrl && !listingLinks.some(l => l.url === data.galleryUrl)) {
