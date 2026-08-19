@@ -269,7 +269,7 @@ Return only a JSON array where each item represents one exhibition (use null for
       }
     ],
     "description": "the full exhibition description text for this specific exhibition only, plain text only.",
-    "warnings": ["issues to flag for the reviewer. Use only these specific warnings where applicable — do not invent other warning types: 'Exhibition URL could not be found' (if no exhibition-specific URL exists), 'Email may contain multiple exhibitions — review source email' (if the email text mentions multiple exhibitions but you could only extract one here), 'Multiple date ranges found — review dates before publishing' (if the email contains complex or multiple date ranges that don't fit neatly into start/end dates), 'Other events and possible exhibitions found in email — review source if needed' (if the email contains non-exhibition events like workshops, talks, job postings, or other noise alongside the exhibition). Omit entirely if no issues."],
+    "warnings": ["issues to flag for the reviewer. Use only these specific warnings where applicable — do not invent other warning types: 'Exhibition URL could not be found' (if no exhibition-specific URL exists), 'Multiple date ranges found — review dates before publishing' (if the email contains complex or multiple date ranges that don't fit neatly into start/end dates), 'Other events and possible exhibitions found in email — review source if needed' (if the email contains non-exhibition events like workshops, talks, job postings, other exhibitions, or other noise alongside the main exhibition). Omit entirely if no issues."],
     "decisions": {
       "title": "how you determined the exhibition title",
       "artist": "how you identified the artist(s), or why you left it blank",
