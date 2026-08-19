@@ -30,17 +30,20 @@ export const listingType = defineType({
       by: [{ field: 'StartDate', direction: 'asc' }],
     },
   ],
+  preview: {
+    select: { title: 'Event' },
+  },
   fields: [
+    defineField({
+      name: 'Event',
+      type: 'string',
+    }),
     defineField({
       name: 'importWarnings',
       title: 'Import Warnings',
       type: 'string',
       components: { input: ImportWarningsInput },
       hidden: ({ document }) => !document?.importWarnings,
-    }),
-    defineField({
-      name: 'Event',
-      type: 'string',
     }),
     defineField({
       name: 'EventUrl',
