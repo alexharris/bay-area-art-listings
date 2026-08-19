@@ -67,7 +67,7 @@ function looksLikeRedirect(url) {
     // Known broadcast/email/tracking subdomains
     if (['broadcast', 'email', 'links', 'link', 'go', 'click', 'track', 'mailings', 'r', 'e', 'redirect'].includes(subdomain)) return true
     // Mailchimp and similar tracking domains
-    if (u.hostname.includes('list-manage.com') && u.pathname.includes('/track/')) return true
+    if (u.hostname.includes('list-manage.com')) return true
     // Known click-tracking URL patterns (Constant Contact /ls/click, etc.)
     if (TRACKING_URL_PATTERNS.some(p => url.includes(p))) return true
     // Short path prefix + long opaque string: /l/abc123xyz, /t/r-l-token-, etc.
@@ -269,7 +269,7 @@ Return only a JSON array where each item represents one exhibition (use null for
       }
     ],
     "description": "the full exhibition description text for this specific exhibition only, plain text only.",
-    "warnings": ["any issues to flag for the person reviewing this import — e.g. 'Email mentions 3 exhibitions but only 1 could be extracted here', 'Dates could not be determined from the email text', 'Exhibition URL could not be found'. Omit if no issues."],
+    "warnings": ["issues to flag for the reviewer. Use only these specific warnings where applicable — do not invent other warning types: 'Exhibition URL could not be found' (if no exhibition-specific URL exists), 'Email may contain multiple exhibitions — review source email' (if the email text mentions multiple exhibitions but you could only extract one here), 'Multiple date ranges found — review dates before publishing' (if the email contains complex or multiple date ranges that don't fit neatly into start/end dates), 'Other events and possible exhibitions found in email — review source if needed' (if the email contains non-exhibition events like workshops, talks, job postings, or other noise alongside the exhibition). Omit entirely if no issues."],
     "decisions": {
       "title": "how you determined the exhibition title",
       "artist": "how you identified the artist(s), or why you left it blank",
@@ -341,6 +341,7 @@ async function createDraft(data, subject, fromEmail, messageId, candidateImages,
     `From: ${fromEmail}`,
     `Email: "${subject}"`,
     data.locationId ? `Venue: ${locationName || data.locationId}` : '⚠ No venue match — please assign manually',
+    data.decisions?.dates     ? `Dates: ${data.decisions.dates}` : null,
     '',
     'Decisions:',
     data.decisions?.title     ? `Title: ${data.decisions.title}` : null,
@@ -352,7 +353,6 @@ async function createDraft(data, subject, fromEmail, messageId, candidateImages,
         ? `Link: No exhibition URL found — using gallery homepage as fallback`
         : `Link: No exhibition URL found — please add manually`,
     data.decisions?.location  ? `Location: ${data.decisions.location}` : null,
-    data.decisions?.dates     ? `Dates: ${data.decisions.dates}` : null,
     data.decisions?.openings  ? `Openings: ${data.decisions.openings}` : null,
   ].filter(Boolean)
 
@@ -456,8 +456,8 @@ async function processEmail(parsed, locations) {
     // Collect warnings — start with anything Claude flagged
     const warnings = Array.isArray(data.warnings) ? [...data.warnings] : []
 
-    // Flag missing dates
-    if (!data.startDate && !data.endDate) {
+    // Flag missing dates — only add if Claude didn't already flag it
+    if (!data.startDate && !data.endDate && !warnings.some(w => w.toLowerCase().includes('date'))) {
       warnings.push('⚠️ Dates could not be extracted from this email')
     }
 
