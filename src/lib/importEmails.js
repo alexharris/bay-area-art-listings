@@ -462,13 +462,11 @@ async function processEmail(parsed, locations) {
     }
 
     // Check for possible duplicate in production
-    // Search using both title and artist since Event field stores "Artist: Title"
     if (data.title) {
       try {
-        const searchTerms = [data.title, data.artist].filter(Boolean).join(' ')
         const duplicate = await getSanityProductionClient().fetch(
-          `*[_type == "listing" && !(_id in path("drafts.**")) && (Event match $q || Event match $title)][0]{ _id, Event }`,
-          { q: searchTerms, title: data.title }
+          `*[_type == "listing" && !(_id in path("drafts.**")) && Event match $q][0]{ _id, Event }`,
+          { q: data.title }
         )
         if (duplicate) {
           warnings.push(`⚠️ Possible duplicate — "${duplicate.Event}" already exists in the database`)
