@@ -485,7 +485,7 @@ async function processEmail(parsed, locations) {
     }
     const matchedLocation = data.locationId ? locations.find(l => l._id === data.locationId) : null
     const draft = await createDraft(data, subject, fromEmail, messageId, images, listingLinks, matchedLocation?.Name, warnings)
-    emailResults.push({ success: true, subject, sanityId: draft._id, title: draft.Event || null })
+    emailResults.push({ success: true, subject, sanityId: draft._id, title: draft.Event || null, warnings })
   }
   return emailResults
 }

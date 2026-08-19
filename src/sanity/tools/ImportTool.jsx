@@ -110,14 +110,24 @@ export function ImportTool() {
                           <Text size={1} muted style={{ fontStyle: 'italic' }}>
                             {subject} — {items.length} shows
                           </Text>
-                          {items.map((r, i) => (
-                            <Text key={i} size={1} style={{ paddingLeft: 12 }}>
-                              ✓ {r.title || '(untitled)'}
-                            </Text>
-                          ))}
+                          {items.map((r, i) => {
+                            const isDuplicate = r.warnings?.some(w => w.toLowerCase().includes('duplicate'))
+                            return (
+                              <Text key={i} size={1} style={{ paddingLeft: 12 }}>
+                                ✓ {r.title || '(untitled)'}{isDuplicate ? ' ⚠️ possible duplicate' : ''}
+                              </Text>
+                            )
+                          })}
                         </>
                       ) : (
-                        <Text size={1}>✓ {items[0].title || subject}</Text>
+                        (() => {
+                          const isDuplicate = items[0].warnings?.some(w => w.toLowerCase().includes('duplicate'))
+                          return (
+                            <Text size={1}>
+                              ✓ {items[0].title || subject}{isDuplicate ? ' ⚠️ possible duplicate' : ''}
+                            </Text>
+                          )
+                        })()
                       )}
                     </Stack>
                   </Card>
