@@ -31,7 +31,7 @@ export const listingType = defineType({
     },
   ],
   preview: {
-    select: { title: 'Event' },
+    select: { title: 'Event', media: 'EventImageUpload' },
   },
   fields: [
     defineField({
