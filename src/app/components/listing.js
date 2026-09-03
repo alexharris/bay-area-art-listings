@@ -7,6 +7,7 @@ import HoursPopup from './HoursPopup';
 import FavoriteButton from './FavoriteButton';
 import { Badge } from '@/components/ui/badge';
 import { generateSlug, getTodayName, cityFromAddress } from '../../utils/shared';
+import { linkifyText } from '../../utils/linkifyText';
 
 export default function Listings({
   listings,
@@ -155,7 +156,7 @@ export default function Listings({
                 />
               </div>
             </div>
-            {opening.note && <div className="text-gray-600 pl-3.5">{opening.note}</div>}
+            {opening.note && <div className="text-gray-600 pl-3.5">{linkifyText(opening.note)}</div>}
           </div>
           );
         })}

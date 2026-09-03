@@ -139,7 +139,7 @@ export const listingType = defineType({
           defineField({ name: 'title', title: 'Title', type: 'string', validation: Rule => Rule.required() }),
           defineField({ name: 'date', title: 'Date', type: 'date', options: { dateFormat: 'MMMM D, YYYY' }, validation: Rule => Rule.required() }),
           defineField({ name: 'time', title: 'Time', type: 'string', description: 'e.g., "6-9pm"' }),
-          defineField({ name: 'note', title: 'Note', type: 'string' }),
+          defineField({ name: 'note', title: 'Note', type: 'string', description: 'Supports links: [link text](https://example.com)' }),
         ],
         preview: {
           select: { title: 'title', date: 'date', time: 'time' },

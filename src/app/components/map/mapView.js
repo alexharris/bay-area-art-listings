@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import { extractPortableTextContent } from '../../../utils/helpers';
+import { linkifyText } from '../../../utils/linkifyText';
 import HoursPopup from '../HoursPopup';
 import { formatDate, getTodayName, generateSlug, cityFromAddress } from '../../../utils/shared';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
@@ -80,7 +81,7 @@ function renderOpenings(item) {
                                 />
                             </div>
                         </div>
-                        {opening.note && <div className="text-gray-600 pl-3.5">{opening.note}</div>}
+                        {opening.note && <div className="text-gray-600 pl-3.5">{linkifyText(opening.note)}</div>}
                     </div>
                 );
             })}

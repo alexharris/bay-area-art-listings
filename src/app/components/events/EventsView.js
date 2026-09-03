@@ -3,6 +3,7 @@
 import { haversineDistance } from '../../../utils/distance';
 import { generateSlug, cityFromAddress } from '../../../utils/shared';
 import { extractPortableTextContent } from '../../../utils/helpers';
+import { linkifyText } from '../../../utils/linkifyText';
 
 function toDateStr(date) {
     if (!date) return null;
@@ -105,7 +106,7 @@ export default function EventsView({ listings, calendarDateRangeFilter, selected
                                 <p className="text-base text-gray-700 font-medium">{event.title}</p>
                                 {event.time && <p className="text-sm text-gray-700">{event.time}</p>}
                                 <button onClick={() => onShowSelect?.(generateSlug(event.listing.Event))} className="text-sm text-gray-700 truncate block hover:underline text-left w-full">Part of: {event.listing.Event}</button>
-                                {event.note && <p className="text-sm text-gray-700">{event.note}</p>}
+                                {event.note && <p className="text-sm text-gray-700">{linkifyText(event.note)}</p>}
                             </div>
                         ))}
                     </div>
