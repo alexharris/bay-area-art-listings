@@ -46,7 +46,7 @@ export default function EventsView({ listings, calendarDateRangeFilter, selected
                     if (o.date < todayStr) return false;
                     if (fromStr && o.date < fromStr) return false;
                     if (toStr && o.date > toStr) return false;
-                    if (openingsOnly && !o.title?.toLowerCase().includes('opening reception')) return false;
+                    if (openingsOnly && !o.title?.toLowerCase().includes('opening')) return false;
                     return true;
                 })
                 .map(opening => ({ ...opening, listing }))

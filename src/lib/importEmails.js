@@ -261,8 +261,9 @@ Return only a JSON array where each item represents one exhibition (use null for
     "startDate": "YYYY-MM-DD or null. CRITICAL: if no year is explicitly stated in the email, always use ${currentYear}. Never infer the year from the day of the week or any other reasoning. Never use a past year.",
     "endDate": "YYYY-MM-DD or null. Same rule: if no year is stated, use ${currentYear}.",
     "openings": [
+      // one object per distinct date+time. If parts of an event happen at different dates or times (e.g. artist talk 5pm, reception 6–8pm), return a separate object for each.
       {
-        "title": "use 'Opening Reception' if it's a reception for the opening of the show, regardless of how the email words it. If the event also includes something else (e.g. an artist talk, performance, panel), append it: 'Opening Reception & Artist Talk'. Use exact wording only for standalone non-opening events like 'Closing Reception', 'Artist Talk', 'Panel Discussion'.",
+        "title": "If the email calls it an 'opening' or 'opening reception' (or just 'reception' for the show's opening), use 'Opening Reception'. If the email uses distinct wording for the opening, keep it as written (e.g. 'Opening Night Party', 'Opening Celebration'). If several parts happen at the SAME date and time, combine them into one title without repeating 'Opening': 'Opening Reception & Celebration', 'Opening Reception & Artist Talk'. Never repeat a word, e.g. never 'Opening Reception & Opening'. Use exact wording for non-opening events like 'Closing Reception', 'Artist Talk', 'Panel Discussion'.",
         "date": "YYYY-MM-DD",
         "time": "e.g. 6–9pm",
         "note": "any extra detail or null"
@@ -311,28 +312,27 @@ function toPortableText(text) {
   }))
 }
 
-const OPENING_RECEPTION_TERMS = ['reception', 'opening night', 'opening event', 'opening party', 'artist reception', 'join us', 'opening']
+// Bare or wordy ways of saying "the opening" that should read as plain "Opening Reception"
+const PLAIN_OPENING = /^(please\s+)?(join us( for)?\s+)?(the|our|an?)?\s*(opening|reception|opening reception|artists?'?s? reception|opening event)$/i
 
+// Safety net for AI-written titles: collapse plain openings to "Opening Reception" and drop a repeated
+// "Opening" ("Opening Reception & Opening Celebration" -> "Opening Reception & Celebration").
+// Distinct wording like "Opening Night Party" is left alone.
 function normalizeOpeningTitle(title) {
-  const lower = title.toLowerCase()
-  if (lower === 'closing reception') return title
+  const trimmed = title.trim().replace(/\s+/g, ' ')
+  if (PLAIN_OPENING.test(trimmed)) return 'Opening Reception'
 
-  const matchedTerm = OPENING_RECEPTION_TERMS.find(t => lower.includes(t))
-  if (!matchedTerm) return title
+  const match = trimmed.match(/^(.*?\bopening reception\b)(.*)$/i)
+  if (!match) return trimmed
 
-  // Strip the matched opening term plus common filler words, keep the rest
-  const extra = lower
-    .replace(matchedTerm, '')
-    .replace(/\b(and|&|\+|with|for|the|an|a|our|this|please|join|us|to)\b/g, ' ')
-    .replace(/[^\w\s]/g, ' ')
+  const extra = match[2]
+    .replace(/\b(opening|reception)\b/gi, ' ')
+    .replace(/^[\s&+,:\-–—]*(and|with)?[\s&+,:\-–—]*/i, '')
     .replace(/\s+/g, ' ')
     .trim()
 
-  if (extra.length > 2) {
-    return `Opening Reception & ${extra.charAt(0).toUpperCase()}${extra.slice(1)}`
-  }
-
-  return 'Opening Reception'
+  if (!extra) return 'Opening Reception'
+  return `Opening Reception & ${extra.charAt(0).toUpperCase()}${extra.slice(1)}`
 }
 
 async function createDraft(data, subject, fromEmail, messageId, candidateImages, candidateLinks, locationName, warnings = []) {
