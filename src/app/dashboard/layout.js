@@ -1,6 +1,7 @@
 export const metadata = {
-  title: 'Dashboard | Bay Area Art Listings',
+  title: 'Dashboard',
   description: 'Statistics and insights for Bay Area art shows',
+  robots: { index: false, follow: false },
 };
 
 export default function DashboardLayout({ children }) {

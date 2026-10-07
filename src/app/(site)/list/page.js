@@ -2,6 +2,10 @@ import { getListingsByIds } from '@/app/components/getListings';
 import SharedListView from '@/app/components/SharedListView';
 import Link from 'next/link';
 
+export const metadata = {
+  robots: { index: false, follow: true },
+};
+
 export default async function SharedListPage({ searchParams }) {
   const { ids: idsParam, name } = await searchParams;
   const ids = idsParam ? idsParam.split(',').filter(Boolean) : [];

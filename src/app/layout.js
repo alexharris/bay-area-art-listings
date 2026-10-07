@@ -11,13 +11,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteTitle = "Art Board | Bay Area Art Exhibitions & Gallery Openings";
+const siteDescription = "Current and upcoming art exhibitions, gallery openings, and museum shows across the San Francisco Bay Area.";
+
 export const metadata = {
-  title: "Art Board",
-  description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
+  title: {
+    default: siteTitle,
+    template: "%s | Art Board",
+  },
+  description: siteDescription,
   metadataBase: new URL("https://bayareaartlist.com"),
   openGraph: {
     title: "Art Board",
-    description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
+    description: siteDescription,
     url: "https://bayareaartlist.com",
     siteName: "Art Board",
     images: [
@@ -33,7 +39,7 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Art Board",
-    description: "A directory of visual arts exhibitions in the San Francisco Bay Area.",
+    description: siteDescription,
     images: ["/favicon/opengraph-image.png"],
   },
   icons: {
@@ -56,9 +62,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <meta itemProp="name" content="Art Board"></meta>
-        <meta itemProp="description" content="A directory of visual arts exhibitions in the San Francisco Bay Area."></meta>
-        <meta itemProp="image" content="https://bayareaartlist.com/favicon/opengraph-image.png"></meta>
         <script src="https://cdn.usefathom.com/script.js" data-site="RPZZSMRK" defer></script>
       </head>
       <body
