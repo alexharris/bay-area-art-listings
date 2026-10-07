@@ -45,7 +45,8 @@ function computeIsOnViewToday(item) {
 export default async function getListings() {
   try {
 
-    let today = new Date().toISOString().split('T')[0];
+    // Pacific Time, so shows ending today stay listed through the evening
+    let today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
     // get the listings
     let data = await client.fetch(`
       *[_type == "listing" && EndDate >= $today] {

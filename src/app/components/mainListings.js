@@ -32,7 +32,7 @@ const sortLabels = {
     recentlyAdded: 'Recently Added',
 };
 
-function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
+function DisplayListingsInner({ newsletterSettings, sharedSlug, initialListings, initialLocations }) {
     // Get today's date in US West Coast (Pacific Time) - memoized to prevent recreation
     const today = useMemo(() => {
         return new Date(
@@ -59,8 +59,8 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
 
 
     // Fetch data with SWR caching (instant on repeat visits)
-    const { listings, isLoading: listingsLoading } = useListings();
-    const { locations, isLoading: locationsLoading } = useLocations();
+    const { listings, isLoading: listingsLoading } = useListings(initialListings);
+    const { locations, isLoading: locationsLoading } = useLocations(initialLocations);
     const loading = listingsLoading || locationsLoading;
 
     const [sharedSlugNotFound, setSharedSlugNotFound] = useState(false);
@@ -86,7 +86,13 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
 
     // Filtering
     const [calendarTypeFilter, setCalendarTypeFilter] = useState('onview'); // onview, opening, closing
-    const [calendarDateRangeFilterInternal, setCalendarDateRangeFilterInternal] = useState(null); // actual date range to filter on
+    // actual date range to filter on — defaults to "anytime" (start of month + 10 years).
+    // Initialized synchronously so the server render already has filtered listings.
+    const [calendarDateRangeFilterInternal, setCalendarDateRangeFilterInternal] = useState(() => {
+        const tenYearsFromNow = new Date(startOfMonth);
+        tenYearsFromNow.setFullYear(tenYearsFromNow.getFullYear() + 10);
+        return { from: startOfMonth, to: tenYearsFromNow };
+    });
 
     // Wrap the setter to prevent updates if dates haven't actually changed
     const setCalendarDateRangeFilter = useCallback((newRange) => {
@@ -105,7 +111,6 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
 
     const calendarDateRangeFilter = calendarDateRangeFilterInternal;
 
-    const [filteredListings, setFilteredListings] = useState([]);
     const [highlightsOnly, setHighlightsOnly] = useState(false);
     const [onViewToday, setOnViewToday] = useState(false);
     const [endingSoonOnly, setEndingSoonOnly] = useState(false);
@@ -134,11 +139,10 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
     const [locationLoading, setLocationLoading] = useState(false);
     //  Sorting
     // Display
-    const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('custom');
+    const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('anytime');
     const [activeView, setActiveView] = useState('exhibitions');
     const isMapView = activeView === 'map';
     const setIsMapView = (val) => setActiveView(val ? 'map' : 'exhibitions');
-    const [displayedResults, setDisplayedResults] = useState(0); // number of results
     const [showMenu, setShowMenu] = useState(false);
 
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
@@ -152,9 +156,6 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
 
     // Mobile UI state
     const [mobileSortOpen, setMobileSortOpen] = useState(false);
-
-    // Use ref to track if initial setup is complete
-    const isInitialized = useRef(false);
 
     // Count future openings per county for the events view where filter
     const eventCountsByCounty = useMemo(() => {
@@ -234,28 +235,15 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
         nearbyRadius,
     ]);
 
-    // Set initial calendar filter defaults
+    // Filtered + sorted listings, computed during render so SSR output includes them
+    const filteredListings = useMemo(
+        () => applySorting(getFilteredListings(currentFilters, listings), sortMethod),
+        [currentFilters, listings, sortMethod]
+    );
+    const displayedResults = filteredListings.length;
+
+    // Update filter counts when filters change
     useEffect(() => {
-        if (!isInitialized.current) {
-            const tenYearsFromNow = new Date(startOfMonth);
-            tenYearsFromNow.setFullYear(tenYearsFromNow.getFullYear() + 10);
-            setCalendarDateRangeFilter({ from: startOfMonth, to: tenYearsFromNow });
-            setCalendarDateRangePreset('anytime');
-            isInitialized.current = true;
-        }
-    }, [startOfMonth, setCalendarDateRangeFilter]);
-
-    // Update filtered listings when filters change
-    useEffect(() => {
-        // Don't run until initialized
-        if (!calendarDateRangeFilter) return;
-
-        const filteredListings = getFilteredListings(currentFilters, listings);
-        const sortedListings = applySorting(filteredListings, sortMethod);
-
-        setFilteredListings(sortedListings);
-        setDisplayedResults(filteredListings.length);
-
         // Calculate calendar type counts for the "What" dropdown
         if (listings && listings.length > 0) {
             const typeCounts = getCalendarTypeCounts(currentFilters, listings);
@@ -283,7 +271,7 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
             });
         }
 
-    }, [currentFilters, listings, sortMethod, calendarDateRangeFilter]);
+    }, [currentFilters, listings]);
 
     // Auto-adjust sort method based on calendar type filter
     useEffect(() => {
@@ -701,10 +689,15 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug }) {
 
 }
 
-export default function DisplayListings({ newsletterSettings, sharedSlug }) {
+export default function DisplayListings({ newsletterSettings, sharedSlug, initialListings, initialLocations }) {
     return (
         <FavoritesProvider>
-            <DisplayListingsInner newsletterSettings={newsletterSettings} sharedSlug={sharedSlug} />
+            <DisplayListingsInner
+                newsletterSettings={newsletterSettings}
+                sharedSlug={sharedSlug}
+                initialListings={initialListings}
+                initialLocations={initialLocations}
+            />
         </FavoritesProvider>
     );
 }

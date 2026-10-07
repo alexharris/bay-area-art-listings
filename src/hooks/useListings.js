@@ -9,11 +9,12 @@ import getLocations from '../app/components/getLocations';
  * - Revalidates in background to keep data fresh
  * - Deduplicates simultaneous requests
  */
-export function useListings() {
+export function useListings(fallbackData) {
     const { data, error, isLoading, mutate } = useSWR(
         'listings',
         getListings,
         {
+            fallbackData,                  // Server-rendered data, so first paint (and crawlers) get listings
             revalidateOnFocus: false,      // Don't refetch when tab regains focus
             revalidateOnReconnect: true,   // Refetch when network reconnects
             dedupingInterval: 60000,       // Dedupe requests within 1 minute
@@ -26,7 +27,8 @@ export function useListings() {
 
     return {
         listings,
-        isLoading,
+        // SWR reports isLoading while revalidating even when fallbackData is present
+        isLoading: isLoading && !data,
         isError: error,
         refresh: mutate,  // Call this to manually refresh data
     };
@@ -35,11 +37,12 @@ export function useListings() {
 /**
  * Custom hook for fetching locations with SWR caching
  */
-export function useLocations() {
+export function useLocations(fallbackData) {
     const { data, error, isLoading, mutate } = useSWR(
         'locations',
         getLocations,
         {
+            fallbackData,
             revalidateOnFocus: false,
             revalidateOnReconnect: true,
             dedupingInterval: 60000,
@@ -52,7 +55,8 @@ export function useLocations() {
 
     return {
         locations,
-        isLoading,
+        // SWR reports isLoading while revalidating even when fallbackData is present
+        isLoading: isLoading && !data,
         isError: error,
         refresh: mutate,
     };
