@@ -166,7 +166,11 @@ export default function Listings({
 
   return (
     <ul id="list-view" className="w-full px-3 md:p-2 lg:px-4">
-      {listings.map((item, index) => (
+      {listings.map((item, index) => {
+        // First listings' mobile image is the LCP element on phones — load it eagerly at high priority.
+        // Everything else (including hidden desktop thumbnails) loads lazily.
+        const isLcpCandidate = index < 2;
+        return (
         <li
           id={generateSlug(item.Event)}
           className={`border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col md:flex-row justify-between gap-4${highlightSlug && generateSlug(item.Event) === highlightSlug ? ' listing-highlight' : ''}`}
@@ -194,6 +198,8 @@ export default function Listings({
                       src={item.eventImageUrl}
                       alt={item.eventImageCaption || item.Event}
                       className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                   )}
                 </div>
@@ -215,12 +221,16 @@ export default function Listings({
                         fill
                         className="object-cover"
                         unoptimized
+                        priority={isLcpCandidate}
                       />
                     ) : (
                       <img
                         src={item.eventImageUrl}
                         alt={item.eventImageCaption || item.Event}
                         className="w-full h-full object-cover"
+                        loading={isLcpCandidate ? 'eager' : 'lazy'}
+                        fetchPriority={isLcpCandidate ? 'high' : 'auto'}
+                        decoding="async"
                       />
                     )}
                   </div>
@@ -393,7 +403,8 @@ export default function Listings({
             </div>
           )}
         </li>
-      ))}
+        );
+      })}
     </ul>
   );
 }
