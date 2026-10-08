@@ -222,6 +222,7 @@ export default function Listings({
                         className="object-cover"
                         unoptimized
                         priority={isLcpCandidate}
+                        fetchPriority={isLcpCandidate ? 'high' : undefined}
                       />
                     ) : (
                       <img
