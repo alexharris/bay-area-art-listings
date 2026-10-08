@@ -5,6 +5,6 @@ export default function robots() {
       allow: '/',
       disallow: ['/studio', '/dashboard', '/styleguide', '/list', '/show', '/api'],
     },
-    sitemap: 'https://bayareaartlist.com/sitemap.xml',
+    sitemap: 'https://artboard.info/sitemap.xml',
   };
 }

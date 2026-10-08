@@ -20,11 +20,11 @@ export const metadata = {
     template: "%s | Art Board",
   },
   description: siteDescription,
-  metadataBase: new URL("https://bayareaartlist.com"),
+  metadataBase: new URL("https://artboard.info"),
   openGraph: {
     title: "Art Board",
     description: siteDescription,
-    url: "https://bayareaartlist.com",
+    url: "https://artboard.info",
     siteName: "Art Board",
     images: [
       {

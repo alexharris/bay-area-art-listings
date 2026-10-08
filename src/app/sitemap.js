@@ -17,7 +17,7 @@ export default async function sitemap() {
 
   return [
     {
-      url: 'https://bayareaartlist.com',
+      url: 'https://artboard.info',
       lastModified,
       changeFrequency: 'daily',
       priority: 1,
