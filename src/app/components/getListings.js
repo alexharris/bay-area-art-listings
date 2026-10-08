@@ -73,7 +73,7 @@ export default async function getListings() {
       
       // Uploaded image takes priority over URL string
       if (listing.EventImageUpload) {
-        eventImageUrl = urlFor(listing.EventImageUpload).width(400).height(400).fit('crop').url();
+        eventImageUrl = urlFor(listing.EventImageUpload).width(400).height(400).fit('crop').auto('format').url();
       } else if (listing.EventImageUrl) {
         eventImageUrl = listing.EventImageUrl;
         eventImageCaption = listing.EventImageCaption;

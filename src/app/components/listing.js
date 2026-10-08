@@ -186,7 +186,8 @@ export default function Listings({
                       alt={item.eventImageCaption || item.Event}
                       fill
                       className="object-cover"
-                      sizes="144px"
+                      // Sanity already serves a cropped 400px thumbnail; skip next/image's srcSet
+                      unoptimized
                     />
                   ) : (
                     <img
@@ -213,7 +214,7 @@ export default function Listings({
                         alt={item.eventImageCaption || item.Event}
                         fill
                         className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 0px"
+                        unoptimized
                       />
                     ) : (
                       <img

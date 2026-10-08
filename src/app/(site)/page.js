@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import MainListings from "../components/mainListings";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
@@ -14,6 +15,19 @@ function stripInternalFields(listing) {
   for (const field of INTERNAL_FIELDS) delete clean[field];
   return clean;
 }
+
+// Cache the Sanity fetch across requests; new/edited listings appear within a minute
+const getHomepageData = unstable_cache(
+  async () => {
+    const [listings, locations] = await Promise.all([getListings(), getLocations()]);
+    return {
+      listings: listings?.map(stripInternalFields),
+      locations: locations?.map(({ InternalNotes, ...location }) => location),
+    };
+  },
+  ['homepage-data'],
+  { revalidate: 60 }
+);
 
 // schema.org ExhibitionEvent markup so search engines understand the listings as events
 function buildStructuredData(listings) {
@@ -107,14 +121,12 @@ export async function generateMetadata({ searchParams }) {
 }
 
 export default async function Home({ searchParams }) {
-  const [settings, { show }, listings, locations] = await Promise.all([
+  const [settings, { show }, homepageData] = await Promise.all([
     getSettings(),
     searchParams,
-    getListings().catch(() => undefined),
-    getLocations().catch(() => undefined),
+    getHomepageData().catch(() => ({})),
   ]);
-  const initialListings = listings?.map(stripInternalFields);
-  const initialLocations = locations?.map(({ InternalNotes, ...location }) => location);
+  const { listings: initialListings, locations: initialLocations } = homepageData;
 
   return (
     <div className="flex flex-col items-start justify-between min-h-screen gap-8 font-[family-name:var(--font-geist-sans)]">
