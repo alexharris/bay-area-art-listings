@@ -682,6 +682,7 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialLoca
                                 openingTodayOnly={openingTodayOnly}
                                 setOpeningTodayOnly={setOpeningTodayOnly}
                                 highlightSlug={sharedSlug}
+                                scrollTargetSlug={pendingScrollSlug}
                             />
                         ) : null}
                     </>

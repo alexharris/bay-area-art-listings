@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import CalendarLink from './CalendarLink';
 import NotesRenderer from './NotesRenderer';
@@ -8,6 +8,11 @@ import FavoriteButton from './FavoriteButton';
 import { Badge } from '@/components/ui/badge';
 import { generateSlug, getTodayName, cityFromAddress } from '../../utils/shared';
 import { linkifyText } from '../../utils/linkifyText';
+
+// Render the first listings up front (server HTML + hydration) and the rest in batches as the
+// user scrolls near the bottom — keeps the initial HTML, DOM and hydration work small.
+const INITIAL_RENDER_COUNT = 30;
+const RENDER_BATCH_SIZE = 30;
 
 export default function Listings({
   listings,
@@ -19,7 +24,30 @@ export default function Listings({
   openingTodayOnly,
   setOpeningTodayOnly,
   highlightSlug,
+  scrollTargetSlug,
 }) {
+  const [renderLimit, setRenderLimit] = useState(INITIAL_RENDER_COUNT);
+  const sentinelRef = useRef(null);
+
+  // Always render far enough to include a listing we're about to scroll to (share link / events view)
+  const targetSlug = scrollTargetSlug || highlightSlug;
+  const targetIndex = targetSlug ? listings.findIndex(item => generateSlug(item.Event) === targetSlug) : -1;
+  const renderCount = Math.max(renderLimit, targetIndex + 1);
+  const hasMore = renderCount < listings.length;
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!hasMore || !el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setRenderLimit(limit => Math.max(limit, renderCount) + RENDER_BATCH_SIZE);
+      },
+      { rootMargin: '2000px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasMore, renderCount]);
+
   const [copiedSlug, setCopiedSlug] = useState(null);
   const [tooltipSlug, setTooltipSlug] = useState(null);
 
@@ -164,7 +192,7 @@ export default function Listings({
 
   return (
     <ul id="list-view" className="w-full px-3 md:p-2 lg:px-4">
-      {listings.map((item, index) => {
+      {listings.slice(0, renderCount).map((item, index) => {
         // First listings' image is the LCP element on phones — load it eagerly at high priority.
         const isLcpCandidate = index < 2;
         const openings = renderOpenings(item);
@@ -309,6 +337,7 @@ export default function Listings({
         </li>
         );
       })}
+      {hasMore && <li ref={sentinelRef} aria-hidden="true" className="h-px" />}
     </ul>
   );
 }
