@@ -20,8 +20,6 @@ export default function Listings({
   setOpeningTodayOnly,
   highlightSlug,
 }) {
-  const [showDetails, setShowDetails] = useState({});
-  const [venueOpen, setVenueOpen] = useState({});
   const [copiedSlug, setCopiedSlug] = useState(null);
   const [tooltipSlug, setTooltipSlug] = useState(null);
 
@@ -167,23 +165,29 @@ export default function Listings({
   return (
     <ul id="list-view" className="w-full px-3 md:p-2 lg:px-4">
       {listings.map((item, index) => {
-        // First listings' mobile image is the LCP element on phones — load it eagerly at high priority.
-        // Everything else (including hidden desktop thumbnails) loads lazily.
+        // First listings' image is the LCP element on phones — load it eagerly at high priority.
         const isLcpCandidate = index < 2;
+        const openings = renderOpenings(item);
         return (
         <li
           id={generateSlug(item.Event)}
-          className={`border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col md:flex-row justify-between gap-4${highlightSlug && generateSlug(item.Event) === highlightSlug ? ' listing-highlight' : ''}`}
+          className={`border-b min-h-40 border-dashed border-gray-400 py-5 w-full relative flex flex-col gap-2 md:flex-row md:gap-4 justify-between${highlightSlug && generateSlug(item.Event) === highlightSlug ? ' listing-highlight' : ''}`}
           key={item._id || index}
         >
+          {/*
+            Each piece renders once. On mobile the wrapper divs are `display: contents`, so the
+            pieces become direct flex items of the <li> and are arranged with order-*; from md up
+            the wrappers are real flex containers and DOM order applies (md:order-none).
+            Mobile order: image, title, date, badges, notes, actions, openings, venue.
+          */}
 
-          {/* Left Column - Title + image + (notes on desktop) */}
-          <div className="flex flex-col md:flex-row lg:flex-row gap-4 w-full md:w-1/2 lg:w-2/3 xl:w-1/2">
+          {/* Left Column - image + title/date/notes/actions */}
+          <div className="contents md:flex md:flex-row gap-4 w-full md:w-1/2 lg:w-2/3 xl:w-1/2">
 
-            {/* Desktop gallery well — hidden on mobile */}
+            {/* Gallery well — full-width 4:3 on mobile, 144px square thumbnail on desktop */}
             {item.eventImageUrl && (
-              <div className="hidden md:flex flex-col flex-shrink-0 gap-1.5">
-                <div className="relative w-36 h-36 bg-gray-100 rounded overflow-hidden">
+              <div className="order-1 md:order-none mb-1 md:mb-0 w-full md:w-36 flex flex-col flex-shrink-0 md:gap-1.5 bg-gray-100 md:bg-transparent rounded overflow-hidden md:overflow-visible">
+                <div className="relative w-full aspect-[4/3] md:w-36 md:h-36 md:aspect-auto bg-gray-100 md:rounded overflow-hidden">
                   {item.eventImageUrl.includes('cdn.sanity.io') ? (
                     <Image
                       src={item.eventImageUrl}
@@ -192,57 +196,29 @@ export default function Listings({
                       className="object-cover"
                       // Sanity already serves a cropped 400px thumbnail; skip next/image's srcSet
                       unoptimized
+                      priority={isLcpCandidate}
+                      fetchPriority={isLcpCandidate ? 'high' : undefined}
                     />
                   ) : (
                     <img
                       src={item.eventImageUrl}
                       alt={item.eventImageCaption || item.Event}
                       className="w-full h-full object-cover"
-                      loading="lazy"
+                      loading={isLcpCandidate ? 'eager' : 'lazy'}
+                      fetchPriority={isLcpCandidate ? 'high' : 'auto'}
                       decoding="async"
                     />
                   )}
                 </div>
                 {item.eventImageCaption && (
-                  <p className="text-xs text-gray-400 w-36 leading-snug">{item.eventImageCaption}</p>
+                  <p className="text-xs text-gray-400 px-2.5 py-2 md:p-0 md:w-36 leading-snug">{item.eventImageCaption}</p>
                 )}
               </div>
             )}
 
-            <div className="flex flex-col flex-1">
-              {/* Mobile gallery well — above title on mobile */}
-              {item.eventImageUrl && (
-                <div className="md:hidden w-full bg-gray-100 rounded overflow-hidden mb-3">
-                  <div className="relative w-full aspect-[4/3]">
-                    {item.eventImageUrl.includes('cdn.sanity.io') ? (
-                      <Image
-                        src={item.eventImageUrl}
-                        alt={item.eventImageCaption || item.Event}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                        priority={isLcpCandidate}
-                        fetchPriority={isLcpCandidate ? 'high' : undefined}
-                      />
-                    ) : (
-                      <img
-                        src={item.eventImageUrl}
-                        alt={item.eventImageCaption || item.Event}
-                        className="w-full h-full object-cover"
-                        loading={isLcpCandidate ? 'eager' : 'lazy'}
-                        fetchPriority={isLcpCandidate ? 'high' : 'auto'}
-                        decoding="async"
-                      />
-                    )}
-                  </div>
-                  {item.eventImageCaption && (
-                    <p className="text-xs text-gray-400 px-2.5 py-2 leading-snug">{item.eventImageCaption}</p>
-                  )}
-                </div>
-              )}
-
+            <div className="contents md:flex md:flex-col md:flex-1">
               {/* Title */}
-              <div className="md:-mt-1 mb-2">
+              <div className="order-2 md:order-none md:-mt-1 md:mb-2">
                 {item.EventUrl
                   ? <a
                       href={item.EventUrl}
@@ -259,17 +235,17 @@ export default function Listings({
               </div>
 
               {/* Date */}
-              <div className="font-semibold mb-1">
+              <div className="order-3 md:order-none font-semibold mb-3 md:mb-1">
                 <CalendarLink listing={item} location="" dateLabel={item.DateOverride || `${formatDate(item.StartDate)} - ${formatDate(item.EndDate)}`} />
               </div>
 
-              {/* Notes — desktop only */}
-              <div className="hidden md:block">
+              {/* Notes */}
+              <div className="order-5 md:order-none">
                 <NotesRenderer notes={item.Notes} itemIndex={index} />
               </div>
 
-              {/* Actions — desktop only */}
-              <div className="hidden md:flex items-center gap-1 mt-2">
+              {/* Actions */}
+              <div className="order-6 md:order-none flex items-center gap-1 md:mt-2">
                 <FavoriteButton listingId={item._id} />
                 <button
                   onClick={() => handleShare(item)}
@@ -291,19 +267,18 @@ export default function Listings({
             </div>
           </div>
 
-          {/* Right Side Container - Subevents and Location */}
-          <div className="hidden md:flex md:flex-row lg:flex-col xl:flex-row items-start gap-2 lg:gap-4 md:w-1/2 lg:w-1/3 xl:w-1/2">
+          {/* Right Side Container - openings/badges and venue */}
+          <div className="contents md:flex md:flex-row lg:flex-col xl:flex-row items-start gap-2 lg:gap-4 md:w-1/2 lg:w-1/3 xl:w-1/2">
 
-            {/* Badges + subevents — desktop only, always reserve space */}
-            <div className="hidden md:flex flex-col gap-2 w-full">
-              {renderOpenings(item) && (
-                <>
-                  <div className="text-xs uppercase tracking-wider text-gray-400">Upcoming Events</div>
-                  {renderOpenings(item)}
-                </>
+            <div className="contents md:flex md:flex-col gap-2 w-full">
+              {openings && (
+                <div className="order-7 md:order-none flex flex-col md:gap-2">
+                  <div className="hidden md:block text-xs uppercase tracking-wider text-gray-400">Upcoming Events</div>
+                  {openings}
+                </div>
               )}
               {(shouldShowOpenToday(item) || item.StartDate || item.EndDate) && (
-                <div className="flex flex-row flex-wrap gap-2">
+                <div className="order-4 md:order-none flex flex-row flex-wrap gap-2">
                   <DateNote
                     startDate={item.StartDate}
                     endDate={item.EndDate}
@@ -325,84 +300,12 @@ export default function Listings({
               )}
             </div>
 
-            {/* Venue section — desktop only (mobile renders at bottom of li) */}
-            <div className="hidden md:block w-full">
+            {/* Venue */}
+            <div className="order-8 md:order-none mt-2 md:mt-0 w-full">
               {renderVenueCard(item, index)}
             </div>
 
           </div>
-
-          {/* Notes + badges + openings — mobile only */}
-          <div className="md:hidden flex flex-col gap-2">
-            <div className="flex flex-row flex-wrap gap-2">
-              <DateNote
-                startDate={item.StartDate}
-                endDate={item.EndDate}
-                endingSoonOnly={endingSoonOnly}
-                setEndingSoonOnly={setEndingSoonOnly}
-                openingTodayOnly={openingTodayOnly}
-                setOpeningTodayOnly={setOpeningTodayOnly}
-              />
-              {shouldShowOpenToday(item) && (
-                <Badge
-                  variant="outline"
-                  className="!border-green-300 text-black hover:bg-green-50 cursor-pointer transition-colors"
-                  onClick={() => setOnViewToday(!onViewToday)}
-                >
-                  On View Today
-                </Badge>
-              )}
-            </div>
-            <NotesRenderer notes={item.Notes} itemIndex={index} />
-            <div className="flex items-center gap-1">
-              <FavoriteButton listingId={item._id} />
-              <button
-                onClick={() => handleShare(item)}
-                aria-label="Share"
-                className={`pt-0 pb-1 px-1 -mt-2 relative ${copiedSlug === generateSlug(item.Event) ? 'share-icon-active' : 'text-gray-400 hover:text-gray-600'}`}
-              >
-                {tooltipSlug === generateSlug(item.Event) && (
-                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap pointer-events-none">
-                    Copied!
-                  </span>
-                )}
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                  <polyline points="16 6 12 2 8 6"/>
-                  <line x1="12" y1="2" x2="12" y2="15"/>
-                </svg>
-              </button>
-            </div>
-            {renderOpenings(item)}
-          </div>
-
-          {/* Venue card — mobile only, at bottom */}
-          <div className="md:hidden">
-            {renderVenueCard(item, index)}
-          </div>
-
-          {showDetails[index] && (
-            <div className="border-t border-dashed border-gray-100 mt-2">
-              <div className="prose">
-                <a
-                  className="underline flex flex-row gap-1 items-center"
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.locationAddress)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="feather feather-map-pin"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                  {item.locationAddress}
-                </a>
-
-                <a className="underline flex flex-row gap-1 items-center"
-                  href={item.locationUrl}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="feather feather-globe"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                  {item.locationUrl}
-                </a>
-              </div>
-            </div>
-          )}
         </li>
         );
       })}
