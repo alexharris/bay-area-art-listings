@@ -1,8 +1,5 @@
-import { unstable_cache } from "next/cache";
 import MainListings from "../components/mainListings";
 import { client } from "@/sanity/lib/client";
-import { urlFor } from "@/sanity/lib/image";
-import { generateSlug, formatDate } from "@/utils/shared";
 import { extractPortableTextContent } from "@/utils/helpers";
 import getListings from "../components/getListings";
 import getLocations from "../components/getLocations";
@@ -16,18 +13,23 @@ function stripInternalFields(listing) {
   return clean;
 }
 
-// Cache the Sanity fetch across requests; new/edited listings appear within a minute
-const getHomepageData = unstable_cache(
-  async () => {
-    const [listings, locations] = await Promise.all([getListings(), getLocations()]);
-    return {
-      listings: listings?.map(stripInternalFields),
-      locations: locations?.map(({ InternalNotes, ...location }) => location),
-    };
-  },
-  ['homepage-data'],
-  { revalidate: 60 }
-);
+// Static page regenerated in the background at most once a minute (ISR), so it's
+// served from Vercel's CDN. Per-show share previews live at /s/[slug] because
+// reading searchParams here would force the page to render on every request.
+export const revalidate = 60;
+
+export const metadata = {
+  alternates: { canonical: '/' },
+};
+
+async function getHomepageData() {
+  // Let errors throw: during regeneration Next keeps serving the last good page
+  const [listings, locations] = await Promise.all([getListings(), getLocations()]);
+  return {
+    listings: listings?.map(stripInternalFields),
+    locations: locations?.map(({ InternalNotes, ...location }) => location),
+  };
+}
 
 // schema.org ExhibitionEvent markup so search engines understand the listings as events
 function buildStructuredData(listings) {
@@ -82,49 +84,10 @@ async function getSettings() {
   }
 }
 
-export async function generateMetadata({ searchParams }) {
-  const { show } = await searchParams;
-  // ?show= share links are duplicates of the homepage; consolidate on "/"
-  const alternates = { canonical: '/' };
-  if (!show) return { alternates };
-
-  const listings = await client.fetch(
-    `*[_type == "listing"]{ Event, StartDate, EndDate, DateOverride, EventImageUpload, EventImageUrl, "locationName": Location->Name }`
-  );
-  const listing = listings.find(item => generateSlug(item.Event) === show);
-  if (!listing) return { alternates };
-
-  const imageUrl = listing.EventImageUpload
-    ? urlFor(listing.EventImageUpload).width(1200).height(630).fit('crop').url()
-    : listing.EventImageUrl || null;
-
-  const dates = listing.DateOverride
-    || [formatDate(listing.StartDate), formatDate(listing.EndDate)].filter(Boolean).join(' – ');
-  const summary = [dates, listing.locationName && `at ${listing.locationName}`].filter(Boolean).join(' ');
-  const description = summary ? summary[0].toUpperCase() + summary.slice(1) : 'Art Board';
-
-  return {
-    alternates,
-    title: listing.Event,
-    description,
-    openGraph: {
-      title: listing.Event,
-      description,
-      ...(imageUrl && { images: [{ url: imageUrl, width: 1200, height: 630 }] }),
-    },
-    twitter: {
-      card: imageUrl ? 'summary_large_image' : 'summary',
-      title: listing.Event,
-      description,
-    },
-  };
-}
-
-export default async function Home({ searchParams }) {
-  const [settings, { show }, homepageData] = await Promise.all([
+export default async function Home() {
+  const [settings, homepageData] = await Promise.all([
     getSettings(),
-    searchParams,
-    getHomepageData().catch(() => ({})),
+    getHomepageData(),
   ]);
   const { listings: initialListings, locations: initialLocations } = homepageData;
 
@@ -141,7 +104,6 @@ export default async function Home({ searchParams }) {
         )}
         <MainListings
           newsletterSettings={settings?.newsletter}
-          sharedSlug={show || null}
           initialListings={initialListings}
           initialLocations={initialLocations}
         />

@@ -27,7 +27,7 @@ export default function Listings({
 
   const handleShare = (item) => {
     const slug = generateSlug(item.Event);
-    const url = `${window.location.origin}?show=${slug}`;
+    const url = `${window.location.origin}/s/${slug}`;
     setCopiedSlug(slug);
     setTimeout(() => setCopiedSlug(null), 1200);
 

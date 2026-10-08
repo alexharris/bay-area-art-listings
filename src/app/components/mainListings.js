@@ -32,7 +32,7 @@ const sortLabels = {
     recentlyAdded: 'Recently Added',
 };
 
-function DisplayListingsInner({ newsletterSettings, sharedSlug, initialListings, initialLocations }) {
+function DisplayListingsInner({ newsletterSettings, initialListings, initialLocations }) {
     // Get today's date in US West Coast (Pacific Time) - memoized to prevent recreation
     const today = useMemo(() => {
         return new Date(
@@ -62,6 +62,12 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug, initialListings,
     const { listings, isLoading: listingsLoading } = useListings(initialListings);
     const { locations, isLoading: locationsLoading } = useLocations(initialLocations);
     const loading = listingsLoading || locationsLoading;
+
+    // ?show=slug from a share link. Read on the client so the homepage can stay static.
+    const [sharedSlug, setSharedSlug] = useState(null);
+    useEffect(() => {
+        setSharedSlug(new URLSearchParams(window.location.search).get('show'));
+    }, []);
 
     const [sharedSlugNotFound, setSharedSlugNotFound] = useState(false);
     const [favoritesNoteDismissed, setFavoritesNoteDismissed] = useState(false);
@@ -689,12 +695,11 @@ function DisplayListingsInner({ newsletterSettings, sharedSlug, initialListings,
 
 }
 
-export default function DisplayListings({ newsletterSettings, sharedSlug, initialListings, initialLocations }) {
+export default function DisplayListings({ newsletterSettings, initialListings, initialLocations }) {
     return (
         <FavoritesProvider>
             <DisplayListingsInner
                 newsletterSettings={newsletterSettings}
-                sharedSlug={sharedSlug}
                 initialListings={initialListings}
                 initialLocations={initialLocations}
             />

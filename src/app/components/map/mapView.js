@@ -96,7 +96,7 @@ function ShowCard({ item, formatDate }) {
 
     const handleShare = () => {
         const slug = generateSlug(item.Event);
-        const url = `${window.location.origin}?show=${slug}`;
+        const url = `${window.location.origin}/s/${slug}`;
         setCopied(true);
         setTimeout(() => setCopied(false), 1200);
 
