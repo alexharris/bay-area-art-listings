@@ -32,7 +32,7 @@ const sortLabels = {
     recentlyAdded: 'Recently Added',
 };
 
-function DisplayListingsInner({ newsletterSettings, initialListings, initialLocations }) {
+function DisplayListingsInner({ newsletterSettings, initialListings }) {
     // Get today's date in US West Coast (Pacific Time) - memoized to prevent recreation
     const today = useMemo(() => {
         return new Date(
@@ -60,8 +60,6 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialLoca
 
     // Fetch data with SWR caching (instant on repeat visits)
     const { listings, isLoading: listingsLoading } = useListings(initialListings);
-    const { locations, isLoading: locationsLoading } = useLocations(initialLocations);
-    const loading = listingsLoading || locationsLoading;
 
     // ?show=slug from a share link. Read on the client so the homepage can stay static.
     const [sharedSlug, setSharedSlug] = useState(null);
@@ -148,6 +146,11 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialLoca
     const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('anytime');
     const [activeView, setActiveView] = useState('exhibitions');
     const isMapView = activeView === 'map';
+    // Locations only feed the map, so fetch them the first time it's opened
+    const [mapOpened, setMapOpened] = useState(false);
+    useEffect(() => { if (isMapView) setMapOpened(true); }, [isMapView]);
+    const { locations, isLoading: locationsLoading } = useLocations(mapOpened || isMapView);
+    const loading = listingsLoading || (isMapView && locationsLoading);
     const setIsMapView = (val) => setActiveView(val ? 'map' : 'exhibitions');
     const [showMenu, setShowMenu] = useState(false);
 
@@ -696,13 +699,12 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialLoca
 
 }
 
-export default function DisplayListings({ newsletterSettings, initialListings, initialLocations }) {
+export default function DisplayListings({ newsletterSettings, initialListings }) {
     return (
         <FavoritesProvider>
             <DisplayListingsInner
                 newsletterSettings={newsletterSettings}
                 initialListings={initialListings}
-                initialLocations={initialLocations}
             />
         </FavoritesProvider>
     );

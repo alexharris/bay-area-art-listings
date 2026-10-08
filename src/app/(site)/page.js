@@ -2,14 +2,34 @@ import MainListings from "../components/mainListings";
 import { client } from "@/sanity/lib/client";
 import { extractPortableTextContent } from "@/utils/helpers";
 import getListings from "../components/getListings";
-import getLocations from "../components/getLocations";
 
-// Editorial/import fields the frontend never reads — keep them out of the HTML payload
-const INTERNAL_FIELDS = ['InternalNotes', 'importNotes', 'importWarnings', 'importLinks', 'emailMessageId', 'candidateImageUrls', 'instagramImage'];
+// Only the fields the client reads. An allowlist keeps the embedded page data small and keeps
+// editorial/import fields (InternalNotes, importNotes, …) out of the HTML.
+const CLIENT_LISTING_FIELDS = [
+  '_id', '_createdAt', 'Event', 'EventUrl', 'StartDate', 'EndDate', 'DateOverride', 'Highlight', 'sfawUrl',
+  'Notes', 'openings', 'eventImageUrl', 'eventImageCaption', 'isOnViewToday',
+  'locationName', 'locationAddress', 'locationCity', 'locationCounty', 'locationUrl',
+  'locationGeolocation', 'locationHours', 'locationInstagram',
+];
 
-function stripInternalFields(listing) {
-  const clean = { ...listing };
-  for (const field of INTERNAL_FIELDS) delete clean[field];
+// Portable text → plain string, matching how NotesRenderer flattens it (blocks joined by newlines)
+function notesToString(notes) {
+  if (!Array.isArray(notes)) return notes;
+  return notes
+    .filter(block => block._type === 'block')
+    .map(block => (block.children ? block.children.map(child => child.text).join('') : ''))
+    .join('\n');
+}
+
+function toClientListing(listing) {
+  const clean = {};
+  for (const field of CLIENT_LISTING_FIELDS) {
+    if (listing[field] !== undefined && listing[field] !== null) clean[field] = listing[field];
+  }
+  if (clean.Notes) clean.Notes = notesToString(clean.Notes);
+  if (clean.openings) {
+    clean.openings = clean.openings.map(({ _key, title, date, time, note }) => ({ _key, title, date, time, note }));
+  }
   return clean;
 }
 
@@ -24,11 +44,9 @@ export const metadata = {
 
 async function getHomepageData() {
   // Let errors throw: during regeneration Next keeps serving the last good page
-  const [listings, locations] = await Promise.all([getListings(), getLocations()]);
-  return {
-    listings: listings?.map(stripInternalFields),
-    locations: locations?.map(({ InternalNotes, ...location }) => location),
-  };
+  // Locations are only needed by the map view, which fetches them on demand
+  const listings = await getListings();
+  return { listings: listings?.map(toClientListing) };
 }
 
 // schema.org ExhibitionEvent markup so search engines understand the listings as events
@@ -89,7 +107,7 @@ export default async function Home() {
     getSettings(),
     getHomepageData(),
   ]);
-  const { listings: initialListings, locations: initialLocations } = homepageData;
+  const { listings: initialListings } = homepageData;
 
   return (
     <div className="flex flex-col items-start justify-between min-h-screen gap-8 font-[family-name:var(--font-geist-sans)]">
@@ -105,7 +123,6 @@ export default async function Home() {
         <MainListings
           newsletterSettings={settings?.newsletter}
           initialListings={initialListings}
-          initialLocations={initialLocations}
         />
       </main>
     </div>

@@ -15,6 +15,7 @@ export function useListings(fallbackData) {
         getListings,
         {
             fallbackData,                  // Server-rendered data, so first paint (and crawlers) get listings
+            revalidateOnMount: !fallbackData, // Server data is at most a minute old (ISR) — don't refetch during page load
             revalidateOnFocus: false,      // Don't refetch when tab regains focus
             revalidateOnReconnect: true,   // Refetch when network reconnects
             dedupingInterval: 60000,       // Dedupe requests within 1 minute
@@ -37,12 +38,11 @@ export function useListings(fallbackData) {
 /**
  * Custom hook for fetching locations with SWR caching
  */
-export function useLocations(fallbackData) {
+export function useLocations(enabled = true) {
     const { data, error, isLoading, mutate } = useSWR(
-        'locations',
+        enabled ? 'locations' : null,   // Only fetched when needed (map view)
         getLocations,
         {
-            fallbackData,
             revalidateOnFocus: false,
             revalidateOnReconnect: true,
             dedupingInterval: 60000,
