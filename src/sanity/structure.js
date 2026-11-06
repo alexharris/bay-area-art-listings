@@ -132,9 +132,13 @@ export const structure = async (S) => {
         .schemaType('listing')
         .child(S.documentTypeList('listing').title('Listings')),
       S.listItem()
+        .title('Events')
+        .schemaType('event')
+        .child(S.documentTypeList('event').title('Events')),
+      S.listItem()
         .title('Pages')
         .schemaType('page')
         .child(S.documentTypeList('page').title('Pages')),
-      ...S.documentTypeListItems().filter(item => !['settings', 'location', 'listing', 'page'].includes(item.getId())),
+      ...S.documentTypeListItems().filter(item => !['settings', 'location', 'listing', 'event', 'page'].includes(item.getId())),
     ]);
 };

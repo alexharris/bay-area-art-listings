@@ -2,7 +2,6 @@
 
 import { haversineDistance } from '../../../utils/distance';
 import { generateSlug, cityFromAddress } from '../../../utils/shared';
-import { extractPortableTextContent } from '../../../utils/helpers';
 import { linkifyText } from '../../../utils/linkifyText';
 
 function toDateStr(date) {
@@ -18,7 +17,7 @@ function formatDayHeader(dateStr) {
     return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
-export default function EventsView({ listings, calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius = 10, openingsOnly = false, searchTerm = '', onShowSelect }) {
+export default function EventsView({ events: allEvents = [], calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius = 10, openingsOnly = false, searchTerm = '', onShowSelect }) {
     const today = new Date(
         new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })
     );
@@ -26,44 +25,25 @@ export default function EventsView({ listings, calendarDateRangeFilter, selected
 
     const fromStr = calendarDateRangeFilter?.from ? toDateStr(calendarDateRangeFilter.from) : null;
     const toStr = calendarDateRangeFilter?.to ? toDateStr(calendarDateRangeFilter.to) : null;
+    const term = searchTerm.trim().toLowerCase();
 
-    const events = (listings || [])
-        .filter(listing => {
-            if (selectedCounty?.length > 0 && !selectedCounty.includes(listing.locationCounty)) return false;
-            if (userLocation && listing.locationGeolocation) {
+    const events = (allEvents || [])
+        .filter(event => {
+            if (!event.date || event.date < todayStr) return false;
+            if (fromStr && event.date < fromStr) return false;
+            if (toStr && event.date > toStr) return false;
+            if (openingsOnly && !event.title?.toLowerCase().includes('opening')) return false;
+            if (selectedCounty?.length > 0 && !selectedCounty.includes(event.locationCounty)) return false;
+            if (userLocation && event.locationGeolocation) {
                 const dist = haversineDistance(
                     userLocation.lat, userLocation.lng,
-                    listing.locationGeolocation.lat, listing.locationGeolocation.lng
+                    event.locationGeolocation.lat, event.locationGeolocation.lng
                 );
                 if (dist > nearbyRadius) return false;
             }
-            return true;
-        })
-        .flatMap(listing =>
-            (listing.openings || [])
-                .filter(o => {
-                    if (!o.date) return false;
-                    if (o.date < todayStr) return false;
-                    if (fromStr && o.date < fromStr) return false;
-                    if (toStr && o.date > toStr) return false;
-                    if (openingsOnly && !o.title?.toLowerCase().includes('opening')) return false;
-                    return true;
-                })
-                .map(opening => ({ ...opening, listing }))
-        )
-        .filter(event => {
-            const term = searchTerm.trim().toLowerCase();
             if (!term) return true;
-            const listing = event.listing;
-            return (
-                listing.Event.toLowerCase().includes(term) ||
-                listing.locationName.toLowerCase().includes(term) ||
-                (listing.locationAddress ? listing.locationAddress.toLowerCase().includes(term) : false) ||
-                extractPortableTextContent(listing.Notes).toLowerCase().includes(term) ||
-                (listing.locationUrl ? listing.locationUrl.toLowerCase().includes(term) : false) ||
-                (event.title ? event.title.toLowerCase().includes(term) : false) ||
-                (event.note ? event.note.toLowerCase().includes(term) : false)
-            );
+            return [event.title, event.note, event.locationName, event.locationAddress, event.locationUrl, event.relatedShow]
+                .some(v => v && v.toLowerCase().includes(term));
         })
         .sort((a, b) => a.date.localeCompare(b.date));
 
@@ -94,18 +74,24 @@ export default function EventsView({ listings, calendarDateRangeFilter, selected
                         {formatDayHeader(date)}
                     </h2>
                     <div className="divide-y divide-gray-200">
-                        {grouped[date].map((event, i) => (
-                            <div key={i} className="py-3 px-3">
+                        {grouped[date].map(event => (
+                            <div key={event._id} className="py-3 px-3">
                                 {(() => {
-                                    const city = event.listing.locationCity || cityFromAddress(event.listing.locationAddress);
-                                    const label = city ? `${event.listing.locationName} · ${city}` : event.listing.locationName;
-                                    return event.listing.locationUrl
-                                        ? <a href={event.listing.locationUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 truncate block mb-0.5 hover:underline">{label}</a>
+                                    const city = event.locationCity || cityFromAddress(event.locationAddress);
+                                    const label = city ? `${event.locationName} · ${city}` : event.locationName;
+                                    return event.locationUrl
+                                        ? <a href={event.locationUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 truncate block mb-0.5 hover:underline">{label}</a>
                                         : <p className="text-sm text-gray-400 truncate mb-0.5">{label}</p>;
                                 })()}
-                                <p className="text-base text-gray-700 font-medium">{event.title}</p>
+                                <p className="text-base text-gray-700 font-medium">
+                                    {event.url
+                                        ? <a href={event.url} target="_blank" rel="noopener noreferrer" className="hover:underline">{event.title}</a>
+                                        : event.title}
+                                </p>
                                 {event.time && <p className="text-sm text-gray-700">{event.time}</p>}
-                                <button onClick={() => onShowSelect?.(generateSlug(event.listing.Event))} className="text-sm text-gray-700 truncate block hover:underline text-left w-full">Part of: {event.listing.Event}</button>
+                                {event.relatedShow && (
+                                    <button onClick={() => onShowSelect?.(generateSlug(event.relatedShow))} className="text-sm text-gray-700 truncate block hover:underline text-left w-full">Part of: {event.relatedShow}</button>
+                                )}
                                 {event.note && <p className="text-sm text-gray-700">{linkifyText(event.note)}</p>}
                             </div>
                         ))}

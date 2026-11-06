@@ -2,6 +2,7 @@ import MainListings from "../components/mainListings";
 import { client } from "@/sanity/lib/client";
 import { extractPortableTextContent } from "@/utils/helpers";
 import getListings from "../components/getListings";
+import getEvents from "../components/getEvents";
 
 // Only the fields the client reads. An allowlist keeps the embedded page data small and keeps
 // editorial/import fields (InternalNotes, importNotes, …) out of the HTML.
@@ -45,8 +46,8 @@ export const metadata = {
 async function getHomepageData() {
   // Let errors throw: during regeneration Next keeps serving the last good page
   // Locations are only needed by the map view, which fetches them on demand
-  const listings = await getListings();
-  return { listings: listings?.map(toClientListing) };
+  const [listings, events] = await Promise.all([getListings(), getEvents()]);
+  return { listings: listings?.map(toClientListing), events };
 }
 
 // schema.org ExhibitionEvent markup so search engines understand the listings as events
@@ -107,7 +108,7 @@ export default async function Home() {
     getSettings(),
     getHomepageData(),
   ]);
-  const { listings: initialListings } = homepageData;
+  const { listings: initialListings, events: initialEvents } = homepageData;
 
   return (
     <div className="flex flex-col items-start justify-between min-h-screen gap-8 font-[family-name:var(--font-geist-sans)]">
@@ -123,6 +124,7 @@ export default async function Home() {
         <MainListings
           newsletterSettings={settings?.newsletter}
           initialListings={initialListings}
+          initialEvents={initialEvents}
         />
       </main>
     </div>

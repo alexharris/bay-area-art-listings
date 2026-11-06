@@ -52,6 +52,7 @@ export default async function getListings() {
       *[_type == "listing" && EndDate >= $today] {
         ...,
         _createdAt,
+        "openings": *[_type == "event" && listing._ref == ^._id] | order(date asc) { "_key": _id, title, date, time, note },
         "locationName": Location->Name,
         "locationAddress": Location->Address,
         "locationCity": Location->City,
@@ -103,6 +104,7 @@ export async function getListingsByIds(ids) {
       *[_type == "listing" && _id in $ids] {
         ...,
         _createdAt,
+        "openings": *[_type == "event" && listing._ref == ^._id] | order(date asc) { "_key": _id, title, date, time, note },
         "locationName": Location->Name,
         "locationAddress": Location->Address,
         "locationCity": Location->City,

@@ -387,22 +387,30 @@ async function createDraft(data, subject, fromEmail, messageId, candidateImages,
   if (data.startDate) doc.StartDate = data.startDate
   if (data.endDate) doc.EndDate = data.endDate
   if (data.description) doc.Notes = toPortableText(data.description)
-  if (data.openings?.length) {
-    doc.openings = data.openings
-      .filter(o => o.date)
-      .map(o => {
-        const time = o.time || (o.startTime ? `${o.startTime}${o.endTime ? `–${o.endTime}` : ''}` : null)
-        return {
-          _key: makeKey(),
-          title: normalizeOpeningTitle(o.title || o.description || 'Opening Reception'),
-          date: o.date,
-          ...(time && { time }),
-          ...(o.note && { note: o.note }),
-        }
-      })
+  const created = await getSanityClient().create(doc)
+
+  // Openings/events are separate `event` documents linked to the exhibition
+  const events = (data.openings || [])
+    .filter(o => o.date)
+    .map(o => {
+      const time = o.time || (o.startTime ? `${o.startTime}${o.endTime ? `–${o.endTime}` : ''}` : null)
+      return {
+        _type: 'event',
+        title: normalizeOpeningTitle(o.title || o.description || 'Opening Reception'),
+        date: o.date,
+        ...(time && { time }),
+        ...(o.note && { note: o.note }),
+        // The listing is created as a draft (drafts.<id>); reference its published id
+        listing: { _type: 'reference', _ref: created._id.replace(/^drafts\./, ''), _weak: true },
+      }
+    })
+  if (events.length) {
+    const tx = getSanityClient().transaction()
+    events.forEach(e => tx.create(e))
+    await tx.commit()
   }
 
-  return await getSanityClient().create(doc)
+  return created
 }
 
 async function processEmail(parsed, locations) {

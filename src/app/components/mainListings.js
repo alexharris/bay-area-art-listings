@@ -32,7 +32,7 @@ const sortLabels = {
     recentlyAdded: 'Recently Added',
 };
 
-function DisplayListingsInner({ newsletterSettings, initialListings }) {
+function DisplayListingsInner({ newsletterSettings, initialListings, initialEvents }) {
     // Get today's date in US West Coast (Pacific Time) - memoized to prevent recreation
     const today = useMemo(() => {
         return new Date(
@@ -166,33 +166,19 @@ function DisplayListingsInner({ newsletterSettings, initialListings }) {
     // Mobile UI state
     const [mobileSortOpen, setMobileSortOpen] = useState(false);
 
-    // Count future openings per county for the events view where filter
+    // Count upcoming events per county for the events view where filter
     const eventCountsByCounty = useMemo(() => {
-        if (!listings) return {};
         const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
         const term = searchTerm.trim().toLowerCase();
         const counts = {};
-        listings.forEach(listing => {
-            if (!listing.locationCounty) return;
-            const listingMatches = !term || (
-                listing.Event.toLowerCase().includes(term) ||
-                listing.locationName.toLowerCase().includes(term) ||
-                (listing.locationAddress ? listing.locationAddress.toLowerCase().includes(term) : false) ||
-                extractPortableTextContent(listing.Notes).toLowerCase().includes(term) ||
-                (listing.locationUrl ? listing.locationUrl.toLowerCase().includes(term) : false)
-            );
-            const futureOpenings = (listing.openings || []).filter(o => {
-                if (o.date < today) return false;
-                if (listingMatches) return true;
-                return (o.title ? o.title.toLowerCase().includes(term) : false) ||
-                    (o.note ? o.note.toLowerCase().includes(term) : false);
-            });
-            if (futureOpenings.length > 0) {
-                counts[listing.locationCounty] = (counts[listing.locationCounty] || 0) + futureOpenings.length;
-            }
+        (initialEvents || []).forEach(event => {
+            if (!event.locationCounty || event.date < today) return;
+            const matches = !term || [event.title, event.note, event.locationName, event.locationAddress, event.locationUrl, event.relatedShow]
+                .some(v => v && v.toLowerCase().includes(term));
+            if (matches) counts[event.locationCounty] = (counts[event.locationCounty] || 0) + 1;
         });
         return counts;
-    }, [listings, searchTerm]);
+    }, [initialEvents, searchTerm]);
 
     // Measure the mobile fixed header stack so content padding stays in sync
     const mobileHeaderRef = useRef(null);
@@ -645,7 +631,7 @@ function DisplayListingsInner({ newsletterSettings, initialListings }) {
 
                         {activeView === 'events' ? (
                             <EventsView
-                                listings={listings}
+                                events={initialEvents}
                                 calendarDateRangeFilter={calendarDateRangeFilter}
                                 selectedCounty={selectedCounty}
                                 userLocation={userLocation}
@@ -699,12 +685,13 @@ function DisplayListingsInner({ newsletterSettings, initialListings }) {
 
 }
 
-export default function DisplayListings({ newsletterSettings, initialListings }) {
+export default function DisplayListings({ newsletterSettings, initialListings, initialEvents }) {
     return (
         <FavoritesProvider>
             <DisplayListingsInner
                 newsletterSettings={newsletterSettings}
                 initialListings={initialListings}
+                initialEvents={initialEvents}
             />
         </FavoritesProvider>
     );
