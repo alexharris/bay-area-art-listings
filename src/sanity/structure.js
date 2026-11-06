@@ -1,5 +1,6 @@
 import { client as sanityClient } from './lib/client';
 import { LocationExhibitions } from './components/LocationExhibitions';
+import { ListingEvents } from './components/ListingEvents';
 
 const getMonthCounts = async (client, year) => {
   const results = await client.fetch(
@@ -47,6 +48,7 @@ const createMonthListItems = (S, year, counts = {}) => {
             S.document()
               .documentId(documentId)
               .schemaType('listing')
+              .views([S.view.form(), S.view.component(ListingEvents).title('Events')])
           )
       );
   });
