@@ -12,7 +12,7 @@ const client = createClient({
 export default async function getEvents() {
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
     return client.fetch(`
-      *[_type == "event" && date >= $today && defined(coalesce(Location._ref, listing->Location._ref))] | order(date asc) {
+      *[_type == "event" && date >= $today && defined(coalesce(Location._ref, listing->Location._ref)) && Location->hideFromSite != true && listing->Location->hideFromSite != true] | order(date asc) {
         _id, title, date, time, note, url,
         "relatedShow": listing->Event,
         "locationName": coalesce(Location->Name, listing->Location->Name),

@@ -19,6 +19,14 @@ export const locationType = defineType({
   ],
   fields: [
     defineField({
+      name: 'hideFromSite',
+      title: 'Hide from site',
+      type: 'boolean',
+      group: 'info',
+      initialValue: false,
+      description: 'Hides this location, its exhibitions and their events from every public view (list, map, events, locations page, share links, email digest).',
+    }),
+    defineField({
       name: 'Name',
       type: 'string',
       group: 'info',

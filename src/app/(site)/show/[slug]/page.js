@@ -34,7 +34,7 @@ export default function ShowPage() {
       try {
         setLoading(true);
         const data = await client.fetch(`
-          *[_type == "listing"] {
+          *[_type == "listing" && Location->hideFromSite != true] {
             ...,
             _id,
             _createdAt,

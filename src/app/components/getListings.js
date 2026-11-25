@@ -49,7 +49,7 @@ export default async function getListings() {
     let today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
     // get the listings
     let data = await client.fetch(`
-      *[_type == "listing" && EndDate >= $today] {
+      *[_type == "listing" && EndDate >= $today && Location->hideFromSite != true] {
         ...,
         _createdAt,
         "openings": *[_type == "event" && listing._ref == ^._id] | order(date asc) { "_key": _id, title, date, time, note },
@@ -101,7 +101,7 @@ export async function getListingsByIds(ids) {
   if (!ids || ids.length === 0) return [];
   try {
     let data = await client.fetch(`
-      *[_type == "listing" && _id in $ids] {
+      *[_type == "listing" && _id in $ids && Location->hideFromSite != true] {
         ...,
         _createdAt,
         "openings": *[_type == "event" && listing._ref == ^._id] | order(date asc) { "_key": _id, title, date, time, note },

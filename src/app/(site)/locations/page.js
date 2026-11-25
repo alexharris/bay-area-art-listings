@@ -12,7 +12,7 @@ export const metadata = {
 async function getLocations() {
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
   return client.fetch(
-    `*[_type == "location" && defined(Name)] | order(Name asc) {
+    `*[_type == "location" && defined(Name) && hideFromSite != true] | order(Name asc) {
       _id, Name, Address, City, county, Url, Instagram, Hours,
       "showCount": count(*[_type == "listing" && Location._ref == ^._id && EndDate >= $today]),
       "totalShowCount": count(*[_type == "listing" && Location._ref == ^._id])

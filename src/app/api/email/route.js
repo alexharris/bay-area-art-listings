@@ -23,7 +23,7 @@ async function getListings(sanity) {
     nextWeek.setDate(nextWeek.getDate() + 7);
     const nextWeekDate = nextWeek.toISOString().split('T')[0];
 
-    let listings = await sanity.fetch(`*[_type == "listing" && StartDate >= "${today}" && StartDate <= "${nextWeekDate}"]`);
+    let listings = await sanity.fetch(`*[_type == "listing" && StartDate >= "${today}" && StartDate <= "${nextWeekDate}" && Location->hideFromSite != true]`);
 
     // get the locations reference by the listing
     const locations = await Promise.all(listings.map(async listing => {

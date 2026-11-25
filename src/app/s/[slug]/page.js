@@ -9,7 +9,7 @@ import ShareRedirect from './ShareRedirect';
 
 const getListingBySlug = cache(async (slug) => {
   const listings = await client.fetch(
-    `*[_type == "listing"]{ Event, StartDate, EndDate, DateOverride, EventImageUpload, EventImageUrl, "locationName": Location->Name }`
+    `*[_type == "listing" && Location->hideFromSite != true]{ Event, StartDate, EndDate, DateOverride, EventImageUpload, EventImageUrl, "locationName": Location->Name }`
   );
   return listings.find(item => generateSlug(item.Event) === slug) || null;
 });

@@ -10,7 +10,7 @@ const client = createClient({
 export default async function getListings() {
   try {
     // get the location
-    let data = await client.fetch('*[_type == "location"]');
+    let data = await client.fetch('*[_type == "location" && hideFromSite != true]');
 
   
 
