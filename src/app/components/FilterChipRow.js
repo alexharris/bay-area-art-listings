@@ -55,6 +55,7 @@ function BadgeChip({ emoji, label, count, active, onToggle, activeClass, inactiv
 
 export default function FilterChipRow({
     activeView = 'exhibitions',
+    isMapView = false,
     hasShowOnly,
     setHasShowOnly,
     calendarTypeFilter,
@@ -101,6 +102,9 @@ export default function FilterChipRow({
     setOpeningTitleOnly,
     openingsOnly,
     setOpeningsOnly,
+    happeningTodayOnly,
+    setHappeningTodayOnly,
+    happeningTodayCount = 0,
     searchTerm,
     setSearchTerm,
     userLocation,
@@ -144,7 +148,6 @@ export default function FilterChipRow({
         : 'Anywhere';
 
     const isEventsView = activeView === 'events';
-    const isMapView = activeView === 'map';
 
     const chips = [
         ...(!isEventsView && !isMapView || whenActive ? [{
@@ -157,10 +160,15 @@ export default function FilterChipRow({
             active: whereActive,
             el: <Chip key="where" emoji="📍" label={whereLabel} active={whereActive} onOpen={() => setWhereOpen(true)} onClear={() => { setSelectedCounty([]); clearUserLocation?.(); }} />,
         },
-        ...(isMapView ? [{
+        ...(isMapView && !isEventsView ? [{
             key: 'hasShowOnly',
             active: hasShowOnly,
             el: <BadgeChip key="hasShowOnly" emoji="🖼️" label="Has Show" active={hasShowOnly} activeClass="bg-yellow-50 border-yellow-200 text-black hover:bg-yellow-100" inactiveClass="bg-white text-gray-600 border-gray-200 hover:border-gray-300" onToggle={() => setHasShowOnly(!hasShowOnly)} />,
+        }] : []),
+        ...(isEventsView ? [{
+            key: 'happeningToday',
+            active: happeningTodayOnly,
+            el: <BadgeChip key="happeningToday" emoji="🟢" label="Happening Today" count={happeningTodayCount} active={happeningTodayOnly} activeClass="bg-yellow-50 border-yellow-200 text-black hover:bg-yellow-100" inactiveClass={!happeningTodayOnly && !happeningTodayCount ? "bg-white text-gray-300 border-gray-100 cursor-not-allowed" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"} onToggle={() => (happeningTodayCount > 0 || happeningTodayOnly) && setHappeningTodayOnly(!happeningTodayOnly)} />,
         }] : []),
         ...(isEventsView ? [{
             key: 'openingsOnly',

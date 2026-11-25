@@ -39,6 +39,9 @@ export default function Sidebar({
     setOpeningTodayOnly,
     openingsOnly,
     setOpeningsOnly,
+    happeningTodayOnly,
+    setHappeningTodayOnly,
+    happeningTodayCount = 0,
     endingSoonOnly,
     setEndingSoonOnly,
     comingUpOnly,
@@ -123,15 +126,9 @@ export default function Sidebar({
                     </button>
                     <button
                         onClick={() => setActiveView('events')}
-                        className={`flex-1 flex items-center justify-center py-2 border-r border-gray-300 transition-colors ${activeView === 'events' ? 'font-medium text-black bg-yellow-50' : 'text-black'}`}
+                        className={`flex-1 flex items-center justify-center py-2 transition-colors ${activeView === 'events' ? 'font-medium text-black bg-yellow-50' : 'text-black'}`}
                     >
                         Events
-                    </button>
-                    <button
-                        onClick={() => setActiveView('map')}
-                        className={`flex-1 flex items-center justify-center py-2 transition-colors ${activeView === 'map' ? 'font-medium text-black bg-yellow-50' : 'text-black'}`}
-                    >
-                        Map
                     </button>
                 </div>
 
@@ -166,6 +163,21 @@ export default function Sidebar({
                         )}
                     </div>
                     )}
+                    {isEventsView && (
+                    <div className="flex items-center gap-1">
+                        <button
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${happeningTodayOnly ? 'bg-yellow-50 border-yellow-200 text-black' : !happeningTodayOnly && happeningTodayCount === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            onClick={() => (happeningTodayCount > 0 || happeningTodayOnly) && setHappeningTodayOnly(!happeningTodayOnly)}
+                            disabled={!happeningTodayOnly && happeningTodayCount === 0}
+                        >
+                            🟢 Happening Today
+                            {!happeningTodayOnly && happeningTodayCount > 0 && <span className="opacity-50">({happeningTodayCount})</span>}
+                        </button>
+                        {happeningTodayOnly && (
+                            <button onClick={() => setHappeningTodayOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear happening today filter">×</button>
+                        )}
+                    </div>
+                    )}
                     {isEventsView ? (
                     <div className="flex items-center gap-1">
                         <button
@@ -178,7 +190,7 @@ export default function Sidebar({
                             <button onClick={() => setOpeningsOnly(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Clear openings filter">×</button>
                         )}
                     </div>
-                    ) : activeView !== 'map' ? (
+                    ) : !isMapView ? (
                     <div className="flex items-center gap-1">
                         <button
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${openingTodayOnly ? 'bg-yellow-50 border-yellow-200 text-black' : !openingTodayOnly && specialFilterCounts.openingTodayOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
@@ -193,7 +205,7 @@ export default function Sidebar({
                         )}
                     </div>
                     ) : null}
-                    {!isEventsView && activeView !== 'map' && (
+                    {!isEventsView && !isMapView && (
                     <div className="flex items-center gap-1">
                         <button
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${endingSoonOnly ? 'bg-yellow-50 border-yellow-200 text-black' : !endingSoonOnly && specialFilterCounts.endingSoonOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
@@ -208,7 +220,7 @@ export default function Sidebar({
                         )}
                     </div>
                     )}
-                    {!isEventsView && activeView !== 'map' && (
+                    {!isEventsView && !isMapView && (
                     <div className="flex items-center gap-1">
                         <button
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${comingUpOnly ? 'bg-yellow-50 border-yellow-200 text-black' : !comingUpOnly && specialFilterCounts.comingUpOnly === 0 ? 'bg-white text-gray-300 border-gray-100 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
@@ -240,7 +252,7 @@ export default function Sidebar({
                     )}
                 </div>
 
-                {activeView === 'map' && (
+                {isMapView && !isEventsView && (
                     <div className="flex items-center gap-1">
                         <button
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${hasShowOnly ? 'bg-yellow-50 border-yellow-200 text-black' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}`}
@@ -253,7 +265,7 @@ export default function Sidebar({
                         )}
                     </div>
                 )}
-                {!isEventsView && activeView !== 'map' && (
+                {!isEventsView && !isMapView && (
                 <div className="flex items-center gap-1">
                     <button
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${whenActive ? 'bg-yellow-50 border-yellow-200 text-black' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}`}

@@ -214,7 +214,23 @@ function ShowCard({ item, formatDate }) {
 }
 
 // Mobile bottom sheet content for a location group
-function LocationSheet({ group, formatDate }) {
+function EventRow({ event }) {
+    const dateLabel = new Date(event.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' });
+    return (
+        <div className="border-b border-dashed border-gray-300 py-3 last:border-0 text-sm">
+            <p className="text-base font-medium text-gray-700">
+                {event.url
+                    ? <a href={event.url} target="_blank" rel="noopener noreferrer" className="hover:underline">{event.title}</a>
+                    : event.title}
+            </p>
+            <p className="text-gray-700">{dateLabel}{event.time ? ` · ${event.time}` : ''}</p>
+            {event.relatedShow && <p className="text-gray-700">Part of: {event.relatedShow}</p>}
+            {event.note && <p className="text-gray-700">{linkifyText(event.note)}</p>}
+        </div>
+    );
+}
+
+function LocationSheet({ group, formatDate, mode }) {
     if (!group) return null;
     const { locationName, locationAddress, locationUrl, locationHours, location, items } = group;
     const city = location?.City || cityFromAddress(locationAddress);
@@ -272,7 +288,9 @@ function LocationSheet({ group, formatDate }) {
             {/* Scrollable show list */}
             <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3 pb-[env(safe-area-inset-bottom)]">
                 {items.length === 0 ? (
-                    <p className="text-sm text-gray-400">No current exhibitions</p>
+                    <p className="text-sm text-gray-400">{mode === 'events' ? 'No upcoming events' : 'No current exhibitions'}</p>
+                ) : mode === 'events' ? (
+                    items.map((item, i) => <EventRow key={item._id || i} event={item} />)
                 ) : (
                     items.map((item, i) => (
                         <ShowCard key={i} item={item} formatDate={formatDate} />
@@ -309,6 +327,8 @@ export default function MapView({
     userLocation,
     hasShowOnly = false,
     hasActiveFilters = false,
+    mode = 'exhibitions',
+    events = [],
 }) {
     const [L, setL] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
@@ -354,7 +374,26 @@ export default function MapView({
     // Group listings by location coordinates
     const locationGroups = {};
 
-    filteredItems.forEach(item => {
+    if (mode === 'events') {
+        events.forEach(event => {
+            const geo = event.locationGeolocation;
+            if (!geo || event.locationName?.toLowerCase() === 'various') return;
+            const key = `${geo.lat},${geo.lng}`;
+            if (!locationGroups[key]) {
+                locationGroups[key] = {
+                    position: [geo.lat, geo.lng],
+                    location: { City: event.locationCity },
+                    locationName: event.locationName,
+                    locationAddress: event.locationAddress,
+                    locationUrl: event.locationUrl,
+                    items: [],
+                };
+            }
+            locationGroups[key].items.push(event);
+        });
+    }
+
+    (mode === 'events' ? [] : filteredItems).forEach(item => {
         const location = locations.find(loc => loc.Name === item.locationName);
         if (location && location.Geolocation) {
             const key = `${location.Geolocation.lat},${location.Geolocation.lng}`;
@@ -375,7 +414,7 @@ export default function MapView({
 
     // Only show grey markers when no filters are active — any filter that reduces
     // the listing set would make grey markers misleading noise
-    if (!hasActiveFilters) {
+    if (!hasActiveFilters && mode !== 'events') {
         locations.forEach(loc => {
             if (!loc.Geolocation || loc.Name?.toLowerCase() === 'various') return;
             const key = `${loc.Geolocation.lat},${loc.Geolocation.lng}`;
@@ -422,7 +461,10 @@ export default function MapView({
 
         // Check if any item in the group is "on view today" using the pre-computed flag
         // (accounts for both show dates AND venue hours)
-        const hasOnViewToday = group.items.some(item => item.isOnViewToday === true);
+        const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+        const hasOnViewToday = mode === 'events'
+            ? group.items.some(item => item.date === todayStr)
+            : group.items.some(item => item.isOnViewToday === true);
 
 
         const singlePinOpenIcon = `data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z' fill='%23F5E8A0' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z' fill='%2393D884' stroke='black' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E`;
@@ -480,7 +522,7 @@ export default function MapView({
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         </button>
-                        <LocationSheet group={selectedGroup} formatDate={formatDate} />
+                        <LocationSheet group={selectedGroup} formatDate={formatDate} mode={mode} />
                     </>
                 )}
             </div>
@@ -488,7 +530,7 @@ export default function MapView({
             {/* Mobile bottom sheet */}
             <Drawer open={isMobile && !!selectedGroup} onOpenChange={(open) => { if (!open) setSelectedGroup(null); }}>
                 <DrawerContent className="flex flex-col max-h-[70vh]">
-                    <LocationSheet group={selectedGroup} formatDate={formatDate} />
+                    <LocationSheet group={selectedGroup} formatDate={formatDate} mode={mode} />
                 </DrawerContent>
             </Drawer>
         </div>

@@ -1,6 +1,6 @@
 'use client'
 
-export default function MobileViewToggleBar({ activeView, setActiveView }) {
+export default function MobileViewToggleBar({ activeView, setActiveView, isMapView, setIsMapView }) {
     const activeClass = 'text-black font-medium bg-yellow-50';
     const inactiveClass = 'text-black';
 
@@ -19,12 +19,22 @@ export default function MobileViewToggleBar({ activeView, setActiveView }) {
                 >
                     Events
                 </button>
-                <button
-                    onClick={() => setActiveView('map')}
-                    className={`flex-1 flex items-center justify-center text-sm transition-colors border-b border-gray-300 ${activeView === 'map' ? activeClass : inactiveClass}`}
-                >
-                    Map
-                </button>
+                <div className="flex items-stretch border-b border-gray-300">
+                    <button
+                        onClick={() => setIsMapView(false)}
+                        aria-pressed={!isMapView}
+                        className={`px-4 flex items-center justify-center text-sm transition-colors ${!isMapView ? activeClass : inactiveClass}`}
+                    >
+                        List
+                    </button>
+                    <button
+                        onClick={() => setIsMapView(true)}
+                        aria-pressed={isMapView}
+                        className={`px-4 flex items-center justify-center text-sm transition-colors border-l border-gray-300 ${isMapView ? activeClass : inactiveClass}`}
+                    >
+                        Map
+                    </button>
+                </div>
             </div>
         </div>
     );
