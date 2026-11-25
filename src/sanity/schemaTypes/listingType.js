@@ -8,6 +8,7 @@ import {CandidateImagesInput} from '../components/CandidateImagesInput'
 import {ImportLinksInput} from '../components/ImportLinksInput'
 import {ImportNotesInput} from '../components/ImportNotesInput'
 import {ImportWarningsInput} from '../components/ImportWarningsInput'
+import {TagsInput} from '../components/TagsInput'
 
 export const listingType = defineType({
   name: 'listing',
@@ -33,13 +34,19 @@ export const listingType = defineType({
   preview: {
     select: { title: 'Event', media: 'EventImageUpload' },
   },
+  groups: [
+    { name: 'details', title: 'Details', default: true },
+    { name: 'import', title: 'Import' },
+  ],
   fields: [
     defineField({
       name: 'Event',
+      group: 'details',
       type: 'string',
     }),
     defineField({
       name: 'importWarnings',
+      group: 'import',
       title: 'Import Warnings',
       type: 'string',
       components: { input: ImportWarningsInput },
@@ -47,11 +54,13 @@ export const listingType = defineType({
     }),
     defineField({
       name: 'EventUrl',
+      group: 'details',
       type: 'url',
       components: { input: EventUrlInput },
     }),
     defineField({
       name: 'importLinks',
+      group: 'import',
       title: 'Candidate Links',
       type: 'array',
       of: [{ type: 'object', fields: [
@@ -64,6 +73,7 @@ export const listingType = defineType({
     }),
     defineField({
       name: 'EventImageUpload',
+      group: 'details',
       type: 'image',
       title: 'Event Image',
       description: 'Upload an image directly to Sanity (enables cropping, CDN serving). Takes priority over Event Image URL.',
@@ -73,6 +83,7 @@ export const listingType = defineType({
     }),
     defineField({
       name: 'EventImageUrl',
+      group: 'details',
       type: 'url',
       title: 'Event Image URL (external)',
       description: 'Paste an external URL, then click "Import to Sanity" to ingest it as a managed asset.',
@@ -82,6 +93,7 @@ export const listingType = defineType({
     }),
     defineField({
       name: 'candidateImageUrls',
+      group: 'import',
       title: 'Candidate Images',
       type: 'array',
       of: [{ type: 'string' }],
@@ -90,6 +102,7 @@ export const listingType = defineType({
     }),
     defineField({
       name: 'StartDate',
+      group: 'details',
       type: 'date',
       options: {
         dateFormat: 'MMMM D, YYYY'
@@ -100,6 +113,7 @@ export const listingType = defineType({
     }),
     defineField({
       name: 'EndDate',
+      group: 'details',
       type: 'date',
       options: {
         dateFormat: 'MMMM D, YYYY'
@@ -110,11 +124,13 @@ export const listingType = defineType({
     }),
     defineField({
       name: 'DateOverride',
+      group: 'details',
       type: 'string',
       description: 'If filled, this will display instead of the date fields'
     }),
     defineField({
       name: 'Location',
+      group: 'details',
       type: 'reference',
       to: [{type: 'location'}],
       weak: true,
@@ -122,6 +138,7 @@ export const listingType = defineType({
     }),
     defineField({
       name: 'Notes',
+      group: 'details',
       type: 'array',
       description: 'Notes about the listing. Use +++ to separate preview and expanded text.',
       of: [
@@ -130,12 +147,23 @@ export const listingType = defineType({
       ]
     }),
     defineField({
+      name: 'tags',
+      group: 'details',
+      title: 'Tags',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'Pick an existing tag or type a new one and press Enter.',
+      components: { input: TagsInput },
+    }),
+    defineField({
       name: 'InternalNotes',
+      group: 'details',
       type: 'string',
       description: 'Notes just for internal use, not displayed on the site.',
     }),
     defineField({
       name: 'includeInDigest',
+      group: 'details',
       title: 'Include in Digest',
       type: 'boolean',
       description: 'Flag this show to appear in the next email digest.',
@@ -143,6 +171,7 @@ export const listingType = defineType({
     }),
     defineField({
       name: 'importNotes',
+      group: 'import',
       title: 'Import Notes',
       type: 'text',
       rows: 8,
@@ -158,6 +187,7 @@ export const listingType = defineType({
     }),
     defineField({
       name: 'instagramImage',
+      group: 'details',
       type: 'image',
       title: 'Instagram Image',
       description: 'Auto-generated 4:5 portrait image for Instagram. Requires an Event Image to be set.',
