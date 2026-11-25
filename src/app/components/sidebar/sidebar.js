@@ -22,6 +22,8 @@ export default function Sidebar({
     setShowMenu,
     displayedResults,
     listings,
+    displayedEventsCount = 0,
+    totalEventsCount = 0,
     showCustomCalendar,
     setShowCustomCalendar,
     newsletterSettings,
@@ -296,10 +298,12 @@ export default function Sidebar({
                     eventCountsByCounty={eventCountsByCounty}
                     chipStyle
                 />
-                {/* Stats indicator showing total vs. filtered listings */}
+                {/* Stats indicator showing total vs. filtered items for the active tab */}
                 <div className="border-t border-gray-100 pt-3 flex flex-row items-center justify-between">
                     <span className="text-sm text-gray-500">
-                        {displayedResults} of {listings.length} listings
+                        {isEventsView
+                            ? `${displayedEventsCount} of ${totalEventsCount} event${totalEventsCount !== 1 ? 's' : ''}`
+                            : `${displayedResults} of ${listings.length} exhibition${listings.length !== 1 ? 's' : ''}`}
                     </span>
                     <button
                         onClick={clearAllFilters}

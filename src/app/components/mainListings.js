@@ -313,12 +313,14 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
         }
     }, [isMapView]);
 
-    const mapEvents = useMemo(
-        () => isMapView && activeView === 'events'
-            ? filterEvents(initialEvents, { calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius, openingsOnly, happeningTodayOnly, searchTerm })
-            : [],
-        [isMapView, activeView, initialEvents, calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius, openingsOnly, happeningTodayOnly, searchTerm]
+    const filteredEvents = useMemo(
+        () => filterEvents(initialEvents, { calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius, openingsOnly, happeningTodayOnly, searchTerm }),
+        [initialEvents, calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius, openingsOnly, happeningTodayOnly, searchTerm]
     );
+    const mapEvents = isMapView && activeView === 'events' ? filteredEvents : [];
+
+    // Total upcoming events (no filters applied) for the sidebar "X of Y" count
+    const totalEventsCount = useMemo(() => filterEvents(initialEvents).length, [initialEvents]);
 
     const happeningTodayCount = useMemo(
         () => filterEvents(initialEvents, { calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius, openingsOnly, happeningTodayOnly: true, searchTerm }).length,
@@ -558,6 +560,8 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
                         setShowMenu={setShowMenu}
                         displayedResults={displayedResults}
                         listings={listings}
+                        displayedEventsCount={filteredEvents.length}
+                        totalEventsCount={totalEventsCount}
                         showCustomCalendar={showCustomCalendar}
                         setShowCustomCalendar={setShowCustomCalendar}
                         newsletterSettings={newsletterSettings}
