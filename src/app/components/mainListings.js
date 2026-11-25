@@ -280,11 +280,16 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
     // Scroll to a listing after switching to exhibitions view
     useEffect(() => {
         if (activeView === 'exhibitions' && pendingScrollSlug) {
-            const t = setTimeout(() => {
-                document.getElementById(pendingScrollSlug)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Jump (not smooth-scroll) so images loading above the target can't shift it mid-animation,
+            // then re-center once those images have had a moment to settle.
+            const scrollToTarget = () =>
+                document.getElementById(pendingScrollSlug)?.scrollIntoView({ behavior: 'auto', block: 'center' });
+            const t = setTimeout(scrollToTarget, 150);
+            const settle = setTimeout(() => {
+                scrollToTarget();
                 setPendingScrollSlug(null);
-            }, 150);
-            return () => clearTimeout(t);
+            }, 700);
+            return () => { clearTimeout(t); clearTimeout(settle); };
         }
     }, [activeView, pendingScrollSlug]);
 

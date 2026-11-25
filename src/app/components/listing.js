@@ -13,6 +13,7 @@ import { linkifyText } from '../../utils/linkifyText';
 // user scrolls near the bottom — keeps the initial HTML, DOM and hydration work small.
 const INITIAL_RENDER_COUNT = 30;
 const RENDER_BATCH_SIZE = 30;
+const TARGET_TRAILING_COUNT = 5;
 
 export default function Listings({
   listings,
@@ -32,8 +33,16 @@ export default function Listings({
   // Always render far enough to include a listing we're about to scroll to (share link / events view)
   const targetSlug = scrollTargetSlug || highlightSlug;
   const targetIndex = targetSlug ? listings.findIndex(item => generateSlug(item.Event) === targetSlug) : -1;
-  const renderCount = Math.max(renderLimit, targetIndex + 1);
+  // Render a few past the target so there's content below it and it can scroll to center.
+  const targetRenderCount = targetIndex >= 0 ? targetIndex + 1 + TARGET_TRAILING_COUNT : 0;
+  const renderCount = Math.max(renderLimit, targetRenderCount);
   const hasMore = renderCount < listings.length;
+
+  // Lock in the extended render range: the scroll target is cleared after the scroll, and
+  // dropping back to renderLimit would unmount the listing out from under the viewport.
+  useEffect(() => {
+    if (targetRenderCount) setRenderLimit(limit => Math.max(limit, targetRenderCount));
+  }, [targetRenderCount]);
 
   useEffect(() => {
     const el = sentinelRef.current;
