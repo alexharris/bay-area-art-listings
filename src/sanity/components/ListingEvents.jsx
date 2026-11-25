@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react'
 import { useClient } from 'sanity'
-import { IntentLink } from 'sanity/router'
+import { usePaneRouter } from 'sanity/structure'
 
 const fmt = (d) =>
   d ? new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : ''
 
 // "Events" tab on an exhibition: lists the event documents linked to it, plus a button
-// to create a new one with this exhibition pre-filled.
+// to create a new one with this exhibition pre-filled. Events open in a pane to the right
+// (like a reference field) so the exhibition stays open alongside.
 export function ListingEvents({ document }) {
   const client = useClient({ apiVersion: '2024-12-26' })
+  const { ChildLink } = usePaneRouter()
   const [events, setEvents] = useState(null)
+  // ID for the next new event; regenerated after each click so every click makes a fresh doc
+  const [newEventId, setNewEventId] = useState(() => crypto.randomUUID())
   const id = document.displayed?._id?.replace('drafts.', '')
 
   useEffect(() => {
@@ -38,13 +42,15 @@ export function ListingEvents({ document }) {
         <h2 style={{ fontSize: '1rem', fontWeight: 600, margin: 0 }}>
           {events === null ? 'Events' : `${events.length} Event${events.length !== 1 ? 's' : ''}`}
         </h2>
-        <IntentLink
-          intent="create"
-          params={[{ type: 'event', template: 'event-for-listing' }, { listingId: id }]}
+        <ChildLink
+          childId={newEventId}
+          childParameters={{ type: 'event', template: 'event-for-listing' }}
+          childPayload={{ listingId: id }}
+          onClick={() => setTimeout(() => setNewEventId(crypto.randomUUID()), 0)}
           style={{ fontSize: '0.85rem', fontWeight: 500, color: 'inherit' }}
         >
           + New event
-        </IntentLink>
+        </ChildLink>
       </div>
       {events === null ? (
         <div style={{ color: '#888' }}>Loading…</div>
@@ -54,13 +60,13 @@ export function ListingEvents({ document }) {
         <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {events.map((ev) => (
             <li key={ev._id} style={{ borderBottom: '1px solid #e5e5e5', paddingBottom: '0.5rem', opacity: ev.date < today ? 0.55 : 1 }}>
-              <IntentLink intent="edit" params={{ id: ev._id, type: 'event' }} style={{ color: 'inherit', textDecoration: 'none', display: 'block' }}>
+              <ChildLink childId={ev._id.replace('drafts.', '')} childParameters={{ type: 'event' }} style={{ color: 'inherit', textDecoration: 'none', display: 'block' }}>
                 <div style={{ fontWeight: 500 }}>{ev.title || 'Untitled'}</div>
                 <div style={{ fontSize: '0.8rem', color: '#888', marginTop: '0.15rem' }}>
                   {[fmt(ev.date), ev.time].filter(Boolean).join(' • ')}
                 </div>
                 {ev.note && <div style={{ fontSize: '0.8rem', color: '#888' }}>{ev.note}</div>}
-              </IntentLink>
+              </ChildLink>
             </li>
           ))}
         </ul>
