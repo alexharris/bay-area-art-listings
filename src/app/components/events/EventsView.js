@@ -17,7 +17,7 @@ function formatDayHeader(dateStr) {
     return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
-export default function EventsView({ events: allEvents = [], calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius = 10, openingsOnly = false, searchTerm = '', onShowSelect }) {
+export function filterEvents(allEvents = [], { calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius = 10, openingsOnly = false, happeningTodayOnly = false, searchTerm = '' } = {}) {
     const today = new Date(
         new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })
     );
@@ -27,9 +27,10 @@ export default function EventsView({ events: allEvents = [], calendarDateRangeFi
     const toStr = calendarDateRangeFilter?.to ? toDateStr(calendarDateRangeFilter.to) : null;
     const term = searchTerm.trim().toLowerCase();
 
-    const events = (allEvents || [])
+    return (allEvents || [])
         .filter(event => {
             if (!event.date || event.date < todayStr) return false;
+            if (happeningTodayOnly && event.date !== todayStr) return false;
             if (fromStr && event.date < fromStr) return false;
             if (toStr && event.date > toStr) return false;
             if (openingsOnly && !event.title?.toLowerCase().includes('opening')) return false;
@@ -46,6 +47,10 @@ export default function EventsView({ events: allEvents = [], calendarDateRangeFi
                 .some(v => v && v.toLowerCase().includes(term));
         })
         .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+export default function EventsView({ events: allEvents = [], calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius = 10, openingsOnly = false, happeningTodayOnly = false, searchTerm = '', onShowSelect }) {
+    const events = filterEvents(allEvents, { calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius, openingsOnly, happeningTodayOnly, searchTerm });
 
     // Group by date
     const grouped = events.reduce((acc, event) => {

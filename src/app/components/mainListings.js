@@ -19,7 +19,7 @@ import MobileViewToggleBar from './MobileViewToggleBar';
 import FilterChipRow from './FilterChipRow';
 import Listing from './listing';
 import MapView from './map/mapView';
-import EventsView from './events/EventsView';
+import EventsView, { filterEvents } from './events/EventsView';
 import Sidebar from './sidebar/sidebar';
 import LoadingSkeleton from './LoadingSkeleton';
 import ContentToolbar from './ContentToolbar';
@@ -122,6 +122,7 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
     const [openingTodayOnly, setOpeningTodayOnly] = useState(false);
     const [openingTitleOnly, setOpeningTitleOnly] = useState(false);
     const [openingsOnly, setOpeningsOnly] = useState(false);
+    const [happeningTodayOnly, setHappeningTodayOnly] = useState(false);
     const [hasShowOnly, setHasShowOnly] = useState(false);
     const [pendingScrollSlug, setPendingScrollSlug] = useState(null);
 
@@ -145,13 +146,14 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
     // Display
     const [calendarDateRangePreset, setCalendarDateRangePreset] = useState('anytime');
     const [activeView, setActiveView] = useState('exhibitions');
-    const isMapView = activeView === 'map';
-    // Locations only feed the map, so fetch them the first time it's opened
+    // Map is a display mode inside both Exhibitions and Events
+    const [isMapView, setIsMapView] = useState(false);
+    // Locations only feed the exhibitions map, so fetch them the first time it's opened
     const [mapOpened, setMapOpened] = useState(false);
     useEffect(() => { if (isMapView) setMapOpened(true); }, [isMapView]);
-    const { locations, isLoading: locationsLoading } = useLocations(mapOpened || isMapView);
-    const loading = listingsLoading || (isMapView && locationsLoading);
-    const setIsMapView = (val) => setActiveView(val ? 'map' : 'exhibitions');
+    const needsLocations = isMapView && activeView === 'exhibitions';
+    const { locations, isLoading: locationsLoading } = useLocations(mapOpened && activeView === 'exhibitions' || needsLocations);
+    const loading = listingsLoading || (needsLocations && locationsLoading);
     const [showMenu, setShowMenu] = useState(false);
 
     const [showCustomCalendar, setShowCustomCalendar] = useState(false);
@@ -279,7 +281,7 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
 
     // Scroll to a listing after switching to exhibitions view
     useEffect(() => {
-        if (activeView === 'exhibitions' && pendingScrollSlug) {
+        if (activeView === 'exhibitions' && !isMapView && pendingScrollSlug) {
             // Jump (not smooth-scroll) so images loading above the target can't shift it mid-animation,
             // then re-center once those images have had a moment to settle.
             const scrollToTarget = () =>
@@ -291,10 +293,11 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
             }, 700);
             return () => { clearTimeout(t); clearTimeout(settle); };
         }
-    }, [activeView, pendingScrollSlug]);
+    }, [activeView, isMapView, pendingScrollSlug]);
 
     const handleShowSelect = useCallback((slug) => {
         setActiveView('exhibitions');
+        setIsMapView(false);
         setPendingScrollSlug(slug);
     }, []);
 
@@ -309,6 +312,18 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
             window.scrollTo(0, 0);
         }
     }, [isMapView]);
+
+    const mapEvents = useMemo(
+        () => isMapView && activeView === 'events'
+            ? filterEvents(initialEvents, { calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius, openingsOnly, happeningTodayOnly, searchTerm })
+            : [],
+        [isMapView, activeView, initialEvents, calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius, openingsOnly, happeningTodayOnly, searchTerm]
+    );
+
+    const happeningTodayCount = useMemo(
+        () => filterEvents(initialEvents, { calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius, openingsOnly, happeningTodayOnly: true, searchTerm }).length,
+        [initialEvents, calendarDateRangeFilter, selectedCounty, userLocation, nearbyRadius, openingsOnly, searchTerm]
+    );
 
     const updateCalendarDateRangeFilter = useCallback((dateRange) => {
         // Handle dates properly to avoid timezone issues
@@ -389,6 +404,8 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
         setSearchTerm('');
         setSearchClearKey(k => k + 1);
         setHasShowOnly(false);
+        setOpeningsOnly(false);
+        setHappeningTodayOnly(false);
         setSelectedLocation('');
         setSelectedCounty([]);
         setUserLocation(null);
@@ -436,9 +453,12 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
                 <MobileViewToggleBar
                     activeView={activeView}
                     setActiveView={setActiveView}
+                    isMapView={isMapView}
+                    setIsMapView={setIsMapView}
                 />
                 <FilterChipRow
                     activeView={activeView}
+                    isMapView={isMapView}
                     calendarTypeFilter={calendarTypeFilter}
                     setCalendarTypeFilter={setCalendarTypeFilter}
                     calendarTypeCounts={calendarTypeCounts}
@@ -472,6 +492,9 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
                     setOpeningTitleOnly={setOpeningTitleOnly}
                     openingsOnly={openingsOnly}
                     setOpeningsOnly={setOpeningsOnly}
+                    happeningTodayOnly={happeningTodayOnly}
+                    setHappeningTodayOnly={setHappeningTodayOnly}
+                    happeningTodayCount={happeningTodayCount}
                     hasShowOnly={hasShowOnly}
                     setHasShowOnly={setHasShowOnly}
                     favoritesOnly={favoritesOnly}
@@ -552,6 +575,9 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
                         setOpeningTodayOnly={setOpeningTodayOnly}
                         openingsOnly={openingsOnly}
                         setOpeningsOnly={setOpeningsOnly}
+                        happeningTodayOnly={happeningTodayOnly}
+                        setHappeningTodayOnly={setHappeningTodayOnly}
+                        happeningTodayCount={happeningTodayCount}
                         endingSoonOnly={endingSoonOnly}
                         setEndingSoonOnly={setEndingSoonOnly}
                         comingUpOnly={comingUpOnly}
@@ -591,12 +617,14 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
                 </div>
 
             {/* Main Col */}
-            <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink lg:pb-0 ${activeView === 'map' ? 'h-screen' : 'min-h-screen'}`}>
+            <div id="main-col" className={`flex flex-col justify-start w-full flex-shrink lg:pb-0 ${isMapView ? 'h-screen' : 'min-h-screen'}`}>
                 <ContentToolbar
                     sortMethod={sortMethod}
                     setSortMethod={setSortMethod}
                     activeView={activeView}
                     setActiveView={setActiveView}
+                    isMapView={isMapView}
+                    setIsMapView={setIsMapView}
                     searchClearKey={searchClearKey}
                     onSearch={onSearch}
                     onClear={onClear}
@@ -626,7 +654,7 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
                             </div>
                         )}
 
-                        {displayedResults === 0 && activeView !== 'events' &&
+                        {displayedResults === 0 && activeView !== 'events' && !isMapView &&
                             <div className="text-center flex-grow flex flex-col justify-center text-2xl py-36">
                                 <p className="pb-4">No Results</p>
                                 <p className="pb-4">¯\_(ツ)_/¯</p>
@@ -634,7 +662,19 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
                             </div>
                         }
 
-                        {activeView === 'events' ? (
+                        {activeView === 'events' && isMapView ? (
+                            <div className="h-full flex-1">
+                                <MapView
+                                    mode="events"
+                                    events={mapEvents}
+                                    locations={[]}
+                                    filteredListings={[]}
+                                    selectedCounty={selectedCounty}
+                                    searchTerm={searchTerm}
+                                    userLocation={userLocation}
+                                />
+                            </div>
+                        ) : activeView === 'events' ? (
                             <EventsView
                                 events={initialEvents}
                                 calendarDateRangeFilter={calendarDateRangeFilter}
@@ -642,10 +682,11 @@ function DisplayListingsInner({ newsletterSettings, initialListings, initialEven
                                 userLocation={userLocation}
                                 nearbyRadius={nearbyRadius}
                                 openingsOnly={openingsOnly}
+                                happeningTodayOnly={happeningTodayOnly}
                                 searchTerm={searchTerm}
                                 onShowSelect={handleShowSelect}
                             />
-                        ) : displayedResults > 0 && activeView === 'map' ? (
+                        ) : displayedResults > 0 && isMapView ? (
                             <div className="h-full flex-1">
                                 <MapView
                                     filteredListings={filteredListings}
